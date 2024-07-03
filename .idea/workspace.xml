@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-03">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/ralouphie/getallheaders" />
+      <path value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer" />
+      <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-normalizer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/var-dumper" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-grapheme" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-iconv" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-kernel" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/vendor/laravel/tinker" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-idn" />
+      <path value="$PROJECT_DIR$/vendor/laravel/framework" />
+      <path value="$PROJECT_DIR$/vendor/symfony/deprecation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/string" />
+      <path value="$PROJECT_DIR$/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/vendor/symfony/mime" />
+      <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/css-selector" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/symfony/routing" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/error-handler" />
+      <path value="$PROJECT_DIR$/vendor/psy/psysh" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/promises" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/guzzle" />
+      <path value="$PROJECT_DIR$/vendor/voku/portable-ascii" />
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/opis/closure" />
+      <path value="$PROJECT_DIR$/vendor/league/flysystem" />
+      <path value="$PROJECT_DIR$/vendor/league/commonmark" />
+      <path value="$PROJECT_DIR$/vendor/league/mime-type-detection" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/vendor/brick/math" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/asm89/stack-cors" />
+      <path value="$PROJECT_DIR$/vendor/egulias/email-validator" />
+      <path value="$PROJECT_DIR$/vendor/ramsey/uuid" />
+      <path value="$PROJECT_DIR$/vendor/ramsey/collection" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-client" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-factory" />
+      <path value="$PROJECT_DIR$/vendor/psr/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/tijsverkoyen/css-to-inline-styles" />
+      <path value="$PROJECT_DIR$/vendor/fideloper/proxy" />
+      <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/vendor/fruitcake/laravel-cors" />
+      <path value="$PROJECT_DIR$/vendor/dragonmantank/cron-expression" />
+      <path value="$PROJECT_DIR$/vendor/phpoption/phpoption" />
+      <path value="$PROJECT_DIR$/vendor/orangehill/iseed" />
+      <path value="$PROJECT_DIR$/vendor/laravel/ui" />
+      <path value="$PROJECT_DIR$/vendor/carbonphp/carbon-doctrine-types" />
+      <path value="$PROJECT_DIR$/vendor/psr/clock" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
+    </include_path>
+  </component>
+  <component name="ProjectId" id="23xMsAcUDdMbDwWcQWCIf2xGwVU" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/sys" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\sys" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\rep" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\bsc" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\chartofaccounts" />
+    </key>
+  </component>
+  <component name="RunManager" selected="PHPUnit.phpunit.xml">
+    <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner scope="XML" />
+      <method v="2" />
+    </configuration>
+    <configuration name="install" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="install" />
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="" />
+      <created>1642671491921</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1642671491921</updated>
+      <workItem from="1642671493150" duration="35019000" />
+      <workItem from="1642848682450" duration="1705000" />
+      <workItem from="1642850784524" duration="397000" />
+      <workItem from="1642851209081" duration="1207000" />
+      <workItem from="1642852559168" duration="22000" />
+      <workItem from="1642852821821" duration="720000" />
+      <workItem from="1642855315148" duration="42000" />
+      <workItem from="1642855417326" duration="41237000" />
+      <workItem from="1645027688438" duration="136626000" />
+      <workItem from="1645858643755" duration="6654000" />
+      <workItem from="1645980916619" duration="7506000" />
+      <workItem from="1646289526011" duration="2583000" />
+      <workItem from="1646675510066" duration="9618000" />
+      <workItem from="1648281438411" duration="15570000" />
+      <workItem from="1716754754394" duration="620000" />
+      <workItem from="1716925896265" duration="13650000" />
+      <workItem from="1717046208549" duration="13049000" />
+      <workItem from="1717433602395" duration="22522000" />
+      <workItem from="1717589667531" duration="16592000" />
+      <workItem from="1717740020955" duration="5444000" />
+      <workItem from="1717874899539" duration="8121000" />
+      <workItem from="1717911203839" duration="605000" />
+      <workItem from="1717911839097" duration="73000" />
+      <workItem from="1717911939988" duration="11013000" />
+      <workItem from="1718053098118" duration="44385000" />
+      <workItem from="1718780455007" duration="20053000" />
+      <workItem from="1718888500759" duration="35000" />
+      <workItem from="1718896887646" duration="10759000" />
+      <workItem from="1719053740852" duration="551000" />
+      <workItem from="1719054482248" duration="44584000" />
+      <workItem from="1719342057829" duration="47915000" />
+      <workItem from="1719764189344" duration="10183000" />
+      <workItem from="1719811146084" duration="9946000" />
+      <workItem from="1720024746436" duration="4520000" />
+    </task>
+    <task id="LOCAL-00001" summary="1">
+      <created>1642851441541</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1642851441541</updated>
+    </task>
+    <task id="LOCAL-00002" summary="1">
+      <created>1642851654027</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1642851654027</updated>
+    </task>
+    <task id="LOCAL-00003" summary="1">
+      <created>1645980998886</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1645980998886</updated>
+    </task>
+    <task id="LOCAL-00004" summary="2024-06-22">
+      <created>1719178938385</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1719178938385</updated>
+    </task>
+    <task id="LOCAL-00005" summary="2024-06-22">
+      <created>1719180102476</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1719180102476</updated>
+    </task>
+    <task id="LOCAL-00006" summary="2024-06-22">
+      <created>1719181341167</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1719181341167</updated>
+    </task>
+    <task id="LOCAL-00007" summary="2024-06-22">
+      <created>1719182427013</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1719182427013</updated>
+    </task>
+    <task id="LOCAL-00008" summary="2024-06-27">
+      <created>1719440805745</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1719440805745</updated>
+    </task>
+    <task id="LOCAL-00009" summary="2024-07-03">
+      <created>1720035322527</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1720035322527</updated>
+    </task>
+    <task id="LOCAL-00010" summary="2024-07-03">
+      <created>1720036646038</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1720036646038</updated>
+    </task>
+    <task id="LOCAL-00011" summary="2024-07-03">
+      <created>1720036687859</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1720036687859</updated>
+    </task>
+    <task id="LOCAL-00012" summary="2024-07-03">
+      <created>1720037511560</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1720037511560</updated>
+    </task>
+    <task id="LOCAL-00013" summary="2024-07-03">
+      <created>1720037838410</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1720037838410</updated>
+    </task>
+    <task id="LOCAL-00014" summary="2024-07-03">
+      <created>1720037872358</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1720037872358</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="1" />
+    <MESSAGE value="2024-06-22" />
+    <MESSAGE value="2024-06-27" />
+    <MESSAGE value="2024-07-03" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-07-03" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="512" y="241" key="#Notifications/0.0.1536.834@0.0.1536.834" timestamp="1719181076114" />
+    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1717912172313">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.834@0.0.1536.834" timestamp="1717912172313" />
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1719698379546">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1719698379546" />
+    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1718888533940">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1718888533940" />
+    <state x="567" y="140" key="NewPhpClassDialog" timestamp="1717879757414">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="567" y="140" key="NewPhpClassDialog/0.0.1536.834@0.0.1536.834" timestamp="1717879757414" />
+    <state x="168" y="56" key="SettingsEditor" timestamp="1719179462790">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="168" y="56" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1719179462790" />
+    <state width="591" height="446" key="SwitcherDM" timestamp="1718869565474">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720037877976">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720037877976" />
+    <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="478" y="150" width="579" height="534" key="find.popup/0.0.1536.834@0.0.1536.834" timestamp="1717597256625" />
+    <state x="425" y="189" key="run.anything.popup" timestamp="1718948617709">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="425" y="189" key="run.anything.popup/0.0.1536.834@0.0.1536.834" timestamp="1718948617709" />
+    <state x="431" y="155" width="672" height="678" key="search.everywhere.popup" timestamp="1719724577226">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="431" y="155" width="672" height="678" key="search.everywhere.popup/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1719054837306" />
+    <state x="431" y="155" width="672" height="678" key="search.everywhere.popup/0.0.1536.834@0.0.1536.834" timestamp="1719724577226" />
+  </component>
+</project>
