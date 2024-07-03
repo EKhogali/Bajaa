@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name'=>'البعجة'
             ,'type'=>3
-            ,'email'=>'bajaa@acc.cm'
+            ,'email'=>'mostfabaja@gmail.com'
             ,'password'=>Hash::make('Acc#2024')
             ,'created_by'=>1
 //            ,'company_id'=>1
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name'=>'Elmo'
             ,'type'=>4
-            ,'email'=>'a@e.e'
+            ,'email'=>'elmothana.elmobarak@gmail.com'
             ,'password'=>Hash::make('e')
             ,'created_by'=>1
 //            ,'company_id'=>3
@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name'=>'Elmo'
             ,'type'=>4
-            ,'email'=>'b@e.e'
+            ,'email'=>'e@e.e'
             ,'password'=>Hash::make('e')
             ,'created_by'=>1
 //            ,'company_id'=>2
