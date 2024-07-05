@@ -22,8 +22,8 @@ class CreateTreasuryTransactionsTable extends Migration
 
             $table->integer('transaction_type_id'); //0:in 1:out
             $table->dateTime('date');
-            $table->unsignedBigInteger('account_id');
-            $table->foreign('account_id')->references('id')->on('accounts');
+//            $table->unsignedBigInteger('account_id');
+//            $table->foreign('account_id')->references('id')->on('accounts');
             $table->unsignedBigInteger('treasury_id');
             $table->foreign('treasury_id')->references('id')->on('treasuries');
 

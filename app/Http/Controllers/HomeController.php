@@ -31,6 +31,7 @@ class homeController extends Controller
      */
     public function index()
     {
+
         if(auth()->user()->type == 3){ //admin
             $companies = company::where('archived',0)->get();
             $financial_years = financial_year::where('archived',0)
