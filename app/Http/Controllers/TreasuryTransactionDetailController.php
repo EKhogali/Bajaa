@@ -29,8 +29,7 @@ class TreasuryTransactionDetailController extends Controller
      */
     public function create()
     {
-        $accounts = account::where('company_id',session::get('company_id'))
-            ->where('is_details',1)
+        $accounts = account::where('is_details',1)
             ->get();
         return view('\trans.treasury_transaction.treasury_transaction_details.create')
             ->with('master_id',Request('master_id'))
@@ -92,8 +91,7 @@ class TreasuryTransactionDetailController extends Controller
      */
     public function edit(treasury_transaction_detail $treasury_transaction_detail)
     {
-        $accounts = account::where('company_id',session::get('company_id'))
-            ->where('is_details',1)
+        $accounts = account::where('is_details',1)
             ->get();
         return view('\trans.treasury_transaction.treasury_transaction_details.edit')
 //            ->with('master_id',Request('master_id'))

@@ -195,7 +195,7 @@ class AccountController extends Controller
     {
 //        $account->delete();
             if( \DB::table('accounts')
-                ->where('company_id',session::get('company_id'))
+//                ->where('company_id',session::get('company_id'))
                 ->where('parent_id',$account->id)
                 ->doesntExist()
             &&
@@ -203,8 +203,17 @@ class AccountController extends Controller
 //                    ->where('company_id',session::get('company_id'))
                     ->where('account_id',$account->id)
                     ->doesntExist()
+            &&
+                \DB::table('treasury_transactions')
+//                    ->where('company_id',session::get('company_id'))
+                    ->where('account_id',$account->id)
+                    ->doesntExist()
+            &&
+                \DB::table('treasury_transaction_details')
+//                    ->where('company_id',session::get('company_id'))
+                    ->where('account_id',$account->id)
+                    ->doesntExist()
             ){
-
                     \DB::table('accounts')->where('id',$account->id)->delete();
                     $msg = 'تمت العملية بنجاح';
                     session::put('msgtype','success') ;

@@ -122,6 +122,15 @@
 
 
 
+        <script>
+            $(document).ready(function() {
+                $('#account_id').select2({
+                    placeholder: "اختر الحساب",
+                    allowClear: true, // Optional: Clearable selection
+                    dir: "rtl" // Optional: Right-to-left text support
+                });
+            });
+        </script>
 </body>
 </html>
 @endsection

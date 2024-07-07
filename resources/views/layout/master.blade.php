@@ -8,6 +8,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
+    <!-- Add Select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
+
+    <!-- jQuery (required for Select2) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Add Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+
+
     <title>المحاسبة الرقمية | Digital Accounting</title>
 
     <script type="text/javascript">
@@ -40,10 +50,10 @@
                                  البيانات الأساسية
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/categories">تصنيف الحسابات</a></li>
+                                <li><a class="dropdown-item" href="/categories">مجموعات الحسابات</a></li>
                                 <li><a class="dropdown-item" href="/accounts?acc_type={{0}}" id="acc0" onclick="changeAccType(0)">دليل الحسابات</a></li>
-                                <li><a class="dropdown-item" href="/accounts?acc_type={{1}}" id="acc1" onclick="changeAccType(1)">الاصول الثابتة</a></li>
-                                <li><a class="dropdown-item" href="/accounts?acc_type={{2}}" id="acc2" onclick="changeAccType(2)">الحسابات التفصيلية</a></li>
+                                <li><a class="dropdown-item" href="/accounts?acc_type={{1}}" id="acc1" onclick="changeAccType(1)">دليل الاصول الثابتة</a></li>
+                                <li><a class="dropdown-item" href="/accounts?acc_type={{2}}" id="acc2" onclick="changeAccType(2)">دليل الحسابات التفصيلية</a></li>
                                 <li><a class="dropdown-item" href="/companies">الشركات / المؤسسات</a></li>
 {{--                                <li><a class="dropdown-item" href="/treasuries">الخزائن</a></li>--}}
                                 <li><a class="dropdown-item" href="/partners">الشركاء</a></li>

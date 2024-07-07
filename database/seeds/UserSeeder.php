@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
         ]);
         DB::table('users')->insert([
             'name'=>'Elmo'
-            ,'type'=>4
+            ,'type'=>3
             ,'email'=>'elmothana.elmobarak@gmail.com'
             ,'password'=>Hash::make('e')
             ,'created_by'=>1
@@ -43,7 +43,21 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name'=>'Elmo'
             ,'type'=>4
-            ,'email'=>'e@e.e'
+            ,'email'=>'user3@bajaa.com'
+            ,'password'=>Hash::make('1234')
+            ,'created_by'=>1
+//            ,'company_id'=>2
+            ,'updated_by'=>1
+
+            ,'current_company_id'=> 1
+            ,'current_treasury_id'=> 1
+            ,'current_financial_year_id'=> 1
+            ,'current_financial_year'=> 1
+        ]);
+        DB::table('users')->insert([
+            'name'=>'Elmo'
+            ,'type'=>4
+            ,'email'=>'user4@bajaa.com'
             ,'password'=>Hash::make('e')
             ,'created_by'=>1
 //            ,'company_id'=>2

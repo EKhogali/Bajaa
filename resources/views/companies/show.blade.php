@@ -6,7 +6,7 @@
 <body>
 <br>
 <div class="container">
-    <h3 ><a href="/companies">Company</a> Details</h3>
+    <h3 ><a href="/companies">بيانات الشركة:</a> {{$company->name}}</h3>
 </div>
 @if(session()->has('message'))
     <div class="alert alert-success">
@@ -19,35 +19,36 @@
         <table class="table">
             <thead>
             <tr>
-                <th scope="col">Field</th>
-                <th scope="col">Value</th>
+                <th scope="col">الحقل</th>
+                <th scope="col">القيمة</th>
             </tr>
             </thead>
             <tbody>
                 <tr>
-                    <th scope="row">Company ID</th>
+                    <th scope="row">رقم الشركة</th>
                     <th scope="row">{{$company->id ?? ''}}</th>
                 </tr>
                 <tr>
-                    <th scope="row">Company Name</th>
+                    <th scope="row">اسم الشركة</th>
                     <th scope="row">{{$company->name ?? ''}}</th>
                 </tr>
                 <tr>
-                    <th scope="row">Address</th>
+                    <th scope="row">العنوان</th>
                     <th scope="row">{{$company->address ?? ''}}</th>
                 </tr>
                 <tr>
-                    <th scope="row">Telephone</th>
+                    <th scope="row">الهاتف</th>
                     <th scope="row">{{$company->tel ?? ''}}</th>
                 </tr>
                 <tr>
-                    <th scope="row">Company Status</th>
+                    <th scope="row">الحالة</th>
                     <th>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#activemodal">
 {{--                            @dd($company->active)--}}
                             @if($company->active == 1)
-                                Active
-                            @else Inactive
+                                مفعلة
+                            @else
+                                غير مفعلة
                             @endif
                         </button>
 

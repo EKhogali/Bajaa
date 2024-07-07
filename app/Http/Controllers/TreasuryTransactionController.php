@@ -53,6 +53,7 @@ class TreasuryTransactionController extends Controller
     {
         $accounts = account::where('is_details',0)
             ->where('archived',0)
+            ->where('is_details',0)
             ->get();
 //        $treasuries = treasury::where('company_id',session::get('company_id'))
 //            ->where('archived',0)

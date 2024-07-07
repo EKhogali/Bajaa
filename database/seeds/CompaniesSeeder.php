@@ -12,27 +12,63 @@ class CompaniesSeeder extends Seeder
     public function run()
     {
         DB::table('companies')->insert([
-            'name'=>'الشركة الافتراضية'
-            ,'address'=>'Dahmani'
-            ,'tel'=>'0999999'
+            'name'=> 'مطعم الانيا قريل النوفليين'
+            ,'address'=>'النوفليين'
+            ,'tel'=>''
             ,'active'=>1
-            ,'user_id'=>1
+            ,'user_id'=> 3
             ,'created_by'=>1
             ,'updated_by'=>1
         ]);
         DB::table('companies')->insert([
-            'name'=> 'الشركة الافتراضية 2'
-            ,'address'=>'Dahmani'
-            ,'tel'=>'0999999'
+            'name'=> 'مطعم ماندو فرع حي الاندلس'
+            ,'address'=>'حي الاندلس'
+            ,'tel'=>''
             ,'active'=>1
-            ,'user_id'=>2
+            ,'user_id'=>4
             ,'created_by'=>1
             ,'updated_by'=>1
         ]);
         DB::table('companies')->insert([
-            'name'=>'الشركة الافتراضية 3'
-            ,'address'=>'Dahmani'
-            ,'tel'=>'0999999'
+            'name'=> 'مطعم ماندو فرع لاسياحية'
+            ,'address'=>'السياحية'
+            ,'tel'=>''
+            ,'active'=>1
+            ,'user_id'=>3
+            ,'created_by'=>1
+            ,'updated_by'=>1
+        ]);
+        DB::table('companies')->insert([
+            'name'=> 'مطعم ماندو فرع مول الجرابة'
+            ,'address'=>'شارع الجرابة'
+            ,'tel'=>''
+            ,'active'=>1
+            ,'user_id'=>3
+            ,'created_by'=>1
+            ,'updated_by'=>1
+        ]);
+        DB::table('companies')->insert([
+            'name'=> 'مطعم ماندو فرع جنزور'
+            ,'address'=>'جنزور'
+            ,'tel'=>''
+            ,'active'=>1
+            ,'user_id'=>3
+            ,'created_by'=>1
+            ,'updated_by'=>1
+        ]);
+        DB::table('companies')->insert([
+            'name'=> 'مطعم نسمة بيروت'
+            ,'address'=>''
+            ,'tel'=>''
+            ,'active'=>1
+            ,'user_id'=>3
+            ,'created_by'=>1
+            ,'updated_by'=>1
+        ]);
+        DB::table('companies')->insert([
+            'name'=> 'المعمل المركزي'
+            ,'address'=>''
+            ,'tel'=>''
             ,'active'=>1
             ,'user_id'=>3
             ,'created_by'=>1

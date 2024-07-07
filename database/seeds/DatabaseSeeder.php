@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             CompaniesSeeder::class,
             CategorySeeder::class,
             AccountsSeeder::class,
-//            TreasuraySeeder::class,
+            TreasuraySeeder::class,
             Financial_YearSeeder::class,
 //            TreasuryTransactionSeeder::class,
 //            TagSeeder::class,

@@ -6,7 +6,7 @@
 <body>
 <br>
 <div class="container">
-    <h3 >الشركات | Companies</h3>
+    <h3 >الشركات | المؤسسات</h3>
 </div>
 @if(session()->has('message'))
     <div class="alert alert-success">
@@ -17,18 +17,18 @@
     <div class="container row">
             <div class="container col">
                 <div class="d-grid gap-2 col-3">
-                     <a class="btn btn-primary" href="companies/create" role="button">Add Company</a>
+                     <a class="btn btn-primary" href="companies/create" role="button">اضافة شركة</a>
                 </div>
                 <br><br>
                 <table class="table">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Company Name</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Telephone</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">edit</th>
+                        <th scope="col">اسم الشركة</th>
+                        <th scope="col">العنوان</th>
+                        <th scope="col">الهاتف</th>
+                        <th scope="col">الحالة</th>
+                        <th scope="col">تعديل</th>
 {{--                        <th scope="col">delete</th>--}}
                     </tr>
                     </thead>
