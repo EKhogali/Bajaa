@@ -28,9 +28,9 @@
                         <th scope="col">نوع الشراكة</th>
                         <th scope="col">النسبة%</th>
                         <th scope="col">الرقم المالي</th>
-                        <th scope="col">الحساب</th>
-                        <th scope="col">تعديل</th>
-                        <th scope="col">الغاء</th>
+{{--                        <th scope="col">الحساب</th>--}}
+                        <th scope="col" width="10%">تعديل</th>
+                        <th scope="col" width="10%">الغاء</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,10 +38,16 @@
                         <tr>
                             <th scope="row">{{$partner->id ?? ''}}</th>
                             <th scope="row">{{$partner->name ?? ''}}</th>
-                            <th scope="row">{{$partner->partnership_type ?? ''}}</th>
-                            <th scope="row">{{$partner->win_percentage ?? ''}}</th>
+                            <th scope="row">
+                                @if($partner->partnership_type == 1)
+                                        شريك
+                                    @else
+                                        مستثمر
+                                @endif
+                            </th>
+                            <th scope="row">{{$partner->win_percentage ?? ''}} %</th>
                             <th scope="row">{{$partner->account->name ?? ''}}</th>
-                            <th scope="row">{{$partner->accounts->name ?? ''}}</th>
+{{--                            <th scope="row">{{$partner->accounts->name ?? ''}}</th>--}}
                             <th scope="row"><a href="partners/{{$partner->id}}/edit" class="btn btn-warning">تعديل</a></th>
                             <th scope="row">
                                 <form method="post" class="delete_form" action="{{action('PartnerController@destroy', $partner->id)}}">

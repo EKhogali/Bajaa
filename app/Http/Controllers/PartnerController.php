@@ -36,7 +36,8 @@ class PartnerController extends Controller
     public function create()
     {
         $accounts = account::where('archived',0)
-            ->where('company_id',session::get('company_id') ?? 0)
+            ->where('is_details','<>',1)
+            ->where('is_fixed_assets','<>',1)
             ->get();
         return view('bsc.partners.create',compact('accounts'));
     }
@@ -86,7 +87,7 @@ class PartnerController extends Controller
         ]);
 
         return redirect('/partners');
-//        redirect()->back()->with('success', 'Partner added successfully!');
+//        redirect()->back()->with('success', 'PartnerSeeder added successfully!');
     }
 
 
@@ -109,7 +110,8 @@ class PartnerController extends Controller
      */
     public function edit(partner $partner)
     {
-        $accounts = account::where('company_id',session::get('company_id') ?? 0)
+        $accounts = account::where('is_details','<>',1)
+            ->where('is_fixed_assets','<>',1)
             ->where('archived',0)->get();
         return view('bsc.partners.edit')
             ->with('partner',$partner)

@@ -10,22 +10,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-05">
+    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-07">
+      <change afterPath="$PROJECT_DIR$/database/seeds/PartnerSeeder.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TreasuryTransactionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TreasuryTransactionController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TreasuryTransactionDetailController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TreasuryTransactionDetailController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/CompaniesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/CompaniesSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PartnerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PartnerController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/seeds/Financial_YearSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/Financial_YearSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/TreasuraySeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/TreasuraySeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/UserSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/UserSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/show.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/show.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/bsc/partners/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/bsc/partners/index.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -191,7 +182,7 @@
       <workItem from="1720024746436" duration="9289000" />
       <workItem from="1720092681071" duration="13836000" />
       <workItem from="1720385471126" duration="657000" />
-      <workItem from="1720386787746" duration="1623000" />
+      <workItem from="1720386787746" duration="4159000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <created>1642851441541</created>
@@ -319,7 +310,14 @@
       <option name="project" value="LOCAL" />
       <updated>1720174969932</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="2024-07-07">
+      <created>1720388613888</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1720388613888</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -343,17 +341,18 @@
     <MESSAGE value="2024-06-27" />
     <MESSAGE value="2024-07-03" />
     <MESSAGE value="2024-07-05" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-07-05" />
+    <MESSAGE value="2024-07-07" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-07-07" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="512" y="241" key="#Notifications/0.0.1536.834@0.0.1536.834" timestamp="1719181076114" />
-    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1717912172313">
+    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1720389695703">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.834@0.0.1536.834" timestamp="1717912172313" />
+    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.834@0.0.1536.834" timestamp="1720389695703" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1719698379546">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
@@ -374,10 +373,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720174971860">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720388616976">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720174971860" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720388616976" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

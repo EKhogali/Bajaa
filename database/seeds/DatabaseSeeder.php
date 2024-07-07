@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             AccountsSeeder::class,
             TreasuraySeeder::class,
             Financial_YearSeeder::class,
-//            TreasuryTransactionSeeder::class,
+            PartnerSeeder::class,
 //            TagSeeder::class,
             SittingSeeder::class
         ]);
