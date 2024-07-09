@@ -33,7 +33,7 @@ class TreasuryController extends Controller
 //                $query->select('account_id')->from('treasuries');
 //            })
 //            ->get();
-        $treasury_accounts = account::find(1);
+        $treasury_accounts = account::where('id',1)->get();
         return view('bsc.treasuries.create')->with('treasury_accounts',$treasury_accounts);
     }
 
