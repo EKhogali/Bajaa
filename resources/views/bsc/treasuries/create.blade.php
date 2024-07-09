@@ -34,17 +34,17 @@
                 </div>
             </div>
             <br>
-{{--            <div class="container-fluid row">--}}
-{{--                <div class="col-6">--}}
-{{--                    <label for="account_id" class="form-label">الحساب</label>--}}
-{{--                    <select class="form-select" id="account_id" name="account_id">--}}
-{{--                        <option selected disabled>اختر الحساب</option>--}}
-{{--                        @foreach($treasury_accounts as $account)--}}
-{{--                            <option value="{{ $account->id }}">{{ $account->name }}</option>--}}
-{{--                        @endforeach--}}
-{{--                    </select>--}}
-{{--                </div>--}}
-{{--            </div>--}}
+            <div class="container-fluid row">
+                <div class="col-6">
+                    <label for="account_id" class="form-label">الحساب</label>
+                    <select class="form-select" id="account_id" name="account_id">
+                        <option selected disabled>اختر الحساب</option>
+                        @foreach($treasury_accounts as $account)
+                            <option value="{{ $account->id }}">{{ $account->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <br>
             <div class="row ">
                 <div class="col"></div>
