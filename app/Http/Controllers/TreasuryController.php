@@ -28,11 +28,12 @@ class TreasuryController extends Controller
      */
     public function create()
     {
-        $treasury_accounts = account::where('category_id','2')
-            ->wherenotin('id',function ($query){
-                $query->select('account_id')->from('treasuries');
-            })
-            ->get();
+//        $treasury_accounts = account::where('category_id','2')
+//            ->wherenotin('id',function ($query){
+//                $query->select('account_id')->from('treasuries');
+//            })
+//            ->get();
+        $treasury_accounts = account::find(1);
         return view('bsc.treasuries.create')->with('treasury_accounts',$treasury_accounts);
     }
 
