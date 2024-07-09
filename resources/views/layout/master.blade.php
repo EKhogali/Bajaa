@@ -55,7 +55,7 @@
                                 <li><a class="dropdown-item" href="/accounts?acc_type={{1}}" id="acc1" onclick="changeAccType(1)">دليل الاصول الثابتة</a></li>
                                 <li><a class="dropdown-item" href="/accounts?acc_type={{2}}" id="acc2" onclick="changeAccType(2)">دليل الحسابات التفصيلية</a></li>
                                 <li><a class="dropdown-item" href="/companies">الشركات / المؤسسات</a></li>
-{{--                                <li><a class="dropdown-item" href="/treasuries">الخزائن</a></li>--}}
+                                <li><a class="dropdown-item" href="/treasuries">الخزائن</a></li>
                                 <li><a class="dropdown-item" href="/partners">الشركاء</a></li>
                             </ul>
                         </li>

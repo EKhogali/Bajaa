@@ -1,7 +1,16 @@
 @extends('layout.master')
 @section('content')
     <div class="container">
-        <h3>تفاصيل إيصال</h3>
+        @if($treasury_transaction->trans_type == 0)
+            <div class="container">
+                <h3>تفاصيل إيصال قبض</h3>
+            </div>
+        @else
+            <div class="container">
+                <h3>تفاصيل إيصال صرف</h3>
+            </div>
+        @endif
+
         <table class="table">
             <tr>
                 <th>رقم آلي</th>
@@ -13,7 +22,7 @@
             </tr>
             <tr>
                 <th>التاريخ</th>
-                <td>{{ \Carbon\Carbon::parse($treasury_transaction->date)->format('yy-m-d') }}</td>
+                <td>{{ \Carbon\Carbon::parse($treasury_transaction->date)->format('Y-m-d') }}</td>
             </tr>
             <tr>
                 <th>الحساب</th>
