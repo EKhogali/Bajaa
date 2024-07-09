@@ -31,7 +31,7 @@ class TreasuryTransactionDetailController extends Controller
     {
         $accounts = account::where('is_details',1)
             ->get();
-        return view('\trans.treasury_transaction.treasury_transaction_details.create')
+        return view('trans.treasury_transaction.treasury_transaction_details.create')
             ->with('master_id',Request('master_id'))
             ->with('accounts',$accounts);
     }
