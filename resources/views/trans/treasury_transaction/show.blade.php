@@ -43,6 +43,10 @@
                             <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{number_format($treasury_transaction->amount, 2) ?? ''}}</th>
                         </tr>
                         <tr>
+                            <th scope="row">القيمة بالحروف</th>
+                            <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{\Alkoumi\LaravelArabicTafqeet\Tafqeet::inArabic($treasury_transaction->amount,'ld')}}</th>
+                        </tr>
+                        <tr>
                             <th scope="row">الخزينة</th>
                             <th scope="row">{{$treasury_transaction->treasury->name ?? ''}}</th>
                         </tr>

@@ -1,6 +1,6 @@
 @extends('layout.master')
 @section('content')
-    <div class="container">
+    <div class="container" style="border: 2px solid #000000; padding: 10px; margin: 5px;">
         @if($treasury_transaction->trans_type == 0)
             <div class="container">
                 <h3>تفاصيل إيصال قبض</h3>
@@ -35,6 +35,10 @@
             <tr>
                 <th>القيمة</th>
                 <td>{{ number_format($treasury_transaction->amount, 2) }}</td>
+            </tr>
+            <tr>
+                <th>القيمة بالحروف</th>
+                <td>{{ \Alkoumi\LaravelArabicTafqeet\Tafqeet::inArabic($treasury_transaction->amount,'ld') }}</td>
             </tr>
             <tr>
                 <th>الوصف</th>
