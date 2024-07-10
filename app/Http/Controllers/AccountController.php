@@ -213,6 +213,11 @@ class AccountController extends Controller
 //                    ->where('company_id',session::get('company_id'))
                     ->where('account_id',$account->id)
                     ->doesntExist()
+            &&
+                \DB::table('treasuries')
+//                    ->where('company_id',session::get('company_id'))
+                    ->where('account_id',$account->id)
+                    ->doesntExist()
             ){
                     \DB::table('accounts')->where('id',$account->id)->delete();
                     $msg = 'تمت العملية بنجاح';
