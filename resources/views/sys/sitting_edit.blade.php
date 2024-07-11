@@ -104,7 +104,7 @@
                 <div class="container-fluid row">
                     <div class="col-6">
                         <label class="form-label">مجموعة حسابات مسحوبات من صافي الدخل</label>
-                        <select class="form-select" name="dioon_account_category">
+                        <select class="form-select" name="pulled_from_net_income_accounts_category">
                             <option selected disabled>اختر المجموعة</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ $category->id == $sitting->pulled_from_net_income_accounts_category ? 'selected' : '' }}>
