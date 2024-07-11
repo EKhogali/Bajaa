@@ -967,48 +967,6 @@ class ReportController extends Controller
             'note' => 0,
         ]);
 
-            //--------------------------------------------------------------------------------------------------------------
-//            $queries = partner::where('company_id',session::get('company_id'))
-//                ->where('archived',0)
-//                ->get();
-//
-//
-//
-//            foreach ($queries as $query){
-//                $rec_id += 1;
-//
-//                $tmp_tot = treasury_transaction::where('transaction_type_id',1)
-//                    ->where('company_id',session::get('company_id'))
-//                    ->where('financial_year',session::get('financial_year'))
-//                    ->whereBetween('date', [$fromdate, $todate])
-//                    ->where('account_id',$queries->account_id)
-//                    ->where('archived',0)
-//                    ->where('tag_id',1)
-//                    ->sum('amount')
-//                    ->get();
-//
-//                DB::table('income_reports')->insert([
-//                    'id' => $rec_id,
-//                    'company_id' => session::get('company_id'),
-//                    'financial_year' => session::get('financial_year'),
-//                    'created_by' => auth()->id(),
-//
-//                    'ordr1' => 24,
-//                    'ordr2' => 24,
-//                    'ordr3' => 24,
-//
-//                    'txt' => 'حصة: الـ '.$query->Partnership_Type.' '.$query->name.' )'.$query->Win_Percentage.' % (',
-//
-//                    'currency' => 'دينار',
-//                    'number1' => ($query->Win_Percentage * (( $net_profit - $dioon_expenses) / 100) ) - $tmp_tot   ,
-//                    'number1_2' => 0,
-//                    'number2' => 0,
-//                    'number3' => 0,
-//                    'number4' => 0,
-//
-//                    'note' => 0,
-//                ]);
-//            }
 
 
         //--------------------------------------------------------------------------------------------------------------
@@ -1035,7 +993,7 @@ class ReportController extends Controller
                     'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
 
                     'currency' => 'دينار',
-                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income - $total_from_party) / 100) ) - $dioon_expenses   ,
+                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses   ,
                     'number1_2' => 0,
                     'number2' => 0,
                     'number3' => 0,
