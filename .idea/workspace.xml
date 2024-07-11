@@ -10,15 +10,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-07-3">
-      <change beforePath="$PROJECT_DIR$/.idea/Accounting-Online.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Accounting-Online.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-11">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/print.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/print.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/show.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/show.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/show_in.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/show_in.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -364,7 +357,14 @@
       <option name="project" value="LOCAL" />
       <updated>1720391097962</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="2024-07-11">
+      <created>1720653012871</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1720653012871</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -390,7 +390,8 @@
     <MESSAGE value="2024-07-05" />
     <MESSAGE value="2024-07-07" />
     <MESSAGE value="2024-07-07-3" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-07-07-3" />
+    <MESSAGE value="2024-07-11" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-07-11" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -413,6 +414,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1718888533940" />
+    <state x="407" y="179" key="MultipleFileMergeDialog" timestamp="1720653099642">
+      <screen x="0" y="0" width="1536" height="834" />
+    </state>
+    <state x="407" y="179" key="MultipleFileMergeDialog/0.0.1536.834@0.0.1536.834" timestamp="1720653099642" />
     <state x="567" y="140" key="NewPhpClassDialog" timestamp="1717879757414">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
@@ -429,10 +434,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720391100677">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720653014800">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720391100677" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720653014800" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
