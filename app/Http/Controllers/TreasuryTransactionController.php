@@ -37,7 +37,7 @@ class TreasuryTransactionController extends Controller
 
 
     public function print($id)
-    {dd('======');
+    {
         $treasury_transaction = treasury_transaction::with('account', 'treasury')->findOrFail($id);
 //        dd('55egeeg',$treasury_transaction);
         return view('trans.treasury_transaction.print', compact('treasury_transaction'));

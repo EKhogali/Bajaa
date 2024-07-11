@@ -24,7 +24,7 @@
                 <th>التاريخ</th>
                 <td>{{ \Carbon\Carbon::parse($treasury_transaction->date)->format('Y-m-d') }}</td>
             </tr>
-            <tr>
+            <tr>@dd('======11111');
                 <th>الحساب</th>
                 <td>{{ $treasury_transaction->account->name }}</td>
             </tr>
