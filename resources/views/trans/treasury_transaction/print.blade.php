@@ -24,7 +24,7 @@
                 <th>التاريخ</th>
                 <td>{{ \Carbon\Carbon::parse($treasury_transaction->date)->format('Y-m-d') }}</td>
             </tr>
-            <tr>@dd('======11111');
+            <tr>
                 <th>الحساب</th>
                 <td>{{ $treasury_transaction->account->name }}</td>
             </tr>
@@ -36,7 +36,7 @@
                 <th>القيمة</th>
                 <td>{{ number_format($treasury_transaction->amount, 2) }}</td>
             </tr>
-            <tr>
+            <tr>@dd('======1111122');
                 <th>القيمة بالحروف</th>
                 <td>{{ \Alkoumi\LaravelArabicTafqeet\Tafqeet::inArabic($treasury_transaction->amount,'ld') }}</td>
             </tr>
