@@ -36,14 +36,14 @@
                 <th>القيمة</th>
                 <td>{{ number_format($treasury_transaction->amount, 2) }}</td>
             </tr>
-            <tr>@dd('======1111122');
+            <tr>
                 <th>القيمة بالحروف</th>
                 <td>{{ \Alkoumi\LaravelArabicTafqeet\Tafqeet::inArabic($treasury_transaction->amount,'ld') }}</td>
             </tr>
             <tr>
                 <th>الوصف</th>
                 <td>{{ $treasury_transaction->description }}</td>
-            </tr>
+            </tr>@dd('======111112233');
             <tr>
                 <th>وسم</th>
                 <td>{{ $treasury_transaction->tag_id == 1 ? 'مسحوبات' : '/' }}</td>
