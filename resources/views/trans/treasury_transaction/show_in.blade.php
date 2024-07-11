@@ -40,7 +40,7 @@
                         </tr>
                         <tr>
                             <th scope="row">القيمة</th>
-                            <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{\number_format($treasury_transaction->amount, 2) ?? ''}}</th>
+                            <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{number_format($treasury_transaction->amount, 2) ?? ''}}</th>
                         </tr>
                         <tr>
                             <th scope="row">القيمة بالحروف</th>
