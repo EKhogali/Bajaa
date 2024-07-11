@@ -43,7 +43,7 @@
             <tr>
                 <th>الوصف</th>
                 <td>{{ $treasury_transaction->description }}</td>
-            </tr>@dd('======111112233');
+            </tr>
             <tr>
                 <th>وسم</th>
                 <td>{{ $treasury_transaction->tag_id == 1 ? 'مسحوبات' : '/' }}</td>
