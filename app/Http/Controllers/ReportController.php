@@ -970,38 +970,41 @@ class ReportController extends Controller
 
 
         //--------------------------------------------------------------------------------------------------------------
-        $queries = DB::table('partners as p')
-            ->leftjoin('treasury_transactions as t', 'p.account_id', '=', 't.account_id')
-            ->where('t.company_id', session::get('company_id'))
-            ->where('t.financial_year', session::get('financial_year'))
-            ->where('t.archived', 0)
-            ->where('p.archived', 0)
-            ->where('t.tag_id', 1)
-            ->whereBetween('t.date', [$fromdate, $todate])
-            ->select('p.id as id', DB::raw('SUM(t.amount) as total_amount'))
-            ->groupBy('p.id')
-            ->orderBy('p.id')
-            ->get();
-
-        $total_from_party = $queries->sum('total_amount');
-
-
-
-//            $queries = partner::where('company_id',session::get('company_id'))
-//                ->where('archived',0)
-//                ->get();
+//        $queries = DB::table('partners as p')
+//            ->leftjoin('treasury_transactions as t', 'p.account_id', '=', 't.account_id')
+//            ->where('t.company_id', session::get('company_id'))
+//            ->where('t.financial_year', session::get('financial_year'))
+//            ->where('t.archived', 0)
+//            ->where('p.archived', 0)
+//            ->where('t.tag_id', 1)
+//            ->whereBetween('t.date', [$fromdate, $todate])
+//            ->select('p.id as id', DB::raw('SUM(t.amount) as total_amount'))
+//            ->groupBy('p.id')
+//            ->orderBy('p.id')
+//            ->get();
+//
+//        $total_from_party = $queries->sum('total_amount');
 
 
+
+            $queries = partner::where('company_id',session::get('company_id'))
+                ->where('archived',0)
+                ->get();
 
             foreach ($queries as $query){
                 $rec_id += 1;
 
+                $total_partner_pulled = DB::table('treasury_transactions')
+                    ->where('company_id', session::get('company_id'))
+                    ->where('financial_year', session::get('financial_year'))
+                    ->where('archived', 0)
+                    ->where('tag_id', 1)
+                    ->where('account_id', $query->id)
+                    ->whereBetween('date', [$fromdate, $todate])
+                    ->sum('amount')
+                    ->get() ?? 0;
 
-                $tmp_queries = partner::where('company_id',session::get('company_id'))
-                    ->where('id',$query->id)
-                    ->first();
-                $partner_type_desc = $tmp_queries->partnership_type == 0 ? 'مستثمر' : 'شريك';
-
+                $partner_type_desc = $queries->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
 
                 DB::table('income_reports')->insert([
@@ -1014,10 +1017,10 @@ class ReportController extends Controller
                     'ordr2' => 24,
                     'ordr3' => 24,
 
-                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$tmp_queries->name.' ('.$tmp_queries->win_percentage.' % )',
+                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$queries->name.' ('.$queries->win_percentage.' % )',
 
                     'currency' => 'دينار',
-                    'number1' => ($tmp_queries->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_from_party   ,
+                    'number1' => ($queries->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
                     'number1_2' => 0,
                     'number2' => 0,
                     'number3' => 0,
