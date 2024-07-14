@@ -1020,7 +1020,7 @@ class ReportController extends Controller
                     'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
 
                     'currency' => 'دينار',
-                    'number1' => ($queries->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
+                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
                     'number1_2' => 0,
                     'number2' => 0,
                     'number3' => 0,
