@@ -1004,7 +1004,7 @@ class ReportController extends Controller
                     ->select(DB::raw('SUM(amount)'))->get() ?? 0;
 //                    ->sum('amount')->get();
 
-                $partner_type_desc = $queries->partnership_type == 0 ? 'مستثمر' : 'شريك';
+                $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
 
                 DB::table('income_reports')->insert([
