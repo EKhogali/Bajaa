@@ -999,14 +999,14 @@ class ReportController extends Controller
                     ->where('financial_year', session::get('financial_year'))
                     ->where('archived', 0)
                     ->where('tag_id', 1)
-                    ->where('account_id', $query->id)
+                    ->where('account_id', $query->account_id)
                     ->whereBetween('date', [$fromdate, $todate])
                     ->select(DB::raw('SUM(amount)'))->get() ?? 0;
 //                    ->sum('amount')->get();
 
                 $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
-dd($total_partner_pulled);
+//dd($total_partner_pulled);
                 DB::table('income_reports')->insert([
                     'id' => $rec_id,
                     'company_id' => session::get('company_id'),
