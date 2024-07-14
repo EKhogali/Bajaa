@@ -1123,6 +1123,43 @@ class ReportController extends Controller
     }
 
 
+    public function treasury_report()
+    {
+        if(!request()->has('fromdate') or !request()->has('todate')){
+
+            $fromdate = \Carbon\Carbon::today()->startOfDay();
+            $todate = \Carbon\Carbon::today()->endOfDay();
+
+            $treasury_report = treasury_transaction::where('id', 0)
+                ->get();
+            $decimal_octets = sitting::where('id',1)->value('decimal_octets');
+
+            return view('rep.treasury_report')
+                ->with('decimal_octets',$decimal_octets)
+                ->with('fromdate',$fromdate)
+                ->with('todate',$todate)
+                ->with('treasury_report',$treasury_report);
+        }else {
+
+            //--------------------------------------------------------------------------------------------------------------
+            $fromdate = \Carbon\Carbon::parse(Request('fromdate'))->startOfDay();
+            $todate = \Carbon\Carbon::parse(Request('todate'))->endOfDay();
+            $decimal_octets = sitting::where('id',1)->value('decimal_octets');
+        }
+
+
+        $treasury_report = treasury_transaction::where('company_id', session::get('company_id'))
+                ->where('financial_year', session::get('financial_year'))
+                ->where('archived', 0)
+                ->whereBetween('date', [$fromdate, $todate])
+                ->get();
+        return view('rep.treasury_report')
+            ->with('decimal_octets',$decimal_octets)
+            ->with('fromdate',$fromdate)
+            ->with('todate',$todate)
+            ->with('treasury_report',$treasury_report);
+    }
+
     public function tr_index()
     {
 
