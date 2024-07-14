@@ -1006,7 +1006,7 @@ class ReportController extends Controller
 
                 $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
-//dd($total_partner_pulled);
+dd($total_partner_pulled,$query->account_id,$query);
                 DB::table('income_reports')->insert([
                     'id' => $rec_id,
                     'company_id' => session::get('company_id'),
