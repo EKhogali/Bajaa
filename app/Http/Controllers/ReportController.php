@@ -1001,7 +1001,7 @@ class ReportController extends Controller
                     ->where('tag_id', 1)
                     ->where('account_id', $query->id)
                     ->whereBetween('date', [$fromdate, $todate])
-                    ->select('SUM(amount)')->get() ?? 0;
+                    ->select(DB::raw('SUM(amount)'))->get() ?? 0;
 //                    ->sum('amount')->get();
 
                 $partner_type_desc = $queries->partnership_type == 0 ? 'مستثمر' : 'شريك';
