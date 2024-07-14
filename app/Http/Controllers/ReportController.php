@@ -970,16 +970,40 @@ class ReportController extends Controller
 
 
         //--------------------------------------------------------------------------------------------------------------
+        $queries = DB::table('partners as p')
+            ->leftjoin('treasury_transactions as t', 'p.account_id', '=', 't.account_id')
+            ->where('t.company_id', session::get('company_id'))
+            ->where('t.financial_year', session::get('financial_year'))
+            ->where('t.archived', 0)
+            ->where('p.archived', 0)
+            ->where('t.tag_id', 1)
+            ->whereBetween('t.date', [$fromdate, $todate])
+            ->select('p.id as id', DB::raw('SUM(t.amount) as total_amount'))
+            ->groupBy('p.id')
+            ->orderBy('p.id')
+            ->get();
 
-            $queries = partner::where('company_id',session::get('company_id'))
-                ->where('archived',0)
-                ->get();
+        $total_from_party = $queries->sum('total_amount');
+
+
+
+//            $queries = partner::where('company_id',session::get('company_id'))
+//                ->where('archived',0)
+//                ->get();
 
 
 
             foreach ($queries as $query){
                 $rec_id += 1;
-                $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
+
+
+                $tmp_queries = partner::where('company_id',session::get('company_id'))
+                    ->where('i',$query->id)
+                    ->first();
+                $partner_type_desc = $tmp_queries->partnership_type == 0 ? 'مستثمر' : 'شريك';
+
+
+
                 DB::table('income_reports')->insert([
                     'id' => $rec_id,
                     'company_id' => session::get('company_id'),
@@ -990,10 +1014,10 @@ class ReportController extends Controller
                     'ordr2' => 24,
                     'ordr3' => 24,
 
-                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
+                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$tmp_queries->name.' ('.$tmp_queries->win_percentage.' % )',
 
                     'currency' => 'دينار',
-                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses   ,
+                    'number1' => ($tmp_queries->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_from_party   ,
                     'number1_2' => 0,
                     'number2' => 0,
                     'number3' => 0,
