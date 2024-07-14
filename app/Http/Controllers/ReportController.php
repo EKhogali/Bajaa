@@ -998,7 +998,7 @@ class ReportController extends Controller
 
 
                 $tmp_queries = partner::where('company_id',session::get('company_id'))
-                    ->where('i',$query->id)
+                    ->where('id',$query->id)
                     ->first();
                 $partner_type_desc = $tmp_queries->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
