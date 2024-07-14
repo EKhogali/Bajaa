@@ -1017,7 +1017,7 @@ class ReportController extends Controller
                     'ordr2' => 24,
                     'ordr3' => 24,
 
-                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$queries->name.' ('.$queries->win_percentage.' % )',
+                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
 
                     'currency' => 'دينار',
                     'number1' => ($queries->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
