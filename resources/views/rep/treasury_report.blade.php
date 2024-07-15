@@ -69,16 +69,18 @@
         </div>
 
         <table class="table">
-            <tbody>
+            <thead style="background-color: #f2f2f2; font-weight: bold;">
             <tr>
-                <th scope="row" width="4%"></th>
-                <th scope="col">التاريخ</th>
-                <th scope="col">صادر/وارد</th>
-                <th scope="col">الحساب</th>
-{{--                <th scope="col">الخزينة</th>--}}
-                <th scope="col">القيمة</th>
-                <th scope="col">الوصف</th>
+                <th scope="row" width="4%" style="text-align: center;"></th>
+                <th scope="col" style="text-align: center;">التاريخ</th>
+                <th scope="col" style="text-align: center;">صادر/وارد</th>
+                <th scope="col" style="text-align: center;">الحساب</th>
+                <th scope="col" style="text-align: center;">القيمة</th>
+                <th scope="col" style="text-align: center;">الوصف</th>
             </tr>
+            </thead>
+            <tbody>
+
             @php
                 $tot_out = 0;
                 $tot_in = 0;
@@ -111,9 +113,26 @@
             @endforeach
             </tbody>
             <tfoot>
-            <tr> <td colspan="4"> {{'اجمالي الوارد: '.$tot_in}} </td> </tr>
-            <tr> <td colspan="4"> {{'اجمالي الصادر: '.$tot_out}} </td> </tr>
+            <tr>
+                <td colspan="4"></td> <!-- Empty cell for spacing -->
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي الوارد</td>
+                <td colspan="2" style="text-align: center;">{{$tot_in}}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي الصادر</td>
+                <td colspan="2" style="text-align: center;">{{$tot_out}}</td>
+            </tr>
+            @php
+                $balance = $tot_in - $tot_out;
+            @endphp
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">الرصيد</td>
+                <td colspan="2" style="text-align: center;">{{$balance}}</td>
+            </tr>
             </tfoot>
+
         </table>
         <br><br><br>
 

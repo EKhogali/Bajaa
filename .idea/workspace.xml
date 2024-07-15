@@ -11,11 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-14">
-      <change afterPath="$PROJECT_DIR$/resources/views/rep/treasury_report.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/treasury_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/treasury_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -219,7 +216,8 @@
       <workItem from="1720385471126" duration="657000" />
       <workItem from="1720386787746" duration="5240000" />
       <workItem from="1720496089160" duration="1652000" />
-      <workItem from="1720972979872" duration="7200000" />
+      <workItem from="1720972979872" duration="7425000" />
+      <workItem from="1721077614908" duration="956000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <created>1642851441541</created>
@@ -550,7 +548,14 @@
       <option name="project" value="LOCAL" />
       <updated>1720976749810</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="2024-07-14">
+      <created>1720980330477</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1720980330477</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -621,10 +626,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720976751024">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1720980332305">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720976751024" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1720980332305" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
