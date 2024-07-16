@@ -47,6 +47,19 @@
                     <input type="text" class="form-control" id="tel" name="tel"></div>
             </div>
             <br>
+            <div class="container-fluid row ">
+                <div class="col-6">
+                    <label for="tel" class="form-label">المستخدم</label>
+                    <select name="user_id"  class="form-control" >
+                        @foreach($users as $user)
+                            <option value="{{$user->id}}" >
+                                {{$user->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <br>
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">

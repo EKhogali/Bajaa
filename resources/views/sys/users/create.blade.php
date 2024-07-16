@@ -50,16 +50,16 @@
                 </div>
             </div>
             <br>
-            <div class="container-fluid row ">
-                <div class="col-6">
-                <label for="company_id">الشركة</label>
-                <select name="company_id" id="company_id" class="form-control" required>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                    @endforeach
-                </select>
-                </div>
-            </div>
+{{--            <div class="container-fluid row ">--}}
+{{--                <div class="col-6">--}}
+{{--                <label for="company_id">الشركة</label>--}}
+{{--                <select name="company_id" id="company_id" class="form-control" required>--}}
+{{--                    @foreach($companies as $company)--}}
+{{--                        <option value="{{ $company->id }}">{{ $company->name }}</option>--}}
+{{--                    @endforeach--}}
+{{--                </select>--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             <br>
             <div class="row ">

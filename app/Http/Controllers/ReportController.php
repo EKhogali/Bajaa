@@ -82,6 +82,70 @@ class ReportController extends Controller
         }
     }
 
+
+
+
+//##################################################################################################################
+//##################################################################################################################
+//##################################################################################################################
+//##################################################################################################################
+//##################################################################################################################
+//
+public function ledger2()
+{
+    //-------------------------------------------------------------------------------------------------------------
+
+    if (!request()->has('fromdate') or !request()->has('todate')) {
+
+        $fromdate = \Carbon\Carbon::today()->startOfDay();
+        $todate = \Carbon\Carbon::today()->endOfDay();
+
+        if (!request()->has('account_id')) {
+            $account_id = 0;
+        }else{
+            $account_id = Request('account_id');
+        }
+
+
+    } else {
+        $fromdate = \Carbon\Carbon::parse(Request('fromdate'))->startOfDay();
+        $todate = \Carbon\Carbon::parse(Request('todate'))->endOfDay();
+
+        if (!request()->has('account_id')) {
+            $account_id = 0;
+        }else{
+            $account_id = Request('account_id');
+        }
+
+    }
+
+
+    $ledger2 = treasury_transaction::where('company_id', session::get('company_id'))
+        ->where('financial_year', session::get('financial_year'))
+        ->where('archived', 0)
+        ->where('account_id', $account_id)
+        ->whereBetween('date', [$fromdate, $todate])
+        ->get();
+
+    $decimal_octets = sitting::where('id', 1)->value('decimal_octets');
+    $accounts = account::where('archived', 0)->where('is_details','<>',1)->get();
+    return view('rep.ledger2')
+        ->with('decimal_octets', $decimal_octets)
+        ->with('fromdate', $fromdate)
+        ->with('todate', $todate)
+        ->with('account_id', $account_id)
+        ->with('accounts', $accounts)
+        ->with('ledger2', $ledger2);
+}
+
+
+//##################################################################################################################
+//##################################################################################################################
+//##################################################################################################################
+//##################################################################################################################
+//##################################################################################################################
+
+
     public function income_report(){
 
         //-------------------------------------------------------------------------------------------------------------
@@ -1145,7 +1209,7 @@ class ReportController extends Controller
             $fromdate = \Carbon\Carbon::parse(Request('fromdate'))->startOfDay();
             $todate = \Carbon\Carbon::parse(Request('todate'))->endOfDay();
             $decimal_octets = sitting::where('id',1)->value('decimal_octets');
-        }
+
 
 
         $treasury_report = treasury_transaction::where('company_id', session::get('company_id'))
@@ -1158,6 +1222,7 @@ class ReportController extends Controller
             ->with('fromdate',$fromdate)
             ->with('todate',$todate)
             ->with('treasury_report',$treasury_report);
+        }
     }
 
     public function tr_index()

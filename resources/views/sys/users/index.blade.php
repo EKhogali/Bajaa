@@ -47,13 +47,15 @@
                             <th scope="row">{{$user->email ?? ''}}</th>
 {{--                            <th scope="row">{{$user->company->name ?? ''}}</th>--}}
                             <th scope="row"><a href="users/{{$user->id}}/edit" class="btn btn-warning">تعديل</a></th>
-{{--                            <th scope="row">--}}
-{{--                                <form method="post" class="delete_form" action="{{action('UserController@destroy', $user->id)}}">--}}
-{{--                                    {{csrf_field()}}--}}
-{{--                                    <input type="hidden" name="_method" value="DELETE" />--}}
-{{--                                    <button type="submit" class="btn btn-danger">الغاء</button>--}}
-{{--                                </form>--}}
-{{--                            </th>--}}
+                            @if($user->type != 3)
+                            <th scope="row">
+                                <form method="post" class="delete_form" action="{{action('UserController@destroy', $user->id)}}">
+                                    {{csrf_field()}}
+                                    <input type="hidden" name="_method" value="DELETE" />
+                                    <button type="submit" class="btn btn-danger">الغاء</button>
+                                </form>
+                            </th>
+                                @endif
                         </tr>
                     @endforeach
                     </tbody>

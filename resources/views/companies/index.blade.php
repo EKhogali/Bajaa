@@ -28,6 +28,7 @@
                         <th scope="col">العنوان</th>
                         <th scope="col">الهاتف</th>
                         <th scope="col">الحالة</th>
+                        <th scope="col">المستخدم</th>
                         <th scope="col">تعديل</th>
 {{--                        <th scope="col">delete</th>--}}
                     </tr>
@@ -49,6 +50,7 @@
                                 @else Inactive
                                 @endif
                             </th>
+                            <th scope="row">{{$company->user->name ?? ''}}</th>
                             <th scope="row"><a href="companies/{{$company->id}}/edit" class="btn btn-warning">Edit</a></th>
 {{--                            <th scope="row">--}}
 {{--                                <form method="post" class="delete_form" action="{{action('CompanyController@destroy', $company->id)}}">--}}

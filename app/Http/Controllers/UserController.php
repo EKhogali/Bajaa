@@ -45,11 +45,11 @@ class UserController extends Controller
             session::put('msgtype','notsuccess') ;
             return back()->with('message', $msg);
         }
-        if (! Request()->has('company_id')  || is_null(Request('company_id'))){
-            $msg = 'عفواً، يجب تحديد الشركة قبل المتابعة في العملية';
-            session::put('msgtype','notsuccess') ;
-            return back()->with('message', $msg);
-        }
+//        if (! Request()->has('company_id')  || is_null(Request('company_id'))){
+//            $msg = 'عفواً، يجب تحديد الشركة قبل المتابعة في العملية';
+//            session::put('msgtype','notsuccess') ;
+//            return back()->with('message', $msg);
+//        }
         if (! Request()->has('type')  || is_null(Request('type'))){
             $msg = 'عفواً، يجب تحديد الصفة قبل المتابعة في العملية';
             session::put('msgtype','notsuccess') ;
@@ -70,12 +70,16 @@ class UserController extends Controller
 
         \DB::table('users')->insert([
             'name' => Request('name')
-            ,'company_id' => Request('company_id')
+//            ,'company_id' => Request('company_id')
             ,'type' => Request('type')
             ,'email' => Request('email')
             ,'password' => Request('password')
             ,'created_by' => auth()->id()
             ,'updated_by' => auth()->id()
+            ,'current_company_id' => 1
+            ,'current_treasury_id' => 1
+            ,'current_financial_year_id' => 1
+            ,'current_financial_year' => 1
         ]);
         return redirect('/users');
     }
@@ -121,11 +125,11 @@ class UserController extends Controller
             session::put('msgtype','notsuccess') ;
             return back()->with('message', $msg);
         }
-        if (! Request()->has('company_id')  || is_null(Request('company_id'))){
-            $msg = 'عفواً، يجب تحديد الشركة قبل المتابعة في العملية';
-            session::put('msgtype','notsuccess') ;
-            return back()->with('message', $msg);
-        }
+//        if (! Request()->has('company_id')  || is_null(Request('company_id'))){
+//            $msg = 'عفواً، يجب تحديد الشركة قبل المتابعة في العملية';
+//            session::put('msgtype','notsuccess') ;
+//            return back()->with('message', $msg);
+//        }
         if (! Request()->has('type')  || is_null(Request('type'))){
             $msg = 'عفواً، يجب تحديد الصفة قبل المتابعة في العملية';
             session::put('msgtype','notsuccess') ;
@@ -142,7 +146,7 @@ class UserController extends Controller
             ->where('id',$id)
             ->update([
             'name' => Request('name')
-            ,'company_id' => Request('company_id')
+//            ,'company_id' => Request('company_id')
             ,'type' => Request('type')
             ,'email' => Request('email')
             ,'updated_by' => auth()->id()
@@ -158,6 +162,17 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::find($id);
+
+        $existsInOtherTable = company::where('user_id', $id)->exists();
+
+        if ($existsInOtherTable) {
+            return redirect()->route('users.index')->with('error', 'Cannot delete user because it exists in another table.');
+        }
+
+        // Delete the user
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }

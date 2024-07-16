@@ -9,9 +9,11 @@
             body * {
                 visibility: hidden;
             }
+
             #printableArea, #printableArea * {
                 visibility: visible;
             }
+
             #printableArea {
                 position: absolute;
                 left: 0;
@@ -26,26 +28,42 @@
 <br>
 
 <br>
-<div class="container row">
-    <div class="container col-3">
-        <form action="/treasury_report?fromdate={{Request('fromdate')}}&todate={{Request('todate')}}" method="get">
+<div class="container row" >
+    <div class="container col-3" >
+        <form action="/ledger2?fromdate={{Request('fromdate')}}&todate={{Request('todate')}}" method="get">
             {{ csrf_field() }}
             <div class="container-fluid row ">
                 <div class="col-12">
                     <label for="fromdate" class="form-label"><strong>تاريخ بداية الفترة: </strong></label>
-                    <input type="date" value="{{request()->has('fromdate') ? Request('fromdate') : \Carbon\Carbon::now()->startOfDay('')}}" class="form-control" id="fromdate" name="fromdate">
-{{--                    <input type="date" value="{{Request('fromdate') ?? \Carbon\Carbon::today()->format('d-m-y')}}" class="form-control" id="fromdate" name="fromdate">--}}
+                    <input type="date"
+                           value="{{request()->has('fromdate') ? Request('fromdate') : \Carbon\Carbon::now()->startOfDay('')}}"
+                           class="form-control" id="fromdate" name="fromdate">
                 </div>
                 <br><br>
                 <br><br>
 
                 <div class="col-12">
                     <label for="todate" class="form-label"><strong>تاريخ نهاية الفترة: </strong></label>
-                    <input type="date" value="{{request()->has('todate') ? Request('todate') : \Carbon\Carbon::now()->startOfDay('')}}" class="form-control" id="todate" name="todate">
+                    <input type="date"
+                           value="{{request()->has('todate') ? Request('todate') : \Carbon\Carbon::now()->startOfDay('')}}"
+                           class="form-control" id="todate" name="todate">
+                </div>
+                <br><br>
+                <br><br>
+
+                <div class="col-12">
+                    <label for="account_id" class="form-label"><strong>Account</strong></label>
+                    <select name="account_id"  class="form-control" >
+                        @foreach($accounts as $account)
+                            <option value="{{$account->id}}" @if($account->id == $account_id) selected @endif>
+                                {{$account->name}}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <br>
-            <div >
+            <div>
                 <button type="submit" class="btn btn-primary col mx-auto">تنفيـــــذ</button>
             </div>
         </form>
@@ -61,7 +79,7 @@
             <div class="col-12 text-center">
                 <h4>{{ session('company_name') }}</h4>
                 <br>
-                <h4>تقرير: الخزينة</h4>
+                <h4>تقرير: حركة حساب</h4>
                 <br>
                 <h5>من: {{ request()->get('fromdate') ?? '' }} إلى: {{ request()->get('todate') ?? '' }}</h5>
                 <br>
@@ -71,13 +89,11 @@
         <table class="table">
             <thead style="background-color: #f2f2f2; font-weight: bold;">
             <tr>
-                <th scope="row" width="4%" style="text-align: center;">#</th>
-{{--                <th scope="row" width="4%" style="text-align: center;"></th>--}}
+                <th scope="row" width="4%" style="text-align: center;"></th>
                 <th scope="col" style="text-align: center;">التاريخ</th>
                 <th scope="col" style="text-align: center;">صادر/وارد</th>
                 <th scope="col" style="text-align: center;">الحساب</th>
-                <th scope="col" style="text-align: center;">مدين (وارد)</th>
-                <th scope="col" style="text-align: center;">دائن (صادر)</th>
+                <th scope="col" style="text-align: center;">القيمة</th>
                 <th scope="col" style="text-align: center;">الوصف</th>
             </tr>
             </thead>
@@ -88,39 +104,29 @@
                 $tot_in = 0;
                 $rec_id = 0;
             @endphp
-            @foreach($treasury_report as $report)
+            @foreach($ledger2 as $report)
                 @php
                     $rec_id +=1;
 
                     if($report->transaction_type_id == 1){
                         $trans_txt = 'صادر';
-                        $tot_out += $report->amount;
-                        $credit = 0;
-                        $debit = $report->amount;
-                    }
+                        $tot_out += $report->amount;}
                     else{
                         $tot_in += $report->amount;
-                    $trans_txt = 'وارد';
-                        $credit = $report->amount;
-                        $debit = 0;
-                    }
+                    $trans_txt = 'وارد';}
 
                 @endphp
 
                 <tr>
                     <th scope="row">{{$rec_id ?? ''}}</th>
-{{--                    <th scope="row">{{$report->id ?? ''}}</th>--}}
-{{--                    <th scope="row">{{$report->manual_no ?? ''}}</th>--}}
+                    {{--                    <th scope="row">{{$report->manual_no ?? ''}}</th>--}}
                     <th scope="row">{{\Carbon\Carbon::parse($report->date)->format('yy-m-d') ?? ''}}</th>
                     <th scope="row"> {{$trans_txt}} </th>
                     <th scope="row">{{$report->account->name ?? ''}}</th>
-{{--                    <th scope="row">{{$report->treasury->name ?? ''}}</th>--}}
-{{--                    <th scope="row">{{ $report->transaction_type_id == 0 ? number_format($report->amount, $decimal_octets) : '' }}</th>--}}
-                    <th scope="row">{{ number_format($credit, $decimal_octets) }}</th>
-                    <th scope="row">{{ number_format($debit, $decimal_octets) }}</th>
-{{--                    <th scope="row">{{ isset($report->amount) and ($report->transaction_type_id == 1) ? number_format($report->amount, $decimal_octets) : '' }}</th>--}}
+                    {{--                    <th scope="row">{{$report->treasury->name ?? ''}}</th>--}}
+                    <th scope="row">{{ isset($report->amount) ? number_format($report->amount, $decimal_octets) : '' }}</th>
                     <th scope="row">{{$report->description ?? ''}}</th>
-{{--                    <th scope="row">{{$report->tag_id == 1 ? 'مسحوبات' : '/'}}</th>--}}
+                    {{--                    <th scope="row">{{$report->tag_id == 1 ? 'مسحوبات' : '/'}}</th>--}}
 
                 </tr>
 
@@ -153,10 +159,6 @@
 
     </div>
 </div>
-
-
-
-
 
 
 <script>

@@ -83,6 +83,7 @@
     {{--                        <li><a class="dropdown-item" href="/tr_index">ميزان المراجعـــة</a></li>--}}
                             <li><a class="dropdown-item" href="/income_report">تقرير الدخل</a></li>
                             <li><a class="dropdown-item" href="/treasury_report">تقرير الخزينة</a></li>
+                            <li><a class="dropdown-item" href="/ledger2">تقرير حركة حساب</a></li>
                             <li><a class="dropdown-item" href="/account_details_report">تقرير الحركة التفصيلية لحساب</a></li>
                         </ul>
                     </li>

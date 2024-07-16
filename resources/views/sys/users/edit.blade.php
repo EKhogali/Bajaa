@@ -15,8 +15,8 @@
 
     </div>
     <div class="container col-10">
-{{--        <form action="/users/{{$user->id}}" method="POST" >--}}
-            <form action="{{ route('users.update', ['user' => $user->id]) }}" method="POST">
+        <form action="/users/{{$user->id}}" method="POST" >
+{{--            <form action="{{ route('users.update', ['user' => $user->id]) }}" method="POST">--}}
 
             {{ csrf_field() }}
             @method('PUT')
@@ -47,18 +47,18 @@
             </div>
             <br>
 
-            <div class="container-fluid row">
-                <div class="col-6">
-                    <label for="company_id" class="form-label">الشركة</label>
-                    <select name="company_id" id="company_id" class="form-control" required>
-                        @foreach($companies as $company)
-                            <option value="{{ $company->id }}" {{ $user->company_id == $company->id ? 'selected' : '' }}>
-                                {{ $company->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
+{{--            <div class="container-fluid row">--}}
+{{--                <div class="col-6">--}}
+{{--                    <label for="company_id" class="form-label">الشركة</label>--}}
+{{--                    <select name="company_id" id="company_id" class="form-control" required>--}}
+{{--                        @foreach($companies as $company)--}}
+{{--                            <option value="{{ $company->id }}" {{ $user->company_id == $company->id ? 'selected' : '' }}>--}}
+{{--                                {{ $company->name }}--}}
+{{--                            </option>--}}
+{{--                        @endforeach--}}
+{{--                    </select>--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             <br>
             <div class="row ">

@@ -45,7 +45,21 @@
             <div class="container-fluid row ">
                 <div class="col-6">
                     <label for="tel" class="form-label">رقم الهاتف</label>
-                    <input type="text" value="{{$company->tel}}" class="form-control" id="tel" name="tel"></div>
+                    <input type="text" value="{{$company->tel}}" class="form-control" id="tel" name="tel">
+                </div>
+            </div>
+            <br>
+            <div class="container-fluid row ">
+                <div class="col-6">
+                    <label for="tel" class="form-label">المستخدم</label>
+                    <select name="user_id"  class="form-control" >
+                        @foreach($users as $user)
+                            <option value="{{$user->id}}" @if($user->id == $company->user_id) selected @endif>
+                                {{$user->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <br>
             <div class="row ">

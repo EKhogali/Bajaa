@@ -58,6 +58,7 @@ Route::get('treasury_transaction/{id}/print', [\App\Http\Controllers\TreasuryTra
 Route::get('/journaldd/{id}', [JournalmController::class,'show']);
 Route::get('/income_report', [ReportController::class, 'income_report']);
 Route::get('/treasury_report', [ReportController::class, 'treasury_report']);
+Route::get('/ledger2', [ReportController::class, 'ledger2']);
 Route::get('/account_details_report', [ReportController::class, 'account_details_report']);
 
 Auth::routes(['register' => true]);
