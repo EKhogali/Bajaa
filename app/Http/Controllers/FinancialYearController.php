@@ -50,6 +50,8 @@ class FinancialYearController extends Controller
 
         $company = company::find(Request()->company_id);
         $financial_years = financial_year::where('company_id',$company->id)->get();
+        created_by = auth()->id();
+            updated_by = auth()->id();
 
 
         return view('companies.show',[
