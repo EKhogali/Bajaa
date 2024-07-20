@@ -42,7 +42,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        $users = User::where('archived',1)->get();
+        $users = User::where('archived',0)->get();
         return view('companies.create')->with('users',$users);
     }
 
@@ -70,6 +70,8 @@ class CompanyController extends Controller
                 'tel' => request('tel') ?? '',
                 'active' => 1,
                 'user_id' => request('user_id'),
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
             ]);
 
             DB::table('treasuries')->insert([
@@ -128,7 +130,7 @@ class CompanyController extends Controller
      */
     public function edit(company $company)
     {
-        $users = User::where('archived',1)->get();
+        $users = User::where('archived',0)->get();
         return view('/companies.edit',[
             'company' => $company
             ,'users' => $users

@@ -60,7 +60,7 @@
                     <th scope="col">الرقم اليدوي</th>
                     <th scope="col">التاريخ</th>
                     <th scope="col">الحساب</th>
-                    <th scope="col">الخزينة</th>
+{{--                    <th scope="col">الخزينة</th>--}}
                     <th scope="col">القيمة</th>
                     <th scope="col">الوصف</th>
                     <th scope="col">وسم</th>
@@ -77,7 +77,7 @@
                         <th scope="row">{{$treasury_transact->manual_no ?? ''}}</th>
                         <th scope="row">{{\Carbon\Carbon::parse($treasury_transact->date)->format('yy-m-d') ?? ''}}</th>
                         <th scope="row">{{$treasury_transact->account->name ?? ''}}</th>
-                        <th scope="row">{{$treasury_transact->treasury->name ?? ''}}</th>
+{{--                        <th scope="row">{{$treasury_transact->treasury->name ?? ''}}</th>--}}
                         <th scope="row">{{ isset($treasury_transact->amount) ? number_format($treasury_transact->amount, 2) : '' }}</th>
                         <th scope="row">{{$treasury_transact->description ?? ''}}</th>
                         <th scope="row">{{$treasury_transact->tag_id == 1 ? 'مسحوبات' : '/'}}</th>

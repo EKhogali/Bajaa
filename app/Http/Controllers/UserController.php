@@ -6,6 +6,7 @@ use App\company;
 use App\treasury_transaction;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
@@ -73,7 +74,9 @@ class UserController extends Controller
 //            ,'company_id' => Request('company_id')
             ,'type' => Request('type')
             ,'email' => Request('email')
-            ,'password' => Request('password')
+//            ,'password' => Request('password')
+            ,'password' => Hash::make(Request('password'))
+            ,'archived' => 0
             ,'created_by' => auth()->id()
             ,'updated_by' => auth()->id()
             ,'current_company_id' => 1
