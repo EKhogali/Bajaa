@@ -41,7 +41,7 @@ class FinancialYearController extends Controller
      */
     public function store(Request $request)
     {
-//        dd(Request()->company_id);
+
         \DB::table('financial_years')->insert([
             'financial_year'=>Request()->financial_year ?? 0
             ,'company_id'=>Request()->company_id
