@@ -32,7 +32,7 @@ class homeController extends Controller
     public function index()
     {
 
-        if(auth()->user()->type == 3){ //admin
+        if(auth()->user()->type == 1){ //admin
             $companies = company::where('archived',0)->get();
             $financial_years = financial_year::where('archived',0)
                 ->get();
@@ -68,7 +68,7 @@ class homeController extends Controller
         session::put('company_name',$companyRec->name);
         session::put('financial_year',$financial_yearRec->financial_year);
 
-        if(auth()->user()->type == 3){ //admin
+        if(auth()->user()->type == 1){ //admin
             $companies = company::where('archived',0)->get();
             $financial_years = financial_year::where('archived',0)
                 ->get();
