@@ -10,22 +10,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-14">
-      <change afterPath="$PROJECT_DIR$/resources/views/rep/ledger2.blade.php" afterDir="false" />
+    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/company.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/company.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/companies/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/companies/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/rep/treasury_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/treasury_report.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/sys/users/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/sys/users/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/sys/users/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/sys/users/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/sys/users/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/sys/users/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,35 +216,8 @@
       <workItem from="1720386787746" duration="5240000" />
       <workItem from="1720496089160" duration="1652000" />
       <workItem from="1720972979872" duration="7425000" />
-      <workItem from="1721077614908" duration="13526000" />
-    </task>
-    <task id="LOCAL-00001" summary="1">
-      <created>1642851441541</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1642851441541</updated>
-    </task>
-    <task id="LOCAL-00002" summary="1">
-      <created>1642851654027</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1642851654027</updated>
-    </task>
-    <task id="LOCAL-00003" summary="1">
-      <created>1645980998886</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1645980998886</updated>
-    </task>
-    <task id="LOCAL-00004" summary="2024-06-22">
-      <created>1719178938385</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1719178938385</updated>
+      <workItem from="1721077614908" duration="14846000" />
+      <workItem from="1721479490996" duration="1298000" />
     </task>
     <task id="LOCAL-00005" summary="2024-06-22">
       <created>1719180102476</created>
@@ -575,7 +534,35 @@
       <option name="project" value="LOCAL" />
       <updated>1721078873849</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="2024-07-16">
+      <created>1721166965971</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1721166965972</updated>
+    </task>
+    <task id="LOCAL-00051" summary="2024-07-24">
+      <created>1721479743904</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1721479743906</updated>
+    </task>
+    <task id="LOCAL-00052" summary="2024-07-24">
+      <created>1721480077526</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1721480077526</updated>
+    </task>
+    <task id="LOCAL-00053" summary="2024-07-24">
+      <created>1721480178026</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1721480178026</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -603,7 +590,9 @@
     <MESSAGE value="2024-07-07-3" />
     <MESSAGE value="2024-07-11" />
     <MESSAGE value="2024-07-14" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-07-14" />
+    <MESSAGE value="2024-07-16" />
+    <MESSAGE value="2024-07-24" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-07-24" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -618,9 +607,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="499" y="164" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651363755" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1719698379546">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1721306034578">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1721306034578" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1719698379546" />
     <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1718888533940">
       <screen x="0" y="0" width="1536" height="834" />
@@ -646,10 +636,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1721078876084">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1721480179294">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1721078876084" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1721480179294" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
