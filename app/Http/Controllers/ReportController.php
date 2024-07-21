@@ -723,7 +723,7 @@ public function ledger2()
                 'number1_2' => 0,
                 'number2' => $query->amount / $days,
                 'number3' => (($query->amount /  ($adminExpenses )  )     * 100),
-                'number4' => (($query->amount) / ($tot_in)) * 100,
+                'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
 
                 'note' => 0,
             ]);
