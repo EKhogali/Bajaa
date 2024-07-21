@@ -24,50 +24,49 @@
 
             <div class="card-body">
                 {{-- List of companies --}}
-                <table class="table">
-                    <tbody>
-                    @foreach($companies as $company)
-                        <tr>
-                            <td>
-                                <h2>{{$company->name}}</h2>
-                            </td>
-                            <td>
-                                <ul class="list-group">
-                                    @forelse($financial_years->where('company_id', $company->id) as $financial_year)
-                                        <li class="list-group-item">
-                                            <a href="/company_and_financial_year?financial_year_id={{$financial_year->id}}&company_id={{$company->id}}">
-                                                {{$financial_year->financial_year}}
-                                            </a>
-                                        </li>
-                                    @empty
-                                        <li class="list-group-item">No financial years found for this company.</li>
-                                    @endforelse
-                                </ul>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-
-
-                {{--                <ul class="list-group">--}}
+{{--                <table class="table">--}}
+{{--                    <tbody>--}}
 {{--                    @foreach($companies as $company)--}}
-{{--                        <li class="list-group-item">--}}
-{{--                            <h2>{{$company->name}}</h2>--}}
-{{--                            <ul class="list-group">--}}
-{{--                                @forelse($financial_years->where('company_id', $company->id) as $financial_year)--}}
-{{--                                    <li class="list-group-item">--}}
-{{--                                        <a href="/company_and_financial_year?financial_year_id={{$financial_year->id}}&company_id={{$company->id}}">--}}
-{{--                                            {{$financial_year->financial_year}}--}}
-{{--                                        </a>--}}
-{{--                                    </li>--}}
-{{--                                @empty--}}
-{{--                                    <li class="list-group-item">No financial years found for this company.</li>--}}
-{{--                                @endforelse--}}
-{{--                            </ul>--}}
-{{--                        </li>--}}
+{{--                        <tr>--}}
+{{--                            <td>--}}
+{{--                                <h2>{{$company->name}}</h2>--}}
+{{--                            </td>--}}
+{{--                            <td>--}}
+{{--                                <ul class="list-group">--}}
+{{--                                    @forelse($financial_years->where('company_id', $company->id) as $financial_year)--}}
+{{--                                        <li class="list-group-item">--}}
+{{--                                            <a href="/company_and_financial_year?financial_year_id={{$financial_year->id}}&company_id={{$company->id}}">--}}
+{{--                                                {{$financial_year->financial_year}}--}}
+{{--                                            </a>--}}
+{{--                                        </li>--}}
+{{--                                    @empty--}}
+{{--                                        <li class="list-group-item">No financial years found for this company.</li>--}}
+{{--                                    @endforelse--}}
+{{--                                </ul>--}}
+{{--                            </td>--}}
+{{--                        </tr>--}}
 {{--                    @endforeach--}}
-{{--                </ul>--}}
+{{--                    </tbody>--}}
+{{--                </table>--}}
+
+                                <ul class="list-group">
+                    @foreach($companies as $company)
+                        <li class="list-group-item">
+                            <h2>{{$company->name}}</h2>
+                            <ul class="list-group">
+                                @forelse($financial_years->where('company_id', $company->id) as $financial_year)
+                                    <li class="list-group-item">
+                                        <a href="/company_and_financial_year?financial_year_id={{$financial_year->id}}&company_id={{$company->id}}">
+                                            {{$financial_year->financial_year}}
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li class="list-group-item">No financial years found for this company.</li>
+                                @endforelse
+                            </ul>
+                        </li>
+                    @endforeach
+                </ul>
                 {{-- End list of companies --}}
             </div>
 

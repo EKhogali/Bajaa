@@ -78,6 +78,7 @@
                     <th scope="col">الحساب</th>
                     <th scope="col">الكمية</th>
                     <th scope="col">القيمة</th>
+                    <th scope="col">الوحدة</th>
                     <th scope="col">تعديل</th>
                     <th scope="col">الغاء</th>
                 </tr>
@@ -88,6 +89,7 @@
                         <th scope="row">{{$treasury_transaction_detail->account->name ?? ''}}</th>
                         <th scope="row">{{$treasury_transaction_detail->qty ?? ''}}</th>
                         <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{ isset($treasury_transaction_detail->amount) ? number_format($treasury_transaction_detail->amount, 2) : '' }}</th>
+                        <th scope="row">{{$treasury_transaction_detail->account->Unit_description ?? ''}}</th>
 
                         <th scope="row" width="10%"><a href="treasury_transaction_details/{{$treasury_transaction_detail->id}}/edit" class="btn btn-warning">تعديل</a></th>
                         <th scope="row" width="10%">
