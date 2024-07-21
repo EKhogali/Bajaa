@@ -28,10 +28,12 @@
                 <div class="col-6">
                     <label for="type" class="form-label">صفة المستخدم</label>
                     <select name="type" id="type" class="form-control">
-{{--                        <option value="1">Admin</option>--}}
-                        <option value="2">Supervisor</option>
-                        <option value="3" selected>Data Entry</option>
-                        <option value="4">Reporter</option>
+                        @if(auth()->id() == 1)
+                            <option value="1">مدير النظام</option>
+                            <option value="2">مشرف</option>
+                        @endif
+                        <option value="3" selected>مدخل بيانات</option>
+                        <option value="4">مسؤول تقارير</option>
                     </select>
                 </div>
             </div>

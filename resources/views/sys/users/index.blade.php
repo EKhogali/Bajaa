@@ -38,16 +38,16 @@
                             <th scope="row">{{$user->id ?? ''}}</th>
                             <th scope="row">{{$user->name ?? ''}}</th>
                             <th scope="row">
-                                @if($user->type == 1)     admin
-                                @elseif($user->type == 2) supervisor
-                                @elseif($user->type == 3) data entry
-                                @elseif($user->type == 4) Reporter
+                                @if($user->type == 1)     مدير النظام
+                                @elseif($user->type == 2) مشرف النظام
+                                @elseif($user->type == 3) مدخل بيانات
+                                @elseif($user->type == 4) مسؤول تقارير
                                 @endif
                             </th>
                             <th scope="row">{{$user->email ?? ''}}</th>
 {{--                            <th scope="row">{{$user->company->name ?? ''}}</th>--}}
                             <th scope="row"><a href="users/{{$user->id}}/edit" class="btn btn-warning">تعديل</a></th>
-                            @if($user->type != 3)
+                            @if($user->type != 1)
                             <th scope="row">
                                 <form method="post" class="delete_form" action="{{action('UserController@destroy', $user->id)}}">
                                     {{csrf_field()}}

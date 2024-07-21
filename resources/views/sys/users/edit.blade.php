@@ -31,10 +31,12 @@
                 <div class="col-6">
                     <label for="type" class="form-label">صفة المستخدم</label>
                     <select name="type" id="type" class="form-control">
-                        <option value="1" {{ $user->type == 1 ? 'selected' : '' }}>Admin</option>
-                        <option value="2" {{ $user->type == 2 ? 'selected' : '' }}>Supervisor</option>
-                        <option value="3" {{ $user->type == 3 ? 'selected' : '' }}>Data Entry</option>
-                        <option value="4" {{ $user->type == 4 ? 'selected' : '' }}>Reporter</option>
+                        @if(auth()->id() == 1)
+                            <option value="1" {{ $user->type == 1 ? 'selected' : '' }}>مدير النظام</option>
+                            <option value="2" {{ $user->type == 2 ? 'selected' : '' }}>مشرف النظام</option>
+                        @endif
+                        <option value="3" {{ $user->type == 3 ? 'selected' : '' }}>مدخل بيانات</option>
+                        <option value="4" {{ $user->type == 4 ? 'selected' : '' }}>مسؤول تقارير</option>
                     </select>
                 </div>
             </div>
