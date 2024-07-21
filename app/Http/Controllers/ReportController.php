@@ -660,7 +660,7 @@ public function ledger2()
             'number1_2' => $operation_expenses,
             'number2' => $operation_expenses_aday,
             'number3' => ( $total_op_pct / $operation_expenses) * 100,
-            'number4' => ( $total_op_pct / $tot_in + $other_income_total + $faaed - $ajz) * 100,
+            'number4' => ( $total_op_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
             'note' => 0,
         ]);
         //--------------------------------------------------------------------------------------------------------------
@@ -747,7 +747,7 @@ public function ledger2()
             'number1_2' => $adminExpenses,
             'number2' => $adminExpenses_aday,
             'number3' => ( $total_admin_pct / $adminExpenses) * 100,
-            'number4' => ( $total_admin_pct / $tot_in + $other_income_total + $faaed - $ajz) * 100,
+            'number4' => ( $total_admin_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
             'note' => 0,
         ]);
         //--------------------------------------------------------------------------------------------------------------
