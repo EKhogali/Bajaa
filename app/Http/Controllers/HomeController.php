@@ -40,9 +40,16 @@ class homeController extends Controller
             $companies = company::where('user_id',auth()->id())
                 ->where('archived',0)
                 ->get();
-            $financial_years = financial_year::where('company_id', $companies->first()->id)//$companies->pluck('id')->toarray()
-                ->where('archived',0)
-                ->get();
+            $financial_years = financial_year::where('archived',0)
+                ->wherein('company_id',function ($query){
+                    $query->select('id')
+                        ->from('companies')
+                        ->where('user_id', auth()->id());
+                })->get();
+
+//            $financial_years = financial_year::where('company_id', $companies->first()->id)//$companies->pluck('id')->toarray()
+//                ->where('archived',0)
+//                ->get();
         }
 
         $companyRec = $companies->first();
