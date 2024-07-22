@@ -10,6 +10,18 @@
     <h3 >Edit Company {{$company->name}} Details</h3>
 </div>
 <br>
+@if( session()->has('message') )
+    @if( session()->has('msgtype') )
+        @if( session()->get('msgtype') == 'success' )
+            <div class="alert alert-success">
+                @elseif(session()->get('msgtype') == 'notsuccess' )
+                    <div class="alert alert-danger">
+                        @endif
+                        @endif
+                        {{ session()->get('message') }}
+                    </div>
+                @endif
+                <br>
 <div class="container row">
     <div class="container col-2">
 

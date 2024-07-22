@@ -52,6 +52,21 @@ class TreasuryTransactionDetailController extends Controller
             'qty' => 'required|numeric',
         ]);
 
+        $master_amount = DB::table('treasury_transactions')
+            ->where('id',Request('master_id'))
+            ->sum('amount');
+        $details_totals = DB::table('treasury_transaction_details')
+            ->where('master_id',Request('master_id'))
+            ->sum('amount');
+        if(($details_totals + Request('amount') ?? 0) > $master_amount){
+
+            $msg = 'عفواً، لا يمكن حفظ القيمة الجديدة لتجاوزها قيمة اجمالي الايصال';
+            session::put('msgtype','notsuccess') ;
+            session::put('message',$msg) ;
+
+            return back()->with('message',$msg);
+        }else{
+
         \DB::table('treasury_transaction_details')->insert([
 
             'company_id' => session::get('company_id'),
@@ -65,11 +80,9 @@ class TreasuryTransactionDetailController extends Controller
             'updated_by' => auth()->id(),
         ]);
 
-//        return back();
         $treasury_transaction = treasury_transaction::findorfail(Request('master_id'));
-//        dd($treasury_transaction);
         return redirect()->route('treasury_transaction.show',['treasury_transaction'=>$treasury_transaction]);
-//        return view('trans.treasury_transaction.show', compact($request->input('master_id')));
+        }
     }
 
     /**
