@@ -46,9 +46,25 @@
                             <th scope="row">القيمة بالحروف</th>
                             <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{\Alkoumi\LaravelArabicTafqeet\Tafqeet::inArabic($treasury_transaction->amount,'ld')}}</th>
                         </tr>
+{{--                        <tr>--}}
+{{--                            <th scope="row">الخزينة</th>--}}
+{{--                            <th scope="row">{{$treasury_transaction->treasury->name ?? ''}}</th>--}}
+{{--                        </tr>--}}
                         <tr>
-                            <th scope="row">الخزينة</th>
-                            <th scope="row">{{$treasury_transaction->treasury->name ?? ''}}</th>
+                            <th scope="row">اجمالي قيمة الايصال</th>
+                            <th scope="row" style="background-color: #ffed4a; color: firebrick;">{{number_format($treasury_transaction->amount, 2) ?? ''}}</th>
+                        </tr>
+                        <tr>
+                            <th scope="row">اجمالي قيمة التفاصيل</th>
+                            <th scope="row">{{ number_format($treasury_transaction_details->sum('amount'), 2) ?? ''}}</th>
+                        </tr>
+                        <tr>
+                            <th scope="row">اجمالي الفرق</th>
+                            <th scope="row">{{ number_format(
+                                                        $treasury_transaction->amount
+                                                        -
+                                                        $treasury_transaction_details->sum('amount')
+                                                        , 2) ?? ''}}</th>
                         </tr>
                     </tbody>
                 </table>

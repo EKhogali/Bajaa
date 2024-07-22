@@ -46,10 +46,10 @@
                             <th scope="row">القيمة بالحروف</th>
                             <th scope="row" style="background-color: #6cb2eb; color: firebrick;">{{\Alkoumi\LaravelArabicTafqeet\Tafqeet::inArabic($treasury_transaction->amount,'ld')}}</th>
                         </tr>
-                        <tr>
-                            <th scope="row">الخزينة</th>
-                            <th scope="row">{{$treasury_transaction->treasury->name ?? ''}}</th>
-                        </tr>
+{{--                        <tr>--}}
+{{--                            <th scope="row">الخزينة</th>--}}
+{{--                            <th scope="row">{{$treasury_transaction->treasury->name ?? ''}}</th>--}}
+{{--                        </tr>--}}
                         <tr>
                             <th scope="row">البيان</th>
                             <th scope="row">{{$treasury_transaction->description ?? ''}}</th>
