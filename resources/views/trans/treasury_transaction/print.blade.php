@@ -28,10 +28,10 @@
                 <th>الحساب</th>
                 <td>{{ $treasury_transaction->account->name }}</td>
             </tr>
-            <tr>
-                <th>الخزينة</th>
-                <td>{{ $treasury_transaction->treasury->name }}</td>
-            </tr>
+{{--            <tr>--}}
+{{--                <th>الخزينة</th>--}}
+{{--                <td>{{ $treasury_transaction->treasury->name }}</td>--}}
+{{--            </tr>--}}
             <tr>
                 <th>القيمة</th>
                 <td>{{ number_format($treasury_transaction->amount, 2) }}</td>
