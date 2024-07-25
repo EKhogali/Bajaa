@@ -7,7 +7,7 @@
 
 <br>
 <div class="container">
-    <h3 >Edit Company {{$company->name}} Details</h3>
+    <h3 >تعديل بيانات </h3>
 </div>
 <br>
 @if( session()->has('message') )
@@ -27,31 +27,43 @@
 
     </div>
     <div class="container col-10">
-        <form action="/companies/{{$company->id}}" method="POST" >
+        <form action="/treasury_transaction_details/{{$treasury_transaction_detail->id}}" method="POST" >
             {{ csrf_field() }}
             @method('PUT')
             <div class="container-fluid row ">
                 <div class="col-6">
-                    <label for="name" class="form-label">Company Name</label>
-                    <input type="text" value="{{$company->name}}" class="form-control" id="name" name="name"></div>
+                    <label for="account_id">الحساب</label>
+                    <select class="form-control" id="account_id" name="account_id" required>
+                        <option value="">اختر الحساب</option>
+                        @foreach($accounts as $account)
+                            <option value="{{ $account->id }}" @if($account->id == $treasury_transaction_detail->account_id) selected @endif>
+                                {{ $account->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <br>
             <div class="container-fluid row ">
                 <div class="col-6">
-                    <label for="address" class="form-label">Company Address</label>
-                    <input type="text" value="{{$company->address}}" class="form-control" id="address" name="address"></div>
+                    <label for="qty">الكمية</label>
+                    <input type="text" class="form-control" id="qty" name="qty" required value="{{$treasury_transaction_detail->qty}}">
+                </div>
             </div>
+
+            <input type="text" hidden name="master_id" value="{{$treasury_transaction_detail->master_id}}">
             <br>
             <div class="container-fluid row ">
                 <div class="col-6">
-                    <label for="tel" class="form-label">Company Telephone</label>
-                    <input type="text" value="{{$company->tel}}" class="form-control" id="tel" name="tel"></div>
+                    <label for="amount">القيمة</label>
+                    <input type="text" class="form-control" id="amount" name="amount" required value="{{$treasury_transaction_detail->amount}}">
+                </div>
             </div>
             <br>
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
 
                 </div>
                 <div class="col"></div>
@@ -62,6 +74,15 @@
     </div>
 </div>
 
+
+                    <script>
+                        $(document).ready(function() {
+                            $('#account_id').select2({
+                                placeholder: 'اختر الحساب',
+                                width: '100%' // Adjust the width as needed
+                            });
+                        });
+                    </script>
 </body>
 </html>
 @endsection

@@ -27,6 +27,10 @@
                     </thead>
                     <tbody>
                         <tr>
+                            {{--                <th></th>--}}
+                            <td>{{ session('company_name') }}</td>
+                        </tr>
+                        <tr>
                             <th scope="row">رقم الايصال</th>
                             <th scope="row">{{$treasury_transaction->id ?? ''}}</th>
                         </tr>

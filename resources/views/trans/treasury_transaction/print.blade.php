@@ -1,6 +1,9 @@
 @extends('layout.master')
 @section('content')
     <div class="container" style="border: 2px solid #000000; padding: 10px; margin: 5px;">
+        <div class="container">
+            <h3>{{session('company_name')}}</h3>
+        </div>
         @if($treasury_transaction->trans_type == 0)
             <div class="container">
                 <h3>تفاصيل إيصال قبض</h3>
@@ -16,10 +19,10 @@
                 <th>رقم آلي</th>
                 <td>{{ $treasury_transaction->id }}</td>
             </tr>
-            <tr>
-                <th>الرقم اليدوي</th>
-                <td>{{ $treasury_transaction->manual_no }}</td>
-            </tr>
+{{--            <tr>--}}
+{{--                <th>الرقم اليدوي</th>--}}
+{{--                <td>{{ $treasury_transaction->manual_no }}</td>--}}
+{{--            </tr>--}}
             <tr>
                 <th>التاريخ</th>
                 <td>{{ \Carbon\Carbon::parse($treasury_transaction->date)->format('Y-m-d') }}</td>

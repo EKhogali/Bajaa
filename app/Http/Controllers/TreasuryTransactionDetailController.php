@@ -106,8 +106,9 @@ class TreasuryTransactionDetailController extends Controller
     {
         $accounts = account::where('is_details',1)
             ->get();
-        return view('\trans.treasury_transaction.treasury_transaction_details.edit')
+        return view('trans.treasury_transaction.treasury_transaction_details.edit')
 //            ->with('master_id',Request('master_id'))
+            ->with('treasury_transaction_detail',$treasury_transaction_detail)
             ->with('accounts',$accounts);
     }
 
@@ -120,7 +121,33 @@ class TreasuryTransactionDetailController extends Controller
      */
     public function update(Request $request, treasury_transaction_detail $treasury_transaction_detail)
     {
-        //
+        if (! Request()->has('account_id')  || is_null(Request('account_id'))){
+            $msg = 'عفواً، يجب تحديد اسم الحساب قبل المتابعة في العملية';
+            session::put('msgtype','notsuccess') ;
+            return back()->with('message', $msg);
+        }
+        if (! Request()->has('amount')  || is_null(Request('amount'))){
+            $msg = 'عفواً، يجب تحديد القيمة قبل المتابعة في العملية';
+            session::put('msgtype','notsuccess') ;
+            return back()->with('message', $msg);
+        }
+        if (! Request()->has('qty')  || is_null(Request('qty'))){
+            $msg = 'عفواً، يجب تحديد الكمية قبل المتابعة في العملية';
+            session::put('msgtype','notsuccess') ;
+            return back()->with('message', $msg);
+        }
+
+        \DB::table('treasury_transaction_details')
+            ->where('id',$treasury_transaction_detail->id)
+            ->update([
+                'account_id'=>Request('account_id'),
+                'amount'=>Request('amount') ?? 0,
+                'qty'=>Request('qty') ?? 0,
+                'updated_by' => auth()->id(),
+            ]);
+
+//        return redirect('/accounts');
+        return redirect()->route('treasury_transaction.show', Request('master_id'));
     }
 
     /**

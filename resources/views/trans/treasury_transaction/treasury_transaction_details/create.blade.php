@@ -38,7 +38,7 @@
                             <option value="{{ $account->id }}">{{ $account->name }}</option>
                         @endforeach
                     </select>
-            </div>
+                </div>
 
                 <br>
                 <input type="text" hidden value="{{Request('master_id')}}" name="master_id">
@@ -63,7 +63,7 @@
                 <div class="container-fluid row">
                 <div class="col"></div>
                 <div class="col-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
                 </div>
                 <div class="col"></div>
             </div>
@@ -73,6 +73,14 @@
     </div>
 </div>
 
+    <script>
+        $(document).ready(function() {
+            $('#account_id').select2({
+                placeholder: 'اختر الحساب',
+                width: '100%' // Adjust the width as needed
+            });
+        });
+    </script>
 </body>
 </html>
 @endsection
