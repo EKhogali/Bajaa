@@ -634,8 +634,8 @@ public function ledger2()
                     'number1' => $query->amount,
                     'number1_2' => 0,
                     'number2' => $query->amount / $days,
-                    'number3' => (($query->amount /  ($operation_expenses)  )     * 100),
-                    'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
+                    'number3' => (($query->amount /  ($operation_expenses)  )     * 100) ?? 0,
+                    'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
 
                     'note' => 0,
                 ]);
@@ -659,8 +659,8 @@ public function ledger2()
             'number1' => 0,
             'number1_2' => $operation_expenses,
             'number2' => $operation_expenses_aday,
-            'number3' => ( $total_op_pct / $operation_expenses) * 100,
-            'number4' => ( $total_op_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
+            'number3' => ( $total_op_pct / $operation_expenses) * 100 ?? 0,
+            'number4' => ( $total_op_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
             'note' => 0,
         ]);
         //--------------------------------------------------------------------------------------------------------------
@@ -722,8 +722,8 @@ public function ledger2()
                 'number1' => $query->amount,
                 'number1_2' => 0,
                 'number2' => $query->amount / $days,
-                'number3' => (($query->amount /  ($adminExpenses )  )     * 100),
-                'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
+                'number3' => (($query->amount /  ($adminExpenses )  )     * 100) ?? 0,
+                'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
 
                 'note' => 0,
             ]);
@@ -746,8 +746,8 @@ public function ledger2()
             'number1' => 0,
             'number1_2' => $adminExpenses,
             'number2' => $adminExpenses_aday,
-            'number3' => ( $total_admin_pct / $adminExpenses) * 100,
-            'number4' => ( $total_admin_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100,
+            'number3' => ( $total_admin_pct / $adminExpenses) * 100 ?? 0,
+            'number4' => ( $total_admin_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
             'note' => 0,
         ]);
         //--------------------------------------------------------------------------------------------------------------
@@ -829,8 +829,8 @@ public function ledger2()
                 'number1' => $query->amount,
                 'number1_2' => 0,
                 'number2' => $query->amount / $days,
-                'number3' => (($query->amount /  ($adminExpenses + $operation_expenses)  )     * 100),
-                'number4' => (($query->amount) / ($tot_in)) * 100,
+                'number3' => (($query->amount /  ($adminExpenses + $operation_expenses)  )     * 100) ?? 0,
+                'number4' => (($query->amount) / ($tot_in)) * 100 ?? 0,
 
                 'note' => 0,
             ]);

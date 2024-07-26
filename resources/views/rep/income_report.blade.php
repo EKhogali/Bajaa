@@ -130,7 +130,7 @@
                     <th scope="row" width="15%">{{ $number1_2 }}</th>
                     <th scope="row" width="15%">{{ $number2 }}</th>
                     @if($ordr1 == 9 or $ordr1 == 10 or $ordr1 == 12 or $ordr1 == 13)
-                    <th scope="row" width="15%">{{ number_format(5 ?? 0,2).'%' }}</th>
+                    <th scope="row" width="15%">{{ number_format($number3 ?? 0,2).'%' }}</th>
                     <th scope="row" width="15%">{{ number_format($number4 ?? 0,2).'%' }}</th>
                     @else
                     <th scope="row" width="15%">{{ $number3 }}</th>
