@@ -394,9 +394,9 @@ public function ledger2()
         // -------------------------------------------------------------------------------------------------------------
         $rec_id = 0;
         DB::table('income_reports')
-            ->where('created_by',auth()->id())
-            ->where('company_id',session::get('company_id'))
-            ->where('financial_year',session::get('financial_year'))
+//            ->where('created_by',auth()->id())
+//            ->where('company_id',session::get('company_id'))
+//            ->where('financial_year',session::get('financial_year'))
             ->delete();
 
         DB::table('income_reports')->insert([
