@@ -111,12 +111,12 @@
 
                     // Replace zero values with an empty string for focus
                     if($ordr1 != 0){
-                        $number1 = $number1 == 0 ? '' : number_format($number1, $decimal_octets);
+                        $number1 = $number1 == 0 ? 0 : number_format($number1, $decimal_octets);
                     }
                     $number1_2 = $number1_2 == 0 ? '' : number_format($number1_2, $decimal_octets);
-                    $number2 = $number2 == 0 ? '' : number_format($number2, $decimal_octets);
-                    $number3 = $number3 == 0 ? '' : number_format($number3, $decimal_octets);
-                    $number4 = $number4 == 0 ? '' : number_format($number4, $decimal_octets);
+                    $number2 = $number2 == 0 ? 0 : number_format($number2, $decimal_octets);
+                    $number3 = $number3 == 0 ? 0 : number_format($number3, $decimal_octets);
+                    $number4 = $number4 == 0 ? 0 : number_format($number4, $decimal_octets);
 
 
                 @endphp
@@ -130,6 +130,7 @@
                     <th scope="row" width="15%">{{ $number1_2 }}</th>
                     <th scope="row" width="15%">{{ $number2 }}</th>
                     @if($ordr1 == 9 or $ordr1 == 10 or $ordr1 == 12 or $ordr1 == 13)
+                        @dd($number3,$number4)
                     <th scope="row" width="15%">{{ number_format($number3 ?? 0,2).'%' }}</th>
                     <th scope="row" width="15%">{{ number_format($number4 ?? 0,2).'%' }}</th>
                     @else
