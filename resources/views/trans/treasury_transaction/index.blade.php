@@ -56,7 +56,7 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th scope="col">رقم آلي</th>
+{{--                    <th scope="col">رقم آلي</th>--}}
                     <th scope="col">الرقم اليدوي</th>
                     <th scope="col">التاريخ</th>
                     <th scope="col">الحساب</th>
@@ -73,9 +73,9 @@
                 <tbody>
                 @foreach($treasury_transaction as $treasury_transact)
                     <tr>
-                        <th scope="row">{{$treasury_transact->id ?? ''}}</th>
-                        <th scope="row">{{$treasury_transact->manual_no ?? ''}}</th>
-                        <th scope="row">{{\Carbon\Carbon::parse($treasury_transact->date)->format('yy-m-d') ?? ''}}</th>
+{{--                        <th scope="row">{{$treasury_transact->id ?? ''}}</th>--}}
+                        <th scope="row" width="5%">{{$treasury_transact->manual_no ?? ''}}</th>
+                        <th scope="row" width="10%">{{\Carbon\Carbon::parse($treasury_transact->date)->format('yy-m-d') ?? ''}}</th>
                         <th scope="row">{{$treasury_transact->account->name ?? ''}}</th>
 {{--                        <th scope="row">{{$treasury_transact->treasury->name ?? ''}}</th>--}}
                         <th scope="row">{{ isset($treasury_transact->amount) ? number_format($treasury_transact->amount, 2) : '' }}</th>
@@ -83,17 +83,17 @@
                         <th scope="row">{{$treasury_transact->tag_id == 1 ? 'مسحوبات' : '/'}}</th>
 
                         @if(request('trans_type') != 0)
-                            <th scope="row"><a href="treasury_transaction/{{$treasury_transact->id}}/" class="btn btn-primary">عرض</a></th>
+                            <th scope="row" width="5%"><a href="treasury_transaction/{{$treasury_transact->id}}/" class="btn btn-primary">عرض</a></th>
                         @else
 {{--                            <th scope="row"><a href="treasury_transactions.show_in/{{$treasury_transact->id}}/" class="btn btn-primary">عرض</a></th>--}}
-                            <th scope="row"><a href="{{ route('show_in', $treasury_transact->id) }}" class="btn btn-primary">عرض</a></th>
+                            <th scope="row" width="5%"><a href="{{ route('show_in', $treasury_transact->id) }}" class="btn btn-primary">عرض</a></th>
                         @endif
 
 {{--                        <th scope="row"><button class="btn btn-success" onclick="window.print()">طباعة</button></th>--}}
-                        <th scope="row"><a href="{{ route('treasury_transaction.print', $treasury_transact->id) }}" class="btn btn-success">طباعة</a></th>
+                        <th scope="row" width="5%"><a href="{{ route('treasury_transaction.print', $treasury_transact->id) }}" class="btn btn-success">طباعة</a></th>
 
-                        <th scope="row"><a href="treasury_transaction/{{$treasury_transact->id}}/edit?trans_type={{request('trans_type')}}" class="btn btn-warning">تعديل</a></th>
-                        <th scope="row">
+                        <th scope="row" width="5%"><a href="treasury_transaction/{{$treasury_transact->id}}/edit?trans_type={{request('trans_type')}}" class="btn btn-warning">تعديل</a></th>
+                        <th scope="row" width="5%">
                             <form method="post" class="delete_form" action="{{action('TreasuryTransactionController@destroy', $treasury_transact->id)}}">
                                 {{csrf_field()}}
                                 <input type="hidden" name="_method" value="DELETE" />

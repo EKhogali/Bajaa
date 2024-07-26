@@ -73,10 +73,13 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
         <div class="col-md-8"> <!-- Table takes 70% width -->
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a class="btn btn-primary" href="/treasury_transaction_details/create?master_id={{$treasury_transaction->id}}" role="button">جديد</a>
+                <a class="btn btn-primary" href="/treasury_transaction_details/create?master_id={{$treasury_transaction->id}}" role="button">جديد</a>
+                <a href="{{ route('treasury_transaction__details_print', $treasury_transaction->id) }}" class="btn btn-success">طباعة</a>
+
                 {{--                <button class="btn btn-secondary mx-2" type="button">...</button>--}}
                 {{--                <button class="btn btn-secondary mx-2" type="button">...</button>--}}
                 {{--                <button class="btn btn-secondary mx-2" type="button">...</button>--}}

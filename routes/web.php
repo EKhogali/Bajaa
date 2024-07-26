@@ -54,6 +54,7 @@ Route::resource('/treasury_transaction', 'TreasuryTransactionController');
 Route::resource('/treasury_transaction_details', 'TreasuryTransactionDetailController');
 
 Route::get('treasury_transaction/{id}/print', [\App\Http\Controllers\TreasuryTransactionController::class, 'print'])->name('treasury_transaction.print');
+Route::get('treasury_transaction__details_print/{id}/print', [\App\Http\Controllers\TreasuryTransactionDetailController::class, 'print'])->name('treasury_transaction__details_print');
 
 Route::get('/journaldd/{id}', [JournalmController::class,'show']);
 Route::get('/income_report', [ReportController::class, 'income_report']);

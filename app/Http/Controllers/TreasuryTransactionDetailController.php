@@ -150,6 +150,16 @@ class TreasuryTransactionDetailController extends Controller
         return redirect()->route('treasury_transaction.show', Request('master_id'));
     }
 
+    public function print($id)
+    {
+        $treasury_transaction_details = treasury_transaction_detail::where('master_id',$id)->get();
+        $treasury_transactions = treasury_transaction::findorfail($id);
+
+//        dd('55egeeg',$treasury_transaction_details);
+        return view('trans.treasury_transaction.treasury_transaction_details.print', compact('treasury_transaction_details'))
+            ->with('treasury_transactions',$treasury_transactions);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
