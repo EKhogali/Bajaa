@@ -100,7 +100,7 @@ class TreasuryTransactionController extends Controller
             'financial_year' => session::get('financial_year'),
 
             'company_serial' => $last_trans,
-            'manual_no' => session::get('company_id').''.$last_trans,
+            'manual_no' => $last_trans,
 
             'transaction_type_id' => request('trans_type'),
             'date' => request('date'),
