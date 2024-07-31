@@ -12,7 +12,12 @@
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TreasuryTransactionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TreasuryTransactionController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/account_details_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/account_details_report.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/ledger2.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/ledger2.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/print.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/print.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,14 +226,7 @@
       <workItem from="1721479490996" duration="13285000" />
       <workItem from="1721724475495" duration="1072000" />
       <workItem from="1721918341604" duration="4899000" />
-      <workItem from="1722013579205" duration="10063000" />
-    </task>
-    <task id="LOCAL-00029" summary="2024-07-11">
-      <created>1720701079248</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1720701079248</updated>
+      <workItem from="1722013579205" duration="14154000" />
     </task>
     <task id="LOCAL-00030" summary="2024-07-11">
       <created>1720702056657</created>
@@ -566,7 +564,14 @@
       <option name="project" value="LOCAL" />
       <updated>1722030925985</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="2024-07-27">
+      <created>1722070011089</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1722070011089</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -601,7 +606,8 @@
     <MESSAGE value="2024-07-23" />
     <MESSAGE value="2024-07-25" />
     <MESSAGE value="2024-07-26" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-07-26" />
+    <MESSAGE value="2024-07-27" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-07-27" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -645,10 +651,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1722030927703">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1722070012260">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1721571925837" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1722030927703" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />

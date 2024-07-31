@@ -97,6 +97,7 @@
                             <form method="post" class="delete_form" action="{{action('TreasuryTransactionController@destroy', $treasury_transact->id)}}">
                                 {{csrf_field()}}
                                 <input type="hidden" name="_method" value="DELETE" />
+
                                 <button type="submit" class="btn btn-danger">الغاء</button>
                             </form>
                         </th>

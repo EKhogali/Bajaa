@@ -229,6 +229,7 @@ class AccountController extends Controller
                 session::put('msgtype','notsuccess') ;
             }
 
-        return redirect('/accounts')->with('message', $msg);
+//        return redirect('/accounts')->with('message', $msg);
+        return redirect()->route('accounts_with_param',['acc_type'=>Request('acc_type')])->with('message', $msg);
     }
 }

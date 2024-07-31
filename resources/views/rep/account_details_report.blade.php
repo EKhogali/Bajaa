@@ -122,7 +122,14 @@
         window.print();
     }
 </script>
-
+<script>
+    $(document).ready(function() {
+        $('#account_id').select2({
+            placeholder: 'اختر الحساب',
+            width: '100%' // Adjust the width as needed
+        });
+    });
+</script>
 </body>
 </html>
 

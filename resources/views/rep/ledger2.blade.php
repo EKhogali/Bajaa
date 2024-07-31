@@ -52,8 +52,9 @@
                 <br><br>
 
                 <div class="col-12">
-                    <label for="account_id" class="form-label"><strong>Account</strong></label>
-                    <select name="account_id"  class="form-control" >
+                    <label for="account_id" class="form-label"><strong>الحساب</strong></label>
+{{--                    <select name="account_id"  class="form-control" >--}}
+                    <select class="form-control" id="account_id" name="account_id" required>
                         @foreach($accounts as $account)
                             <option value="{{$account->id}}" @if($account->id == $account_id) selected @endif>
                                 {{$account->name}}
@@ -165,6 +166,15 @@
     function printReport() {
         window.print();
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#account_id').select2({
+            placeholder: 'اختر الحساب',
+            width: '100%' // Adjust the width as needed
+        });
+    });
 </script>
 
 </body>

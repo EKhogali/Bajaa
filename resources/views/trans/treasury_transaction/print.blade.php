@@ -4,7 +4,7 @@
         <div class="container">
             <h3>{{session('company_name')}}</h3>
         </div>
-        @if($treasury_transaction->trans_type == 0)
+        @if($treasury_transaction->transaction_type_id == 0)
             <div class="container">
                 <h3>تفاصيل إيصال قبض</h3>
             </div>

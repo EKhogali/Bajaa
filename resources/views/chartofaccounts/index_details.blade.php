@@ -24,7 +24,7 @@
     <div class="container col-2">
         <div class="d-grid gap-2 col mx-auto">
 {{--            <button class="btn btn-secondary" type="button"><a href="$accounts/create">Add Category</a></button>--}}
-            <a class="btn btn-primary" href="accounts/create?acc_type={{2}}" role="button">اضافة حساب</a>
+            <a class="btn btn-primary" href="/accounts/create?acc_type={{2}}" role="button">اضافة حساب</a>
         </div>
     </div>
     <div class="container col-10">
@@ -64,6 +64,7 @@
                     <th scope="row"><form method="post" class="delete_form" action="{{action('AccountController@destroy', $account->id)}}">
                             {{csrf_field()}}
                             <input type="hidden" name="_method" value="DELETE" />
+                            <input type="hidden" name="acc_type" value="2" />
                             <button type="submit" class="btn btn-danger">الغاء</button>
                         </form></th>
                 </tr>
