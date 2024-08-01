@@ -32,8 +32,7 @@ class ReportController extends Controller
                 ->get();
 
             $total_amount = $account_details_report->sum('d_amount');
-            $accounts = account::where('company_id',session::get('company_id') ?? 0)
-                ->where('is_fixed_assets',0)
+            $accounts = account::where('is_fixed_assets',0)
                 ->where('is_details',1)
                 ->where('archived',0)
                 ->get();
@@ -63,8 +62,7 @@ class ReportController extends Controller
                 ->get();
 
             $total_amount = $account_details_report->sum('d_amount');
-            $accounts = account::where('company_id',session::get('company_id') ?? 0)
-                ->where('is_fixed_assets',0)
+            $accounts = account::where('is_fixed_assets',0)
                 ->where('is_details',1)
                 ->where('archived',0)
                 ->get();
