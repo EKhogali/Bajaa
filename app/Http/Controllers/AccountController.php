@@ -21,20 +21,35 @@ class AccountController extends Controller
 
         $acc_type = Request('acc_type');
         switch ($acc_type){
-            case 0:  $accounts = account::where('is_fixed_assets',0)
-                ->where('is_details',0)
-                ->get();
-                return view('chartofaccounts.index')->with('accounts',$accounts);
+            case 0:
+                if(Request('is_search') == true){
+                    $accounts = account::where('id',Request('account_id'))->get();
+                    $search_accounts = account::where('is_fixed_assets',0)->where('is_details',0)->get();
+                }else{
+                    $accounts = account::where('is_fixed_assets',0)->where('is_details',0)->get();
+                    $search_accounts = account::where('is_fixed_assets',0)->where('is_details',0)->get();
+                }
+                return view('chartofaccounts.index')->with('accounts',$accounts)->with('search_accounts',$search_accounts);
             break;
-            case 1:  $accounts = account::where('is_fixed_assets',1)
-                ->where('is_details',0)
-                ->get();
-                return view('chartofaccounts.index_assets')->with('accounts',$accounts);
+            case 1:
+                if(Request('is_search') == true){
+                    $accounts = account::where('id',Request('account_id'))->get();
+                    $search_accounts = account::where('is_fixed_assets',1)->where('is_details',0)->get();
+                }else{
+                    $accounts = account::where('is_fixed_assets',1)->where('is_details',0)->get();
+                    $search_accounts = account::where('is_fixed_assets',1)->where('is_details',0)->get();
+                }
+                return view('chartofaccounts.index_assets')->with('accounts',$accounts)->with('search_accounts',$search_accounts);
             break;
-            case 2:  $accounts = account::where('is_fixed_assets',0)
-                ->where('is_details',1)
-                ->get();
-                return view('chartofaccounts.index_details')->with('accounts',$accounts);
+            case 2:
+                if(Request('is_search') == true){
+                    $accounts = account::where('id',Request('account_id'))->get();
+                    $search_accounts = account::where('is_fixed_assets',0)->where('is_details',1)->get();
+                }else{
+                    $accounts = account::where('is_fixed_assets',0)->where('is_details',1)->get();
+                    $search_accounts = account::where('is_fixed_assets',0)->where('is_details',1)->get();
+                }
+                return view('chartofaccounts.index_details')->with('accounts',$accounts)->with('search_accounts',$search_accounts);
             break;
         }
 

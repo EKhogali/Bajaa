@@ -21,13 +21,27 @@
                 @endif
 <br>
 <div class="container row">
-    <div class="container col-2">
+    <div class="container col-3">
         <div class="d-grid gap-2 col mx-auto">
 {{--            <button class="btn btn-secondary" type="button"><a href="$accounts/create">Add Category</a></button>--}}
             <a class="btn btn-primary" href="/accounts/create?acc_type={{2}}" role="button">اضافة حساب</a>
+            <br>
+            <form action="/accounts" method="get">
+                <input type="hidden" name="is_search" value="true">
+                <input type="hidden" name="acc_type" value="2">
+                <label for="account_id" class="form-label"><strong>البحث عن حساب</strong></label>
+                <select class="form-control" id="account_id" name="account_id" required>
+                    @foreach($search_accounts as $search_account)
+                        <option value="{{$search_account->id}}" >
+                            {{$search_account->name}}
+                        </option>
+                    @endforeach
+                </select>
+                <button type="submit" name="filter" id="filter" class="btn btn-primary">بحث</button>
+            </form>
         </div>
     </div>
-    <div class="container col-10">
+    <div class="container col-9">
         <table class="table">
             <thead>
             <tr>
@@ -73,6 +87,14 @@
         </table>
     </div>
 </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#account_id').select2({
+                                placeholder: 'اختر الحساب',
+                                width: '100%' // Adjust the width as needed
+                            });
+                        });
+                    </script>
 
 </body>
 </html>
