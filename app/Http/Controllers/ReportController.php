@@ -279,7 +279,7 @@ public function ledger2()
                 ->where('t.company_id', $companyId)
                 ->where('t.financial_year', $financialYear)
                 ->where('t.archived', 0)
-                ->where('a.category_id', Sales_Accounts_category)
+                ->where('a.category_id', $Sales_Accounts_category)
                 ->whereBetween('t.date', [$fromdate, $todate])
                 ->sum('t.amount');
 
