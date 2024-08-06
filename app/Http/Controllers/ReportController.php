@@ -190,6 +190,7 @@ public function ledger2()
             ->toArray();
 
         $decimal_octets = sitting::where('id',1)->value('decimal_octets');
+        $Sales_Accounts_category = sitting::where('id',1)->value('Sales_Accounts_category');
 
         $cashbox_faaed_account = sitting::where('id',1)->value('Cashbox_Faaed_Account');
         $cashbox_ajz_account = sitting::where('id',1)->value('Cashbox_Ajz_Account');
@@ -271,6 +272,16 @@ public function ledger2()
 
         // -----------------
         // (مبيعات الفترة)
+
+        $total_sales = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a','a.id','t.account_id')
+                ->where('t.transaction_type_id',0)
+                ->where('t.company_id', $companyId)
+                ->where('t.financial_year', $financialYear)
+                ->where('t.archived', 0)
+                ->where('a.category_id', Sales_Accounts_category)
+                ->whereBetween('t.date', [$fromdate, $todate])
+                ->sum('t.amount');
 
         $tot_in = DB::table('treasury_transactions')
                 ->where('transaction_type_id',0)
@@ -475,9 +486,9 @@ public function ledger2()
             'txt' => 'مبيعات الفتــــرة',
 
             'currency' => 'دينار',
-            'number1' => $tot_in ?? 0,
+            'number1' => $total_sales ?? 0,
             'number1_2' => 0,
-            'number2' => $tot_in/$days,
+            'number2' => $total_sales/$days,
             'number3' => 0,
             'number4' => 0,
             'note' => 0,
