@@ -46,6 +46,7 @@
                 </div>
             </div>
             <br>
+            <input type="hidden" name="ch" value="1">
             <div >
                 <button type="submit" class="btn btn-primary col mx-auto">تنفيـــــذ</button>
             </div>

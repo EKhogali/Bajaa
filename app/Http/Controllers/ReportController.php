@@ -148,14 +148,14 @@ public function ledger2()
 
         //-------------------------------------------------------------------------------------------------------------
 
-        if(!request()->has('fromdate') or !request()->has('todate')){
+        if(!request()->has('ch') ){
 
             DB::table('income_reports')
                 ->where('created_by',auth()->id())
                 ->where('company_id',session::get('company_id'))
                 ->where('financial_year',session::get('financial_year'))
                 ->delete();
-            $income_reports = income_report::all()->sortBy('ordr1');
+            $income_reports = income_report::where('id',0)->sortBy('ordr1');
             $decimal_octets = sitting::where('id',1)->value('decimal_octets');
 
             return view('rep.income_report')
