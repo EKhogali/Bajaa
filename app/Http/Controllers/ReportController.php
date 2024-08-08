@@ -147,7 +147,7 @@ public function ledger2()
     public function income_report(){
 
         //-------------------------------------------------------------------------------------------------------------
-
+        dd('شوية يا مصطفى قاعد نحل في المشكلة');
         if(!request()->has('ch') ){
 
             DB::table('income_reports')
@@ -155,7 +155,7 @@ public function ledger2()
                 ->where('company_id',session::get('company_id'))
                 ->where('financial_year',session::get('financial_year'))
                 ->delete();
-            $income_reports = income_report::where('id',0)->sortBy('ordr1')->get();
+            $income_reports = income_report::where('id',0)->sortBy('ordr1');
             $decimal_octets = sitting::where('id',1)->value('decimal_octets');
 
             return view('rep.income_report')
