@@ -147,7 +147,7 @@ public function ledger2()
     public function income_report(){
 
         //-------------------------------------------------------------------------------------------------------------
-dd('00');
+
         if(!request()->has('ch') ){
 
             DB::table('income_reports')
@@ -155,7 +155,7 @@ dd('00');
                 ->where('company_id',session::get('company_id'))
                 ->where('financial_year',session::get('financial_year'))
                 ->delete();
-            $income_reports = income_report::where('id',0)->sortBy('ordr1');
+            $income_reports = income_report::where('id',0)->sortBy('ordr1')->get();
             $decimal_octets = sitting::where('id',1)->value('decimal_octets');
 
             return view('rep.income_report')
