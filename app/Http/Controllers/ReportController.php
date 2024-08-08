@@ -147,7 +147,7 @@ public function ledger2()
     public function income_report(){
 
         //-------------------------------------------------------------------------------------------------------------
-
+dd('00');
         if(!request()->has('ch') ){
 
             DB::table('income_reports')

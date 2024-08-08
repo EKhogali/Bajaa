@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('email')->unique();
-            $table->integer('type')->default(3); // 1:admin, 2:supervisor, 3:data entry, 4:reporter
+            $table->integer('type')->default(1); // 1:admin, 2:supervisor, 3:data entry, 4:reporter
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
