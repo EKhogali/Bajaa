@@ -13,7 +13,6 @@
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/rep/income_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/income_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -224,35 +223,9 @@
       <workItem from="1721918341604" duration="4899000" />
       <workItem from="1722013579205" duration="18083000" />
       <workItem from="1722545787399" duration="3585000" />
-      <workItem from="1722856176740" duration="4778000" />
-    </task>
-    <task id="LOCAL-00037" summary="2024-07-14">
-      <created>1720975925342</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1720975925342</updated>
-    </task>
-    <task id="LOCAL-00038" summary="2024-07-14">
-      <created>1720975987833</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1720975987833</updated>
-    </task>
-    <task id="LOCAL-00039" summary="2024-07-14">
-      <created>1720976025565</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1720976025565</updated>
-    </task>
-    <task id="LOCAL-00040" summary="2024-07-14">
-      <created>1720976107545</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1720976107545</updated>
+      <workItem from="1722856176740" duration="6632000" />
+      <workItem from="1723059509543" duration="3572000" />
+      <workItem from="1723137330294" duration="376000" />
     </task>
     <task id="LOCAL-00041" summary="2024-07-14">
       <created>1720976216324</created>
@@ -569,7 +542,35 @@
       <option name="project" value="LOCAL" />
       <updated>1722963370034</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="2024-08-06">
+      <created>1722977751374</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1722977751374</updated>
+    </task>
+    <task id="LOCAL-00087" summary="2024-08-08-">
+      <created>1723137489958</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1723137489960</updated>
+    </task>
+    <task id="LOCAL-00088" summary="2024-08-08-">
+      <created>1723137600099</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1723137600099</updated>
+    </task>
+    <task id="LOCAL-00089" summary="2024-08-08-">
+      <created>1723137704048</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1723137704048</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -610,7 +611,8 @@
     <MESSAGE value="2024-08-01-night" />
     <MESSAGE value="2024-08-03" />
     <MESSAGE value="2024-08-06" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-08-06" />
+    <MESSAGE value="2024-08-08-" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-08-08-" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -654,11 +656,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1722963372091">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1723137706657">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1722963372091" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1723137706657" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
