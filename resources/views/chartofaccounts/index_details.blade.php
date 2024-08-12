@@ -49,7 +49,7 @@
 {{--                <th scope="col">المستوى</th>--}}
                 <th scope="col">كود الحساب</th>
                 <th scope="col">اسم الحساب</th>
-{{--                <th scope="col">فئة الحساب</th>--}}
+                <th scope="col">فئة الحساب</th>
 {{--                <th scope="col">تصنيف الحساب</th>--}}
 {{--                <th scope="col">الحساب الرئيسي</th>--}}
                 <th scope="col" width="10%">تعديل</th>
@@ -63,6 +63,7 @@
 {{--                    <th scope="row">{{$account->level ?? ''}}</th>--}}
                     <th scope="row">{{$account->code ?? ''}}</th>
                     <th scope="row">{{$account->name ?? ''}}</th>
+                    <th scope="row">{{$account->CategoryTxt ?? ''}}</th>
 {{--                    <th scope="row">{{$account->category->name ?? ''}}</th>--}}
 {{--                    <th scope="row">--}}
 {{--                        @if($account->classification_id == 1)--}}

@@ -147,7 +147,7 @@ public function ledger2()
     public function income_report(){
 
         //-------------------------------------------------------------------------------------------------------------
-//        dd('شوية يا مصطفى قاعد نحل في المشكلة');
+
         if(!request()->has('ch') ){
 
             DB::table('income_reports')

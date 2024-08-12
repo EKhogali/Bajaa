@@ -11,8 +11,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
+      <change afterPath="$PROJECT_DIR$/resources/views/rep/category_percentage_report.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,15 +147,15 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/trans/treasury_transaction/treasury_transaction_details" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/rep" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction\treasury_transaction_details" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\rep" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction\treasury_transaction_details" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\sys" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\bsc" />
@@ -225,14 +229,8 @@
       <workItem from="1722545787399" duration="3585000" />
       <workItem from="1722856176740" duration="6632000" />
       <workItem from="1723059509543" duration="3572000" />
-      <workItem from="1723137330294" duration="376000" />
-    </task>
-    <task id="LOCAL-00041" summary="2024-07-14">
-      <created>1720976216324</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1720976216324</updated>
+      <workItem from="1723137330294" duration="1257000" />
+      <workItem from="1723438412627" duration="4793000" />
     </task>
     <task id="LOCAL-00042" summary="2024-07-14">
       <created>1720976301383</created>
@@ -570,7 +568,14 @@
       <option name="project" value="LOCAL" />
       <updated>1723137704048</updated>
     </task>
-    <option name="localTasksCounter" value="90" />
+    <task id="LOCAL-00090" summary="2024-08-08-">
+      <created>1723137953896</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1723137953896</updated>
+    </task>
+    <option name="localTasksCounter" value="91" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -627,11 +632,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="499" y="164" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651363755" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1721306034578">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1723495909097">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1721306034578" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1719698379546" />
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1723495909097" />
     <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1718888533940">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
@@ -656,11 +661,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1723137706657">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1723137955991">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1723137706657" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1723137955991" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
