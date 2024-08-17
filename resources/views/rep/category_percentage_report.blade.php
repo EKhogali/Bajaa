@@ -76,18 +76,18 @@
                 <th scope="row" width="4%"></th>
                 <th scope="row" width="4%"></th>
                 <th scope="row" width="40%">البيــــان</th>
-                <th scope="row" width="10%">%</th>
-                <th scope="row" width="15%">جزئي</th>
-                <th scope="row" width="15%">كلي</th>
-                <th scope="row" width="15%">اليومي</th>
-                <th scope="row" width="15%">نسبة/اجماليال</th>
-                <th scope="row" width="15%">النسبة/مبيعات</th>
+{{--                <th scope="row" width="10%">%</th>--}}
+                <th scope="row" width="15%">العملة</th>
+                <th scope="row" width="15%">الاستهلاك الشهري</th>
+                <th scope="row" width="15%">الاستهلاك اليومي</th>
+                <th scope="row" width="15%">الكمية</th>
+                <th scope="row" width="15%">الوحدة</th>
             </tr>
             @foreach($reports as $report)
                 @php
                     $ordr1 = $report->ordr1 ?? '';
                     $lightBlueBold = ($ordr1 == 0 || $ordr1 == 1);
-                    $totalRecord = in_array($ordr1, [7, 9, 12, 15, 17]);
+                    $totalRecord = in_array($ordr1, [6, 9, 12, 15, 18, 21]);
                     $backgroundColor = $totalRecord ? 'background-color: #f0f0f0;' : '';
                     $number1 = $report->number1 ?? 0;
                     $number1_2 = $report->number1_2 ?? 0;
@@ -96,8 +96,28 @@
                     $number4 = $report->number4 ?? 0;
 
 
-                     // Determineumber4 == 0 ? 0 : number_format($number4, $decimal_octets);
+                     // Determine background color
+                    $backgroundColor = '';
+                    if (($ordr1 == 0 or $ordr1 == 6 or $ordr1 == 9 or $ordr1 == 12 or $ordr1 == 15 or $ordr1 == 18 or $ordr1 == 21 ) && $number1 <= 0) {
+                        $backgroundColor = 'background-color: lightblue;';
+                    } elseif (in_array($ordr1, [7, 10, 13, 14, 17, 18, 20, 23, 25])) {
+                        $backgroundColor = 'background-color: #f0f0f0;';
+                    } elseif ($ordr1 == 0 || $ordr1 == 1) {
+                        $backgroundColor = 'background-color: lightblue; font-weight: bold;';
+                    }
 
+                    // Additional styles for total records
+                    $additionalStyles = in_array($ordr1, [6, 9, 12, 15, 18, 21]) ? 'text-decoration: underline; font-style: italic;' : '';
+
+
+                    // Replace zero values with an empty string for focus
+                    if($ordr1 != 0){
+                        $number1 = $number1 == 0 ? 0 : number_format($number1, $decimal_octets);
+                    }
+                    $number1_2 = $number1_2 == 0 ? '' : number_format($number1_2, $decimal_octets);
+                    $number2 = $number2 == 0 ? 0 : number_format($number2, $decimal_octets);
+                    $number3 = $number3 == 0 ? 0 : number_format($number3, $decimal_octets);
+                    $number4 = $number4 == 0 ? 0 : number_format($number4, $decimal_octets);
 
                 @endphp
 {{--                <tr style="{{ $backgroundColor }} {{ $lightBlueBold ? 'background-color: lightblue; font-weight: bold;' : '' }} {{ $totalRecord ? 'text-decoration: underline; font-style: italic;' : '' }}">--}}
@@ -109,13 +129,13 @@
                     <th scope="row" width="15%">{{ $number1 }}</th>
                     <th scope="row" width="15%">{{ $number1_2 }}</th>
                     <th scope="row" width="15%">{{ $number2 }}</th>
-                    @if($ordr1 == 9 or $ordr1 == 10 or $ordr1 == 12 or $ordr1 == 13)
-                    <th scope="row" width="15%">{{ number_format($number3 ?? 0,2).'%' }}</th>
-                    <th scope="row" width="15%">{{ number_format($number4 ?? 0,2).'%' }}</th>
-                    @else
+{{--                    @if($ordr1 == 9 or $ordr1 == 10 or $ordr1 == 12 or $ordr1 == 13)--}}
+{{--                    <th scope="row" width="15%">{{ number_format($number3 ?? 0,2).'%' }}</th>--}}
+{{--                    <th scope="row" width="15%">{{ number_format($number4 ?? 0,2).'%' }}</th>--}}
+{{--                    @else--}}
                     <th scope="row" width="15%">{{ $number3 }}</th>
                     <th scope="row" width="15%">{{ $number4 }}</th>
-                        @endif
+{{--                        @endif--}}
                 </tr>
             @endforeach
             </tbody>

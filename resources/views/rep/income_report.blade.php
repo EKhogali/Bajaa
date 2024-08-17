@@ -119,7 +119,6 @@
                     $number3 = $number3 == 0 ? 0 : number_format($number3, $decimal_octets);
                     $number4 = $number4 == 0 ? 0 : number_format($number4, $decimal_octets);
 
-
                 @endphp
 {{--                <tr style="{{ $backgroundColor }} {{ $lightBlueBold ? 'background-color: lightblue; font-weight: bold;' : '' }} {{ $totalRecord ? 'text-decoration: underline; font-style: italic;' : '' }}">--}}
                 <tr style="{{ $backgroundColor }} {{ $additionalStyles }}">

@@ -11,11 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change afterPath="$PROJECT_DIR$/resources/views/rep/category_percentage_report.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/rep/pulled_from_net_income_report.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CategoryPercentageReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CategoryPercentageReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/category_percentage_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/category_percentage_report.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/income_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/income_report.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -230,14 +232,8 @@
       <workItem from="1722856176740" duration="6632000" />
       <workItem from="1723059509543" duration="3572000" />
       <workItem from="1723137330294" duration="1257000" />
-      <workItem from="1723438412627" duration="4793000" />
-    </task>
-    <task id="LOCAL-00042" summary="2024-07-14">
-      <created>1720976301383</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1720976301383</updated>
+      <workItem from="1723438412627" duration="16578000" />
+      <workItem from="1723873691236" duration="708000" />
     </task>
     <task id="LOCAL-00043" summary="2024-07-14">
       <created>1720976362760</created>
@@ -575,7 +571,14 @@
       <option name="project" value="LOCAL" />
       <updated>1723137953896</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="2024-08-12-before implement Category_Percentage_Report">
+      <created>1723497318037</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1723497318038</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -617,7 +620,8 @@
     <MESSAGE value="2024-08-03" />
     <MESSAGE value="2024-08-06" />
     <MESSAGE value="2024-08-08-" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-08-08-" />
+    <MESSAGE value="2024-08-12-before implement Category_Percentage_Report" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-08-12-before implement Category_Percentage_Report" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -661,11 +665,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1723137955991">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1723497329752">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1723137955991" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1723497329752" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

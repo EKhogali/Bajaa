@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\account;
+use App\category;
 use App\income_report;
 use App\journald;
 use App\partner;
@@ -17,6 +18,55 @@ use phpDocumentor\Reflection\Types\Integer;
 
 class ReportController extends Controller
 {
+
+    public function pulled_from_net_income_report()
+    {
+        //-------------------------------------------------------------------------------------------------------------
+
+        $fromdate = \Carbon\Carbon::today()->startOfDay();
+        $todate = \Carbon\Carbon::today()->endOfDay();
+
+        if (request()->has('fromdate')) {
+            $fromdate = \Carbon\Carbon::parse(Request('fromdate'))->startOfDay();
+            }
+        if (request()->has('todate')) {
+            $todate = \Carbon\Carbon::parse(Request('todate'))->endOfDay();
+            }
+
+
+        if (!request()->has('category_id')) {
+            $category_id = 0;
+        }else {
+            $category_id = Request('category_id');
+        }
+
+        $pulled_from_net_income_accounts_category = $category_id;
+        $pulled_from_net_income_accounts_array = DB::table('accounts')
+            ->where('category_id',$pulled_from_net_income_accounts_category)
+            ->pluck('id')
+            ->toArray();
+
+        $reports = DB::table('treasury_transactions as t')
+        ->leftjoin('accounts as a','a.id','t.account_id')
+        ->leftjoin('categories as c','a.id','a.category_id')
+            ->where('t.company_id', session::get('company_id'))
+            ->where('t.financial_year', session::get('financial_year'))
+            ->where('t.archived', 0)
+            ->wherein('t.account_id',$pulled_from_net_income_accounts_array)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->get();
+
+        $decimal_octets = sitting::where('id', 1)->value('decimal_octets');
+        $categories = category::where('archived', 0)->get();
+        return view('rep.pulled_from_net_income_report')
+            ->with('decimal_octets', $decimal_octets)
+            ->with('fromdate', $fromdate)
+            ->with('todate', $todate)
+            ->with('category_id', $category_id)
+            ->with('categories', $categories)
+            ->with('reports', $reports);
+    }
+
 
     public function account_details_report(){
         //-------------------------------------------------------------------------------------------------------------
