@@ -296,15 +296,16 @@ class CategoryPercentageReportController extends Controller
 
             //-------------------------------------------------------------------------------------------------------------
 
-
-
-
             $rec_id = 0;
+
             DB::table('category__percentage__reports')
                 ->where('created_by',auth()->id())
                 ->where('company_id',session::get('company_id'))
                 ->where('financial_year',session::get('financial_year'))
                 ->delete();
+//
+
+            //-------------------------------------------------------------------------------------------------------------
 
             DB::table('category__percentage__reports')->insert([
                 'id' => $rec_id,
@@ -324,7 +325,7 @@ class CategoryPercentageReportController extends Controller
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -347,7 +348,7 @@ class CategoryPercentageReportController extends Controller
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -370,7 +371,7 @@ class CategoryPercentageReportController extends Controller
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -393,7 +394,7 @@ class CategoryPercentageReportController extends Controller
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -409,12 +410,22 @@ class CategoryPercentageReportController extends Controller
                 ->where('m.tag_id','<>',1)
                 ->whereBetween('m.date', [$fromdate, $todate])
                 ->where('a.CategoryTxt','لحوم')
-                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
+                ->select(
+                    'a.id as acc_id'
+                    ,'a.name as acc_name'
+                    ,DB::raw('Sum(d.amount) as sub_total')
+                    ,DB::raw('Sum(d.qty) as sub_qty_total')
+                )
                 ->groupBy('acc_id','acc_name')
             ->get();
-//            dd($meet_transactions);
 
-            foreach ($meet_transactions as $meet_transaction){
+
+            foreach ($meet_transactions as $transaction){
+
+                $Unit_description = DB::table('accounts')
+                    ->where('id',$transaction->acc_id)
+                    ->pluck('Unit_description')->first();
+
                 $rec_id += 1;
                 DB::table('category__percentage__reports')->insert([
                     'id' => $rec_id,
@@ -426,15 +437,15 @@ class CategoryPercentageReportController extends Controller
                     'ordr2' => 5,
                     'ordr3' => 5,
 
-                    'txt' => $meet_transaction->acc_name,
+                    'txt' => $transaction->acc_name,
 
                     'currency' => '',
-                    'number1' => $meet_transaction->sub_total ?? 0,
-                    'number1_2' => 0,
-                    'number2' => 0,
+                    'number1' => $transaction->sub_total ?? 0,
+                    'number1_2' => fdiv($transaction->sub_total,$days),
+                    'number2' => $transaction->sub_qty_total ?? 0,
                     'number3' => 0,
                     'number4' => 0,
-                    'note' => 0,
+                    'note' => $Unit_description,
                 ]);
             }
 
@@ -456,11 +467,11 @@ class CategoryPercentageReportController extends Controller
 
                 'currency' => '',
                 'number1' => $meet_transactions->sum('sub_total'),
-                'number1_2' => 0,
+                'number1_2' => fdiv($meet_transactions->sum('sub_total'),$days),
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -475,7 +486,7 @@ class CategoryPercentageReportController extends Controller
                 'ordr2' => 7,
                 'ordr3' => 7,
 
-                'txt' => ' -- تغليفات',
+                'txt' => 'تغليفات',
 
                 'currency' => '',
                 'number1' => 0,
@@ -483,7 +494,7 @@ class CategoryPercentageReportController extends Controller
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -499,12 +510,23 @@ class CategoryPercentageReportController extends Controller
                 ->where('m.tag_id','<>',1)
                 ->whereBetween('m.date', [$fromdate, $todate])
                 ->where('a.CategoryTxt','تغليفات')
-                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
+                ->select(
+                    'a.id as acc_id'
+                    ,'a.name as acc_name'
+                    ,DB::raw('Sum(d.amount) as sub_total')
+                    ,DB::raw('Sum(d.qty) as sub_qty_total')
+                )
+//                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
                 ->groupBy('acc_id','acc_name')
                 ->get();
 
 
             foreach ($taglifat_transactions as $transaction){
+
+                $Unit_description = DB::table('accounts')
+                    ->where('id',$transaction->acc_id)
+                    ->pluck('Unit_description')->first();
+
                 $rec_id += 1;
                 DB::table('category__percentage__reports')->insert([
                     'id' => $rec_id,
@@ -520,11 +542,11 @@ class CategoryPercentageReportController extends Controller
 
                     'currency' => '',
                     'number1' => $transaction->sub_total ?? 0,
-                    'number1_2' => 0,
-                    'number2' => 0,
+                    'number1_2' => fdiv($transaction->sub_total ?? 0, $days),
+                    'number2' => $transaction->sub_qty_total ?? 0,
                     'number3' => 0,
                     'number4' => 0,
-                    'note' => 0,
+                    'note' => $Unit_description,
                 ]);
             }
 
@@ -545,7 +567,7 @@ class CategoryPercentageReportController extends Controller
 
                 'currency' => '',
                 'number1' => $taglifat_transactions->sum('sub_total'),
-                'number1_2' => 0,
+                'number1_2' => fdiv($taglifat_transactions->sum('sub_total'), $days),
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
@@ -565,7 +587,7 @@ class CategoryPercentageReportController extends Controller
                 'ordr2' => 10,
                 'ordr3' => 10,
 
-                'txt' => ' -- خضراوات',
+                'txt' => 'خضراوات',
 
                 'currency' => '',
                 'number1' => 0,
@@ -589,12 +611,23 @@ class CategoryPercentageReportController extends Controller
                 ->where('m.tag_id','<>',1)
                 ->whereBetween('m.date', [$fromdate, $todate])
                 ->where('a.CategoryTxt','خضراوات')
-                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
+                ->select(
+                    'a.id as acc_id'
+                    ,'a.name as acc_name'
+                    ,DB::raw('Sum(d.amount) as sub_total')
+                    ,DB::raw('Sum(d.qty) as sub_qty_total')
+                )
+//                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
                 ->groupBy('acc_id','acc_name')
                 ->get();
 
 
             foreach ($transactions as $transaction){
+
+                $Unit_description = DB::table('accounts')
+                    ->where('id',$transaction->acc_id)
+                    ->pluck('Unit_description')->first();
+
                 $rec_id += 1;
                 DB::table('category__percentage__reports')->insert([
                     'id' => $rec_id,
@@ -610,11 +643,11 @@ class CategoryPercentageReportController extends Controller
 
                     'currency' => '',
                     'number1' => $transaction->sub_total ?? 0,
-                    'number1_2' => 0,
-                    'number2' => 0,
+                    'number1_2' => fdiv($transaction->sub_total ?? 0, $days),
+                    'number2' => $transaction->sub_qty_total ?? 0,
                     'number3' => 0,
                     'number4' => 0,
-                    'note' => 0,
+                    'note' => $Unit_description,
                 ]);
             }
 
@@ -635,7 +668,7 @@ class CategoryPercentageReportController extends Controller
 
                 'currency' => '',
                 'number1' => $transactions->sum('sub_total'),
-                'number1_2' => 0,
+                'number1_2' => fdiv($transactions->sum('sub_total'), $days),
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
@@ -644,93 +677,93 @@ class CategoryPercentageReportController extends Controller
             //--------------------------------------------------------------------------------------------------------------
 
 
-            $rec_id += 1;
-            DB::table('category__percentage__reports')->insert([
-                'id' => $rec_id,
-                'company_id' => session::get('company_id'),
-                'financial_year' => session::get('financial_year'),
-                'created_by' => auth()->id(),
-
-                'ordr1' => 13,
-                'ordr2' => 13,
-                'ordr3' => 13,
-
-                'txt' => ' -- خضراوات',
-
-                'currency' => '',
-                'number1' => 0,
-                'number1_2' => 0,
-                'number2' => 0,
-                'number3' => 0,
-                'number4' => 0,
-                'note' => 0,
-            ]);
-            //--------------------------------------------------------------------------------------------------------------
-
-            $transactions = DB::table('treasury_transaction_details as d')
-                ->leftjoin('treasury_transactions as m','m.id','d.master_id')
-                ->leftjoin('accounts as a','a.id','d.account_id')
-                ->where('m.transaction_type_id',1)
-                ->where('m.company_id',session::get('company_id'))
-                ->where('m.financial_year',session::get('financial_year'))
-                ->where('m.archived',0)
-                ->where('a.archived',0)
-                ->where('d.archived',0)
-                ->where('m.tag_id','<>',1)
-                ->whereBetween('m.date', [$fromdate, $todate])
-                ->where('a.CategoryTxt','خضراوات')
-                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
-                ->groupBy('acc_id','acc_name')
-                ->get();
-
-
-            foreach ($transactions as $transaction){
-                $rec_id += 1;
-                DB::table('category__percentage__reports')->insert([
-                    'id' => $rec_id,
-                    'company_id' => session::get('company_id'),
-                    'financial_year' => session::get('financial_year'),
-                    'created_by' => auth()->id(),
-
-                    'ordr1' => 14,
-                    'ordr2' => 14,
-                    'ordr3' => 14,
-
-                    'txt' => $transaction->acc_name,
-
-                    'currency' => '',
-                    'number1' => $transaction->sub_total ?? 0,
-                    'number1_2' => 0,
-                    'number2' => 0,
-                    'number3' => 0,
-                    'number4' => 0,
-                    'note' => 0,
-                ]);
-            }
-
-            //--------------------------------------------------------------------------------------------------------------
-
-            $rec_id += 1;
-            DB::table('category__percentage__reports')->insert([
-                'id' => $rec_id,
-                'company_id' => session::get('company_id'),
-                'financial_year' => session::get('financial_year'),
-                'created_by' => auth()->id(),
-
-                'ordr1' => 15,
-                'ordr2' => 15,
-                'ordr3' => 15,
-
-                'txt' => 'اجمالي الخضراوات',
-
-                'currency' => '',
-                'number1' => $transactions->sum('sub_total'),
-                'number1_2' => 0,
-                'number2' => 0,
-                'number3' => 0,
-                'number4' => 0,
-                'note' => 0,
-            ]);
+//            $rec_id += 1;
+//            DB::table('category__percentage__reports')->insert([
+//                'id' => $rec_id,
+//                'company_id' => session::get('company_id'),
+//                'financial_year' => session::get('financial_year'),
+//                'created_by' => auth()->id(),
+//
+//                'ordr1' => 13,
+//                'ordr2' => 13,
+//                'ordr3' => 13,
+//
+//                'txt' => ' -- خضراوات',
+//
+//                'currency' => '',
+//                'number1' => 0,
+//                'number1_2' => 0,
+//                'number2' => 0,
+//                'number3' => 0,
+//                'number4' => 0,
+//                'note' => 0,
+//            ]);
+//            //--------------------------------------------------------------------------------------------------------------
+//
+//            $transactions = DB::table('treasury_transaction_details as d')
+//                ->leftjoin('treasury_transactions as m','m.id','d.master_id')
+//                ->leftjoin('accounts as a','a.id','d.account_id')
+//                ->where('m.transaction_type_id',1)
+//                ->where('m.company_id',session::get('company_id'))
+//                ->where('m.financial_year',session::get('financial_year'))
+//                ->where('m.archived',0)
+//                ->where('a.archived',0)
+//                ->where('d.archived',0)
+//                ->where('m.tag_id','<>',1)
+//                ->whereBetween('m.date', [$fromdate, $todate])
+//                ->where('a.CategoryTxt','خضراوات')
+//                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
+//                ->groupBy('acc_id','acc_name')
+//                ->get();
+//
+//
+//            foreach ($transactions as $transaction){
+//                $rec_id += 1;
+//                DB::table('category__percentage__reports')->insert([
+//                    'id' => $rec_id,
+//                    'company_id' => session::get('company_id'),
+//                    'financial_year' => session::get('financial_year'),
+//                    'created_by' => auth()->id(),
+//
+//                    'ordr1' => 14,
+//                    'ordr2' => 14,
+//                    'ordr3' => 14,
+//
+//                    'txt' => $transaction->acc_name,
+//
+//                    'currency' => '',
+//                    'number1' => $transaction->sub_total ?? 0,
+//                    'number1_2' => 0,
+//                    'number2' => 0,
+//                    'number3' => 0,
+//                    'number4' => 0,
+//                    'note' => 0,
+//                ]);
+//            }
+//
+//            //--------------------------------------------------------------------------------------------------------------
+//
+//            $rec_id += 1;
+//            DB::table('category__percentage__reports')->insert([
+//                'id' => $rec_id,
+//                'company_id' => session::get('company_id'),
+//                'financial_year' => session::get('financial_year'),
+//                'created_by' => auth()->id(),
+//
+//                'ordr1' => 15,
+//                'ordr2' => 15,
+//                'ordr3' => 15,
+//
+//                'txt' => 'اجمالي الخضراوات',
+//
+//                'currency' => '',
+//                'number1' => $transactions->sum('sub_total'),
+//                'number1_2' => 0,
+//                'number2' => 0,
+//                'number3' => 0,
+//                'number4' => 0,
+//                'note' => 0,
+//            ]);
             //--------------------------------------------------------------------------------------------------------------
 
             $rec_id += 1;
@@ -744,7 +777,7 @@ class CategoryPercentageReportController extends Controller
                 'ordr2' => 16,
                 'ordr3' => 16,
 
-                'txt' => ' -- خبز',
+                'txt' => 'خبز',
 
                 'currency' => '',
                 'number1' => 0,
@@ -768,12 +801,23 @@ class CategoryPercentageReportController extends Controller
                 ->where('m.tag_id','<>',1)
                 ->whereBetween('m.date', [$fromdate, $todate])
                 ->where('a.CategoryTxt','خبز')
-                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
+                ->select(
+                    'a.id as acc_id'
+                    ,'a.name as acc_name'
+                    ,DB::raw('Sum(d.amount) as sub_total')
+                    ,DB::raw('Sum(d.qty) as sub_qty_total')
+                )
+//                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
                 ->groupBy('acc_id','acc_name')
                 ->get();
 
 
             foreach ($transactions as $transaction){
+
+                $Unit_description = DB::table('accounts')
+                    ->where('id',$transaction->acc_id)
+                    ->pluck('Unit_description')->first();
+
                 $rec_id += 1;
                 DB::table('category__percentage__reports')->insert([
                     'id' => $rec_id,
@@ -789,11 +833,11 @@ class CategoryPercentageReportController extends Controller
 
                     'currency' => '',
                     'number1' => $transaction->sub_total ?? 0,
-                    'number1_2' => 0,
-                    'number2' => 0,
+                    'number1_2' => fdiv($transaction->sub_total, $days),
+                    'number2' => $transaction->sub_qty_total ?? 0,
                     'number3' => 0,
                     'number4' => 0,
-                    'note' => 0,
+                    'note' => $Unit_description,
                 ]);
             }
 
@@ -814,7 +858,7 @@ class CategoryPercentageReportController extends Controller
 
                 'currency' => '',
                 'number1' => $transactions->sum('sub_total'),
-                'number1_2' => 0,
+                'number1_2' => fdiv($transactions->sum('sub_total'), $days),
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
@@ -833,7 +877,7 @@ class CategoryPercentageReportController extends Controller
                 'ordr2' => 19,
                 'ordr3' => 19,
 
-                'txt' => ' -- خبز',
+                'txt' => 'أخرى',
 
                 'currency' => '',
                 'number1' => 0,
@@ -857,12 +901,23 @@ class CategoryPercentageReportController extends Controller
                 ->where('m.tag_id','<>',1)
                 ->whereBetween('m.date', [$fromdate, $todate])
                 ->where('a.CategoryTxt','أخرى')
-                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
+                ->select(
+                    'a.id as acc_id'
+                    ,'a.name as acc_name'
+                    ,DB::raw('Sum(d.amount) as sub_total')
+                    ,DB::raw('Sum(d.qty) as sub_qty_total')
+                )
+//                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
                 ->groupBy('acc_id','acc_name')
                 ->get();
 
 
             foreach ($transactions as $transaction){
+
+                $Unit_description = DB::table('accounts')
+                    ->where('id',$transaction->acc_id)
+                    ->pluck('Unit_description')->first();
+
                 $rec_id += 1;
                 DB::table('category__percentage__reports')->insert([
                     'id' => $rec_id,
@@ -878,11 +933,11 @@ class CategoryPercentageReportController extends Controller
 
                     'currency' => '',
                     'number1' => $transaction->sub_total ?? 0,
-                    'number1_2' => 0,
-                    'number2' => 0,
+                    'number1_2' => fdiv($transaction->sub_total, $days),
+                    'number2' => $transaction->sub_qty_total ?? 0,
                     'number3' => 0,
                     'number4' => 0,
-                    'note' => 0,
+                    'note' => $Unit_description,
                 ]);
             }
 
@@ -903,11 +958,11 @@ class CategoryPercentageReportController extends Controller
 
                 'currency' => '',
                 'number1' => $transactions->sum('sub_total'),
-                'number1_2' => 0,
+                'number1_2' => fdiv($transactions->sum('sub_total'), $days),
                 'number2' => 0,
                 'number3' => 0,
                 'number4' => 0,
-                'note' => 0,
+                'note' => '',
             ]);
             //--------------------------------------------------------------------------------------------------------------
 
@@ -924,6 +979,7 @@ class CategoryPercentageReportController extends Controller
 
             return view('rep.category_percentage_report')
                 ->with('decimal_octets', $decimal_octets)
+                ->with('total_pct', $tot_in + $other_income_total + $faaed - $ajz)
                 ->with('reports', $category_percentage_report);
         }
         }
