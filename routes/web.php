@@ -62,6 +62,7 @@ Route::get('/pulled_from_net_income_report', [ReportController::class, 'pulled_f
 Route::get('/category_percentage_report', [\App\Http\Controllers\CategoryPercentageReportController::class, 'category_percentage_report']);
 Route::get('/treasury_report', [ReportController::class, 'treasury_report']);
 Route::get('/ledger2', [ReportController::class, 'ledger2']);
+Route::get('/partners_accounts_report', [ReportController::class, 'partners_accounts_report']);
 Route::get('/account_details_report', [ReportController::class, 'account_details_report']);
 
 Auth::routes(['register' => true]);

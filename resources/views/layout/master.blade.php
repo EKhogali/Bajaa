@@ -87,6 +87,7 @@
                             <li><a class="dropdown-item" href="/account_details_report">تقرير الحركة التفصيلية لحساب</a></li>
                             <li><a class="dropdown-item" href="/category_percentage_report">تقرير نسبة المصروفات من اجمالي المبيعات</a></li>
                             <li><a class="dropdown-item" href="/pulled_from_net_income_report">تقرير مسحوبات من صافي الربح</a></li>
+                            <li><a class="dropdown-item" href="/partners_accounts_report">تقرير حساب المستثمر والشريك</a></li>
                         </ul>
                     </li>
 
