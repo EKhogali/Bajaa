@@ -233,14 +233,8 @@
       <workItem from="1724601494584" duration="1855000" />
       <workItem from="1724963691700" duration="595000" />
       <workItem from="1725011981799" duration="795000" />
-      <workItem from="1725214115731" duration="11415000" />
-    </task>
-    <task id="LOCAL-00044" summary="2024-07-14">
-      <created>1720976498054</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1720976498054</updated>
+      <workItem from="1725214115731" duration="12357000" />
+      <workItem from="1725269830653" duration="958000" />
     </task>
     <task id="LOCAL-00045" summary="2024-07-14">
       <created>1720976536359</created>
@@ -578,7 +572,14 @@
       <option name="project" value="LOCAL" />
       <updated>1723923212995</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="2024-09-02">
+      <created>1725231255362</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1725231255362</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -597,7 +598,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="1" />
     <MESSAGE value="2024-06-22" />
     <MESSAGE value="2024-06-27" />
     <MESSAGE value="2024-07-03" />
@@ -622,7 +622,8 @@
     <MESSAGE value="2024-08-08-" />
     <MESSAGE value="2024-08-12-before implement Category_Percentage_Report" />
     <MESSAGE value="2024-08-17" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-08-17" />
+    <MESSAGE value="2024-09-02" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-09-02" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -666,11 +667,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1723923214703">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725231261450">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1723923214703" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725231261450" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

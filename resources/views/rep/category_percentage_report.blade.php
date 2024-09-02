@@ -87,8 +87,8 @@
             @foreach($reports as $report)
 
                 @php
-                    $isStartRecord = in_array($report->ordr1, [1, 2, 3, 4, 7, 10, 16, 19]);
-                    $isEndRecord = in_array($report->ordr1, [6, 9, 13, 18, 21]);
+                    $isStartRecord = in_array($report->ordr1, [1, 2, 3, 4, 7, 10, 13, 16, 19]);
+                    $isEndRecord = in_array($report->ordr1, [6, 9, 12, 15, 18, 21]);
 
                 //if(in_array($report->ordr1,[5,6])){ $total_pct = $reports->where('ordr1',5)->sum('number1'); }
                 //elseif(in_array($report->ordr1,[8,9])){ $total_pct = $reports->where('ordr1',8)->sum('number1'); }
@@ -104,7 +104,7 @@
                 <th scope="row" width="4%">{{ $report->id ?? '' }}</th>
                     <th scope="row" width="4%">{{ $report->ordr1 }}</th>
                     <th scope="row" width="40%">{{ $report->txt ?? '' }}</th>
-                    @if(! in_array($report->ordr1, [1,2,3,4,7,10,16,19]))
+                    @if(! in_array($report->ordr1, [1,2,3,4,7,10,13,16,19]))
                         <th scope="row" width="10%">دينار</th>
                     @else
                         <th scope="row" width="10%"></th>
@@ -115,7 +115,7 @@
 {{--                    <th scope="row" width="15%">{{ $report->number3 == 0 ? '' : $report->number3 }}</th>--}}
                     <th scope="row" width="15%">{{ $report->note }}</th>
 
-                    @if(in_array($report->ordr1,[5,6,8,9,11,12,17,18,20,21]))
+                    @if(in_array($report->ordr1,[5,6,8,9,11,12,14,15,17,18,20,21]))
                         <th scope="row" width="15%">{{ number_format(fdiv($report->number1, $total_pct) * 100,2).'%' }}</th>
                     @else
                         <th scope="row" width="15%"></th>

@@ -587,7 +587,7 @@ class CategoryPercentageReportController extends Controller
                 'ordr2' => 10,
                 'ordr3' => 10,
 
-                'txt' => 'خضراوات',
+                'txt' => 'خضروات',
 
                 'currency' => '',
                 'number1' => 0,
@@ -610,7 +610,7 @@ class CategoryPercentageReportController extends Controller
                 ->where('d.archived',0)
                 ->where('m.tag_id','<>',1)
                 ->whereBetween('m.date', [$fromdate, $todate])
-                ->where('a.CategoryTxt','خضراوات')
+                ->where('a.CategoryTxt','خضروات')
                 ->select(
                     'a.id as acc_id'
                     ,'a.name as acc_name'
@@ -620,7 +620,7 @@ class CategoryPercentageReportController extends Controller
 //                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
                 ->groupBy('acc_id','acc_name')
                 ->get();
-
+//dd($transactions);
 
             foreach ($transactions as $transaction){
 
@@ -664,7 +664,7 @@ class CategoryPercentageReportController extends Controller
                 'ordr2' => 12,
                 'ordr3' => 12,
 
-                'txt' => 'اجمالي الخضراوات',
+                'txt' => 'اجمالي الخضروات',
 
                 'currency' => '',
                 'number1' => $transactions->sum('sub_total'),
@@ -677,93 +677,104 @@ class CategoryPercentageReportController extends Controller
             //--------------------------------------------------------------------------------------------------------------
 
 
-//            $rec_id += 1;
-//            DB::table('category__percentage__reports')->insert([
-//                'id' => $rec_id,
-//                'company_id' => session::get('company_id'),
-//                'financial_year' => session::get('financial_year'),
-//                'created_by' => auth()->id(),
-//
-//                'ordr1' => 13,
-//                'ordr2' => 13,
-//                'ordr3' => 13,
-//
-//                'txt' => ' -- خضراوات',
-//
-//                'currency' => '',
-//                'number1' => 0,
-//                'number1_2' => 0,
-//                'number2' => 0,
-//                'number3' => 0,
-//                'number4' => 0,
-//                'note' => 0,
-//            ]);
-//            //--------------------------------------------------------------------------------------------------------------
-//
-//            $transactions = DB::table('treasury_transaction_details as d')
-//                ->leftjoin('treasury_transactions as m','m.id','d.master_id')
-//                ->leftjoin('accounts as a','a.id','d.account_id')
-//                ->where('m.transaction_type_id',1)
-//                ->where('m.company_id',session::get('company_id'))
-//                ->where('m.financial_year',session::get('financial_year'))
-//                ->where('m.archived',0)
-//                ->where('a.archived',0)
-//                ->where('d.archived',0)
-//                ->where('m.tag_id','<>',1)
-//                ->whereBetween('m.date', [$fromdate, $todate])
-//                ->where('a.CategoryTxt','خضراوات')
+            $rec_id += 1;
+            DB::table('category__percentage__reports')->insert([
+                'id' => $rec_id,
+                'company_id' => session::get('company_id'),
+                'financial_year' => session::get('financial_year'),
+                'created_by' => auth()->id(),
+
+                'ordr1' => 13,
+                'ordr2' => 13,
+                'ordr3' => 13,
+
+                'txt' => 'غذائية',
+
+                'currency' => '',
+                'number1' => 0,
+                'number1_2' => 0,
+                'number2' => 0,
+                'number3' => 0,
+                'number4' => 0,
+                'note' => 0,
+            ]);
+            //--------------------------------------------------------------------------------------------------------------
+
+            $transactions = DB::table('treasury_transaction_details as d')
+                ->leftjoin('treasury_transactions as m','m.id','d.master_id')
+                ->leftjoin('accounts as a','a.id','d.account_id')
+                ->where('m.transaction_type_id',1)
+                ->where('m.company_id',session::get('company_id'))
+                ->where('m.financial_year',session::get('financial_year'))
+                ->where('m.archived',0)
+                ->where('a.archived',0)
+                ->where('d.archived',0)
+                ->where('m.tag_id','<>',1)
+                ->whereBetween('m.date', [$fromdate, $todate])
+                ->where('a.CategoryTxt','غذائية')
+                ->select(
+                    'a.id as acc_id'
+                    ,'a.name as acc_name'
+                    ,DB::raw('Sum(d.amount) as sub_total')
+                    ,DB::raw('Sum(d.qty) as sub_qty_total')
+                )
 //                ->select('a.id as acc_id','a.name as acc_name',DB::raw('Sum(d.amount) as sub_total'))
-//                ->groupBy('acc_id','acc_name')
-//                ->get();
-//
-//
-//            foreach ($transactions as $transaction){
-//                $rec_id += 1;
-//                DB::table('category__percentage__reports')->insert([
-//                    'id' => $rec_id,
-//                    'company_id' => session::get('company_id'),
-//                    'financial_year' => session::get('financial_year'),
-//                    'created_by' => auth()->id(),
-//
-//                    'ordr1' => 14,
-//                    'ordr2' => 14,
-//                    'ordr3' => 14,
-//
-//                    'txt' => $transaction->acc_name,
-//
-//                    'currency' => '',
-//                    'number1' => $transaction->sub_total ?? 0,
-//                    'number1_2' => 0,
-//                    'number2' => 0,
-//                    'number3' => 0,
-//                    'number4' => 0,
-//                    'note' => 0,
-//                ]);
-//            }
-//
-//            //--------------------------------------------------------------------------------------------------------------
-//
-//            $rec_id += 1;
-//            DB::table('category__percentage__reports')->insert([
-//                'id' => $rec_id,
-//                'company_id' => session::get('company_id'),
-//                'financial_year' => session::get('financial_year'),
-//                'created_by' => auth()->id(),
-//
-//                'ordr1' => 15,
-//                'ordr2' => 15,
-//                'ordr3' => 15,
-//
-//                'txt' => 'اجمالي الخضراوات',
-//
-//                'currency' => '',
-//                'number1' => $transactions->sum('sub_total'),
-//                'number1_2' => 0,
-//                'number2' => 0,
-//                'number3' => 0,
-//                'number4' => 0,
-//                'note' => 0,
-//            ]);
+                ->groupBy('acc_id','acc_name')
+                ->get();
+
+
+            foreach ($transactions as $transaction){
+
+                $Unit_description = DB::table('accounts')
+                    ->where('id',$transaction->acc_id)
+                    ->pluck('Unit_description')->first();
+
+                $rec_id += 1;
+                DB::table('category__percentage__reports')->insert([
+                    'id' => $rec_id,
+                    'company_id' => session::get('company_id'),
+                    'financial_year' => session::get('financial_year'),
+                    'created_by' => auth()->id(),
+
+                    'ordr1' => 14,
+                    'ordr2' => 14,
+                    'ordr3' => 14,
+
+                    'txt' => $transaction->acc_name,
+
+                    'currency' => '',
+                    'number1' => $transaction->sub_total ?? 0,
+                    'number1_2' => fdiv($transaction->sub_total, $days),
+                    'number2' => $transaction->sub_qty_total ?? 0,
+                    'number3' => 0,
+                    'number4' => 0,
+                    'note' => $Unit_description ?? '',
+                ]);
+            }
+
+            //--------------------------------------------------------------------------------------------------------------
+
+            $rec_id += 1;
+            DB::table('category__percentage__reports')->insert([
+                'id' => $rec_id,
+                'company_id' => session::get('company_id'),
+                'financial_year' => session::get('financial_year'),
+                'created_by' => auth()->id(),
+
+                'ordr1' => 15,
+                'ordr2' => 15,
+                'ordr3' => 15,
+
+                'txt' => 'اجمالي الغذائية',
+
+                'currency' => '',
+                'number1' => $transactions->sum('sub_total'),
+                'number1_2' => 0,
+                'number2' => 0,
+                'number3' => 0,
+                'number4' => 0,
+                'note' => 0,
+            ]);
             //--------------------------------------------------------------------------------------------------------------
 
             $rec_id += 1;
