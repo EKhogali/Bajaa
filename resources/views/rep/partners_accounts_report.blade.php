@@ -95,7 +95,7 @@
                 <th scope="col" style="text-align: center;">وارد</th>
                 <th scope="col" style="text-align: center;">صادر</th>
 {{--                <th scope="col" style="text-align: center;">الحساب</th>--}}
-                <th scope="col" style="text-align: center;">القيمة</th>
+{{--                <th scope="col" style="text-align: center;">القيمة</th>--}}
                 <th scope="col" style="text-align: center;">الوصف</th>
             </tr>
             </thead>
@@ -110,7 +110,7 @@
             <tr>
                 <th scope="row">{{$rec_id ?? ''}}</th>
                 <th scope="row"></th>
-                <th scope="row">{{ isset($profit) ? number_format($profit, $decimal_octets) : '' }}</th>
+                <th scope="row">{{ isset($arr['net_profit']) ? number_format($arr['net_profit'], $decimal_octets) : '' }}</th>
                 <th scope="row"></th>
                 <th scope="row"></th>
                 <th scope="row"></th>
@@ -149,15 +149,31 @@
                 <td colspan="4"></td> <!-- Empty cell for spacing -->
             </tr>
             <tr style="background-color: #f2f2f2;">
-                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي الوارد</td>
-                <td colspan="2" style="text-align: center;">{{ isset($profit) ? number_format($profit, $decimal_octets) : '' }}</td>
+                <td colspan="2" style="font-weight: bold; text-align: center;">صافي الربـــــــــــــــــح</td>
+                <td colspan="2" style="text-align: center;">{{ isset($arr['net_profit']) ? number_format($arr['net_profit'], $decimal_octets) : '' }}</td>
             </tr>
             <tr style="background-color: #f2f2f2;">
-                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي الصادر</td>
-                <td colspan="2" style="text-align: center;">{{$tot_out}}</td>
+                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات من صافي الربح</td>
+                <td colspan="2" style="text-align: center;">{{ isset($arr['total_pulled_from_net_income']) ? number_format($arr['total_pulled_from_net_income'], $decimal_octets) : '' }}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">صافي الربح بعد المسحوبات</td>
+                <td colspan="2" style="text-align: center;">{{ isset($arr['total_pulled_from_net_income'], $arr['net_profit']) ? number_format($arr['net_profit'] - $arr['total_pulled_from_net_income'], $decimal_octets) : '' }}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">النسبة</td>
+                <td colspan="2" style="text-align: center;">{{ $arr['partner_pct'].' %' ?? ''  }}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">قيمة النسبة</td>
+                <td colspan="2" style="text-align: center;">{{ isset($arr['profit_after_total_pulled_from_net_income']) ? number_format($arr['profit_after_total_pulled_from_net_income'], $decimal_octets) : '' }}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">قيمة النسبة</td>
+                <td colspan="2" style="text-align: center;">{{ isset($tot_out) ? number_format($tot_out, $decimal_octets) : '' }}</td>
             </tr>
             @php
-                $balance = $profit - $tot_out;
+                $balance = $arr['profit_after_total_pulled_from_net_income'] - $tot_out;
             @endphp
             <tr style="background-color: #f2f2f2;">
                 <td colspan="2" style="font-weight: bold; text-align: center;">الرصيد</td>

@@ -152,7 +152,7 @@ class ReportController extends Controller
 
         $queries = DB::table('treasury_transactions as t')
             ->leftjoin('accounts as a','a.id','t.account_id')
-            ->where('t.transaction_type_id',0)
+            ->where('t.transaction_type_id',1)
             ->where('t.company_id',session::get('company_id'))
             ->where('t.financial_year',session::get('financial_year'))
             ->where('t.archived',0)
@@ -163,9 +163,10 @@ class ReportController extends Controller
             ->groupBy('t.account_id','a.name')
             ->get();
 
+        $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses ;
+
         $total_pulled_from_net_income = $queries->sum('amount');
 
-        $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses ;
         $partners_array = partner::where('company_id',session::get('company_id'))
             ->where('archived',0)
             ->pluck('account_id')
@@ -179,8 +180,18 @@ class ReportController extends Controller
             ->get();
         $partner_pct = $partners->where('account_id',$account_id)->pluck('win_percentage')->first();
 
-        $profit = fdiv($net_profit,100)*$partner_pct;//((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
+        $profit = ((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
+
+        $profit_after_total_pulled_from_net_income = fdiv($net_profit,100)*$partner_pct;
 //        dd($net_profit,$partner_pct,$profit);
+        $arr = array(
+            "net_profit" => $net_profit,
+            "total_pulled_from_net_income"=> $total_pulled_from_net_income,
+            "partner_pct" => $partner_pct,
+            "profit" => $profit,
+            "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
+        );
+        //dd($arr,$arr["profit"],'yy');
 
 //        dd(
 //            '$fromdate: '.$fromdate,
@@ -251,6 +262,7 @@ class ReportController extends Controller
             ->with('accounts', $accounts)
             ->with('account_id', $account_id)
             ->with('profit', $profit)
+            ->with('arr', $arr)
             ->with('reports', $reports);
     }
 
