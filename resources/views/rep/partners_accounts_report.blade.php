@@ -166,7 +166,7 @@
 {{--                <td colspan="2" style="text-align: center;">{{ $arr['partner_pct'].' %' ?? ''  }}</td>--}}
 {{--            </tr>--}}
             <tr style="background-color: #f2f2f2;">
-                <td colspan="2" style="font-weight: bold; text-align: center;">الوارد</td>
+                <td colspan="2" style="font-weight: bold; text-align: center;">الوارد ({{$arr['partner_pct'].' %' }}) من صافي الربح</td>
                 <td colspan="2" style="text-align: center;">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</td>
             </tr>
             <tr style="background-color: #f2f2f2;">
