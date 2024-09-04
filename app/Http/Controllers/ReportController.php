@@ -152,7 +152,7 @@ class ReportController extends Controller
 
         $queries = DB::table('treasury_transactions as t')
             ->leftjoin('accounts as a','a.id','t.account_id')
-            ->where('t.transaction_type_id',1)
+            ->where('t.transaction_type_id',0)
             ->where('t.company_id',session::get('company_id'))
             ->where('t.financial_year',session::get('financial_year'))
             ->where('t.archived',0)
@@ -166,9 +166,21 @@ class ReportController extends Controller
         $total_pulled_from_net_income = $queries->sum('amount');
 
         $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses ;
+        $partners_array = partner::where('company_id',session::get('company_id'))
+            ->where('archived',0)
+            ->pluck('account_id')
+            ->toArray();
 
-        $profit = ((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
+        if(\request()->has('account_id')){$account_id = Request('account_id');}
+        else{$account_id = 0;}
 
+        $partners = partner::where('company_id',session::get('company_id'))
+            ->where('archived',0)
+            ->get();
+        $partner_pct = $partners->where('account_id',$account_id)->pluck('win_percentage')->first();
+
+        $profit = fdiv($net_profit,100)*$partner_pct;//((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
+//        dd($net_profit,$partner_pct,$profit);
 
 //        dd(
 //            '$fromdate: '.$fromdate,
@@ -212,8 +224,7 @@ class ReportController extends Controller
 
 
 
-        if(\request()->has('account_id')){$account_id = Request('account_id');}
-        else{$account_id = 0;}
+
 
         $reports = DB::table('treasury_transactions as t')
         ->leftjoin('accounts as a','a.id','t.account_id')
@@ -226,10 +237,9 @@ class ReportController extends Controller
             ->get();
 
         $decimal_octets = sitting::where('id', 1)->value('decimal_octets');
-        $partners_array = partner::where('company_id',session::get('company_id'))
-            ->where('archived',0)
-            ->pluck('account_id')
-            ->toArray();
+
+
+
         $accounts = account::where('archived',0)
             ->wherein('id',$partners_array)
             ->get();

@@ -11,6 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -233,14 +235,7 @@
       <workItem from="1725011981799" duration="795000" />
       <workItem from="1725214115731" duration="12357000" />
       <workItem from="1725269830653" duration="1841000" />
-      <workItem from="1725289480109" duration="7637000" />
-    </task>
-    <task id="LOCAL-00047" summary="2024-07-14">
-      <created>1720976749810</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1720976749810</updated>
+      <workItem from="1725289480109" duration="10353000" />
     </task>
     <task id="LOCAL-00048" summary="2024-07-14">
       <created>1720980330477</created>
@@ -578,7 +573,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725313252263</updated>
     </task>
-    <option name="localTasksCounter" value="96" />
+    <task id="LOCAL-00096" summary="2024-09-03">
+      <created>1725313507959</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1725313507959</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -666,11 +668,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725271087101">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725313509248">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725271087101" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725313509248" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
