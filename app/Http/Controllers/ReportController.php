@@ -194,6 +194,7 @@ class ReportController extends Controller
             "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
             "profit_pct_amount" => $profit_pct_amount,
             "partner_name" => $partner_name,
+            "title_amount" => $net_profit - $total_pulled_from_net_income,
         );
         //dd($arr,$arr["profit"],'yy');
 
