@@ -174,7 +174,7 @@
                 <td colspan="2" style="text-align: center;">{{ isset($tot_out) ? number_format($tot_out, $decimal_octets) : '' }}</td>
             </tr>
             @php
-                $balance = $arr['profit_after_total_pulled_from_net_income'] - $tot_out;
+                $balance = $arr['profit_pct_amount'] - $tot_out;
             @endphp
             <tr style="background-color: #f2f2f2;">
                 <td colspan="2" style="font-weight: bold; text-align: center;">الرصيد</td>
