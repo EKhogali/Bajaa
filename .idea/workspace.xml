@@ -11,7 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -233,28 +233,7 @@
       <workItem from="1725011981799" duration="795000" />
       <workItem from="1725214115731" duration="12357000" />
       <workItem from="1725269830653" duration="1841000" />
-      <workItem from="1725289480109" duration="15616000" />
-    </task>
-    <task id="LOCAL-00052" summary="2024-07-24">
-      <created>1721480077526</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1721480077526</updated>
-    </task>
-    <task id="LOCAL-00053" summary="2024-07-24">
-      <created>1721480178026</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1721480178026</updated>
-    </task>
-    <task id="LOCAL-00054" summary="2024-07-24">
-      <created>1721570823593</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1721570823593</updated>
+      <workItem from="1725289480109" duration="15962000" />
     </task>
     <task id="LOCAL-00055" summary="2024-07-24">
       <created>1721571921782</created>
@@ -578,7 +557,28 @@
       <option name="project" value="LOCAL" />
       <updated>1725469714167</updated>
     </task>
-    <option name="localTasksCounter" value="101" />
+    <task id="LOCAL-00101" summary="2024-09-04">
+      <created>1725469820237</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1725469820237</updated>
+    </task>
+    <task id="LOCAL-00102" summary="2024-09-04">
+      <created>1725469890461</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1725469890461</updated>
+    </task>
+    <task id="LOCAL-00103" summary="2024-09-04">
+      <created>1725470063491</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1725470063491</updated>
+    </task>
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -666,11 +666,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725469715882">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725470064823">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725469715882" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725470064823" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

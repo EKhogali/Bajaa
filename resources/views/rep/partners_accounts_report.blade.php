@@ -82,9 +82,11 @@
                 <br>
                 <h4>تقرير: تقرير حساب المستثمر والشريك</h4>
                 <br>
+                <h5>{{$arr['partner_name']}}</h5>
+                <br>
                 <h5>من: {{ request()->get('fromdate') ?? '' }} إلى: {{ request()->get('todate') ?? '' }}</h5>
                 <br>
-                <h4> صافي الربح بعد المسحوبات: {{$arr['profit_pct_amount']}}</h4>
+                <h5> صافي الربح بعد المسحوبات: {{$arr['total_pulled_from_net_income']}}</h5>
             </div>
         </div>
 

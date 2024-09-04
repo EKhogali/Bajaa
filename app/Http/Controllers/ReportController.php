@@ -179,6 +179,7 @@ class ReportController extends Controller
             ->where('archived',0)
             ->get();
         $partner_pct = $partners->where('account_id',$account_id)->pluck('win_percentage')->first();
+        $partner_name = $partners->where('account_id',$account_id)->pluck('name')->first();
 
         $profit = ((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
 
@@ -192,6 +193,7 @@ class ReportController extends Controller
             "profit" => $profit,
             "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
             "profit_pct_amount" => $profit_pct_amount,
+            "partner_name" => $partner_name,
         );
         //dd($arr,$arr["profit"],'yy');
 
