@@ -84,7 +84,7 @@
                 <br>
                 <h5>من: {{ request()->get('fromdate') ?? '' }} إلى: {{ request()->get('todate') ?? '' }}</h5>
                 <br>
-                <h4> صافي الربح بعد المسحوبات: {{$arr['profit_after_total_pulled_from_net_income']}}</h4>
+                <h4> صافي الربح بعد المسحوبات: {{$arr['profit_pct_amount']}}</h4>
             </div>
         </div>
 
