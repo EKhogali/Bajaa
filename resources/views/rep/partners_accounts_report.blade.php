@@ -115,7 +115,7 @@
                 <th scope="row"></th>
                 <th scope="row">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</th>
                 <th scope="row"></th>
-                <th scope="row"></th>
+{{--                <th scope="row"></th>--}}
                 <th scope="row"> {{$arr['partner_pct'].' %'.' من صافي الربح' }} </th>
 
             </tr>
