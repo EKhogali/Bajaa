@@ -11,8 +11,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -235,14 +233,7 @@
       <workItem from="1725011981799" duration="795000" />
       <workItem from="1725214115731" duration="12357000" />
       <workItem from="1725269830653" duration="1841000" />
-      <workItem from="1725289480109" duration="14299000" />
-    </task>
-    <task id="LOCAL-00049" summary="2024-07-14">
-      <created>1721078873849</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1721078873849</updated>
+      <workItem from="1725289480109" duration="15093000" />
     </task>
     <task id="LOCAL-00050" summary="2024-07-16">
       <created>1721166965971</created>
@@ -580,7 +571,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725441148748</updated>
     </task>
-    <option name="localTasksCounter" value="98" />
+    <task id="LOCAL-00098" summary="2024-09-04">
+      <created>1725468427337</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1725468427337</updated>
+    </task>
+    <option name="localTasksCounter" value="99" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -599,7 +597,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-05" />
     <MESSAGE value="2024-07-07" />
     <MESSAGE value="2024-07-07-3" />
     <MESSAGE value="2024-07-11" />
@@ -624,7 +621,8 @@
     <MESSAGE value="2024-09-02-2" />
     <MESSAGE value="2024-09-03" />
     <MESSAGE value="2024-09-03-4" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-09-03-4" />
+    <MESSAGE value="2024-09-04" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-09-04" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -668,11 +666,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725441149890">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725468429004">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725441149890" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725468429004" />
     <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

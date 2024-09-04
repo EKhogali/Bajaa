@@ -183,6 +183,7 @@ class ReportController extends Controller
         $profit = ((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
 
         $profit_after_total_pulled_from_net_income = fdiv($net_profit,100)*$partner_pct;
+        $profit_pct_amount = fdiv($net_profit,100)*$partner_pct;
 //        dd($net_profit,$partner_pct,$profit);
         $arr = array(
             "net_profit" => $net_profit,
@@ -190,6 +191,7 @@ class ReportController extends Controller
             "partner_pct" => $partner_pct,
             "profit" => $profit,
             "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
+            "profit_pct_amount" => $profit_pct_amount,
         );
         //dd($arr,$arr["profit"],'yy');
 
