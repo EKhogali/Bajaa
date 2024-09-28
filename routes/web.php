@@ -1,5 +1,6 @@
 <?php
 
+use App\estimated_expense;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 
@@ -52,18 +53,21 @@ Route::resource('/sitting', 'SittingController');
 Route::resource('/users', 'UserController');
 Route::resource('/treasury_transaction', 'TreasuryTransactionController');
 Route::resource('/treasury_transaction_details', 'TreasuryTransactionDetailController');
+Route::resource('/estimated_expense', 'EstimatedExpenseController');
 
 Route::get('treasury_transaction/{id}/print', [\App\Http\Controllers\TreasuryTransactionController::class, 'print'])->name('treasury_transaction.print');
 Route::get('treasury_transaction__details_print/{id}/print', [\App\Http\Controllers\TreasuryTransactionDetailController::class, 'print'])->name('treasury_transaction__details_print');
 
 Route::get('/journaldd/{id}', [JournalmController::class,'show']);
 Route::get('/income_report', [ReportController::class, 'income_report']);
+Route::get('/estimated_expense_report', [ReportController::class, 'estimated_expense_report']);
 Route::get('/pulled_from_net_income_report', [ReportController::class, 'pulled_from_net_income_report']);
 Route::get('/category_percentage_report', [\App\Http\Controllers\CategoryPercentageReportController::class, 'category_percentage_report']);
 Route::get('/treasury_report', [ReportController::class, 'treasury_report']);
 Route::get('/ledger2', [ReportController::class, 'ledger2']);
 Route::get('/partners_accounts_report', [ReportController::class, 'partners_accounts_report']);
 Route::get('/account_details_report', [ReportController::class, 'account_details_report']);
+//Route::get('/estimated_expense_report', [ReportController::class, 'estimated_expense_report']);
 
 Auth::routes(['register' => true]);
 

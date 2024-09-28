@@ -11,7 +11,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_report.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/EstimatedExpenseController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/estimated_expense.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/EstimatedExpenseFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_09_25_063743_create_estimated_expenses_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/EstimatedExpenseSeeder.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/rep/estimated_expense_report.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,10 +162,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\rep" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\estimated_expense" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction\treasury_transaction_details" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\sys" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction" />
-      <recent name="C:\wamp64\www\Accounting-Online\resources\views\bsc" />
     </key>
   </component>
   <component name="RunManager" selected="PHPUnit.phpunit.xml">
@@ -234,6 +246,9 @@
       <workItem from="1725214115731" duration="12357000" />
       <workItem from="1725269830653" duration="1841000" />
       <workItem from="1725289480109" duration="16867000" />
+      <workItem from="1726513301623" duration="1190000" />
+      <workItem from="1727246163027" duration="5026000" />
+      <workItem from="1727508431740" duration="4959000" />
     </task>
     <task id="LOCAL-00059" summary="2024-07-24">
       <created>1721595091782</created>
@@ -637,10 +652,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="499" y="164" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651363755" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1723495909097">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1727248260837">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1721306034578" />
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1727248260837" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1723495909097" />
     <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1718888533940">
       <screen x="0" y="0" width="1536" height="834" />
@@ -650,10 +665,6 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="407" y="179" key="MultipleFileMergeDialog/0.0.1536.834@0.0.1536.834" timestamp="1720653099642" />
-    <state x="567" y="140" key="NewPhpClassDialog" timestamp="1717879757414">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="567" y="140" key="NewPhpClassDialog/0.0.1536.834@0.0.1536.834" timestamp="1717879757414" />
     <state x="604" y="341" key="NewPhpFileDialog" timestamp="1720651373290">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
@@ -671,10 +682,6 @@
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725470976679" />
-    <state x="478" y="150" width="579" height="534" key="find.popup" timestamp="1717597256625">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="478" y="150" width="579" height="534" key="find.popup/0.0.1536.834@0.0.1536.834" timestamp="1717597256625" />
     <state x="425" y="189" key="run.anything.popup" timestamp="1718948617709">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

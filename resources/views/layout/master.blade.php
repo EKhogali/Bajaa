@@ -69,7 +69,8 @@
     {{--                        <li><hr class="dropdown-divider"></li>--}}
                             <li><a class="dropdown-item" href="/treasury_transaction?trans_type={{0}}">ايصالات القبض</a></li>
                             <li><a class="dropdown-item" href="/treasury_transaction?trans_type={{1}}">ايصالات الصرف</a></li>
-    {{--                        <li><a class="dropdown-item" href="/treasury_transaction?transaction_type_id={{1}}">التحويلات</a></li>--}}
+                                <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/estimated_expense?transaction_type_id={{1}}">المصروفات الإدارية التقديرية</a></li>
                         </ul>
                     </li>
                     @if(auth()->id() == 1 or auth()->id() == 2)
@@ -82,6 +83,9 @@
     {{--                        <li><a class="dropdown-item" href="/l_index">الأستــــاذ المساعد</a></li>--}}
     {{--                        <li><a class="dropdown-item" href="/tr_index">ميزان المراجعـــة</a></li>--}}
                             <li><a class="dropdown-item" href="/income_report">تقرير الدخل</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/estimated_expense_report">تقرير الدخل التقديري</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/treasury_report">تقرير الخزينة</a></li>
                             <li><a class="dropdown-item" href="/ledger2">تقرير حركة حساب</a></li>
                             <li><a class="dropdown-item" href="/account_details_report">تقرير الحركة التفصيلية لحساب</a></li>
