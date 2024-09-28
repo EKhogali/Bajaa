@@ -2420,7 +2420,7 @@ public function ledger2()
                 'txt' => 'رصيد الخزينة',
 
                 'currency' => '',
-                'number1' => ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses - $dioon_expenses - $total_from_party - $total_pulled_from_net_income,
+                'number1' => ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - ($adminExpenses * $days) - $dioon_expenses - $total_from_party - $total_pulled_from_net_income,
                 'number1_2' => 0,
                 'number2' => 0,
                 'number3' => 0,
