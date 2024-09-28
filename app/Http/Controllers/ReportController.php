@@ -2070,7 +2070,7 @@ public function ledger2()
 
                 'currency' => 'دينار',
                 'number1' => 0,
-                'number1_2' => $adminExpenses,
+                'number1_2' => $adminExpenses * $days,
                 'number2' => $adminExpenses_aday,
                 'number3' => ( $total_admin_pct / $adminExpenses) * 100 ?? 0,
                 'number4' => ( $total_admin_pct / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
