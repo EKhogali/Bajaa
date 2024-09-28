@@ -2048,7 +2048,7 @@ public function ledger2()
                     'number1' => $query->amount * $days,
                     'number1_2' => 0,
                     'number2' => ($query->amount * $days) / $days,
-                    'number3' => ((($query->amount * $days) /  ($adminExpenses )  )     * 100) ?? 0,
+                    'number3' => ((($query->amount * $days) /  ($adminExpenses  * $days)  )     * 100) ?? 0,
                     'number4' => ((($query->amount * $days)) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
 
                     'note' => 0,
