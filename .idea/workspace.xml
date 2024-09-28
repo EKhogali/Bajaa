@@ -11,19 +11,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/EstimatedExpenseController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/estimated_expense.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/EstimatedExpenseFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_09_25_063743_create_estimated_expenses_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/EstimatedExpenseSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/rep/estimated_expense_report.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/treasury_transaction/create.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -248,14 +238,8 @@
       <workItem from="1725289480109" duration="16867000" />
       <workItem from="1726513301623" duration="1190000" />
       <workItem from="1727246163027" duration="5026000" />
-      <workItem from="1727508431740" duration="4959000" />
-    </task>
-    <task id="LOCAL-00059" summary="2024-07-24">
-      <created>1721595091782</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1721595091783</updated>
+      <workItem from="1727508431740" duration="6295000" />
+      <workItem from="1727521142777" duration="799000" />
     </task>
     <task id="LOCAL-00060" summary="2024-07-24">
       <created>1721595879211</created>
@@ -593,7 +577,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725470974664</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <task id="LOCAL-00108" summary="2024-09-28">
+      <created>1727514716683</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1727514716683</updated>
+    </task>
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -612,7 +603,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-07" />
     <MESSAGE value="2024-07-07-3" />
     <MESSAGE value="2024-07-11" />
     <MESSAGE value="2024-07-14" />
@@ -637,7 +627,8 @@
     <MESSAGE value="2024-09-03" />
     <MESSAGE value="2024-09-03-4" />
     <MESSAGE value="2024-09-04" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-09-04" />
+    <MESSAGE value="2024-09-28" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-09-28" />
   </component>
   <component name="WindowStateProjectService">
     <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
@@ -673,15 +664,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="168" y="56" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1719179462790" />
-    <state width="591" height="446" key="SwitcherDM" timestamp="1718869565474">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state width="591" height="446" key="SwitcherDM/0.0.1536.834@0.0.1536.834" timestamp="1718869565474" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1725470976679">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1727514719623">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1725470976679" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1727514719623" />
     <state x="425" y="189" key="run.anything.popup" timestamp="1718948617709">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

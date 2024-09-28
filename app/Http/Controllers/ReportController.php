@@ -1647,7 +1647,7 @@ public function ledger2()
                 ->sum('amount');
 
             if ($days > 0) {
-                $adminExpenses_aday = $adminExpenses / $days;
+                $adminExpenses_aday = $adminExpenses * $days;
             } else {
                 $adminExpenses_aday = 0;
             }
@@ -2045,11 +2045,11 @@ public function ledger2()
                     'txt' => $query->name ?? '',
 
                     'currency' => 'دينار',
-                    'number1' => $query->amount,
+                    'number1' => $query->amount * $days,
                     'number1_2' => 0,
-                    'number2' => $query->amount / $days,
-                    'number3' => (($query->amount /  ($adminExpenses )  )     * 100) ?? 0,
-                    'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
+                    'number2' => ($query->amount * $days) / $days,
+                    'number3' => ((($query->amount * $days) /  ($adminExpenses )  )     * 100) ?? 0,
+                    'number4' => ((($query->amount * $days)) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
 
                     'note' => 0,
                 ]);
