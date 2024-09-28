@@ -2030,7 +2030,7 @@ public function ledger2()
             $total_admin_pct = 0;
             foreach ($queries as $query){
                 $rec_id += 1;
-                $total_admin_pct += $query->amount;
+                $total_admin_pct += ($query->amount * $days);
 
                 DB::table('income_reports')->insert([
                     'id' => $rec_id,
