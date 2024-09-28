@@ -1697,7 +1697,7 @@ public function ledger2()
 
 
             //-------------------------------------------------------------------------------------------------------------
-            $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses ;
+            $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - ($adminExpenses * $days);
             //-------------------------------------------------------------------------------------------------------------
 
 //            dd(
