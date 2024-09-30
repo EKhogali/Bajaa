@@ -10,7 +10,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16" />
+    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/partner.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/partner.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -235,35 +239,7 @@
       <workItem from="1726513301623" duration="1190000" />
       <workItem from="1727246163027" duration="5026000" />
       <workItem from="1727508431740" duration="6295000" />
-      <workItem from="1727521142777" duration="2130000" />
-    </task>
-    <task id="LOCAL-00065" summary="2024-07-21--">
-      <created>1721597281476</created>
-      <option name="number" value="00065" />
-      <option name="presentableId" value="LOCAL-00065" />
-      <option name="project" value="LOCAL" />
-      <updated>1721597281476</updated>
-    </task>
-    <task id="LOCAL-00066" summary="2024-07-22">
-      <created>1721640967097</created>
-      <option name="number" value="00066" />
-      <option name="presentableId" value="LOCAL-00066" />
-      <option name="project" value="LOCAL" />
-      <updated>1721640967097</updated>
-    </task>
-    <task id="LOCAL-00067" summary="2024-07-22">
-      <created>1721644231317</created>
-      <option name="number" value="00067" />
-      <option name="presentableId" value="LOCAL-00067" />
-      <option name="project" value="LOCAL" />
-      <updated>1721644231317</updated>
-    </task>
-    <task id="LOCAL-00068" summary="2024-07-22">
-      <created>1721645684494</created>
-      <option name="number" value="00068" />
-      <option name="presentableId" value="LOCAL-00068" />
-      <option name="project" value="LOCAL" />
-      <updated>1721645684495</updated>
+      <workItem from="1727521142777" duration="7768000" />
     </task>
     <task id="LOCAL-00069" summary="2024-07-23">
       <created>1721724945178</created>
@@ -580,7 +556,35 @@
       <option name="project" value="LOCAL" />
       <updated>1727523284750</updated>
     </task>
-    <option name="localTasksCounter" value="114" />
+    <task id="LOCAL-00114" summary="2024-09-28-02">
+      <created>1727523383568</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1727523383568</updated>
+    </task>
+    <task id="LOCAL-00115" summary="2024-09-28-02">
+      <created>1727523478132</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1727523478132</updated>
+    </task>
+    <task id="LOCAL-00116" summary="2024-09-28-02">
+      <created>1727523530927</created>
+      <option name="number" value="00116" />
+      <option name="presentableId" value="LOCAL-00116" />
+      <option name="project" value="LOCAL" />
+      <updated>1727523530927</updated>
+    </task>
+    <task id="LOCAL-00117" summary="2024-09-28-02">
+      <created>1727523599745</created>
+      <option name="number" value="00117" />
+      <option name="presentableId" value="LOCAL-00117" />
+      <option name="project" value="LOCAL" />
+      <updated>1727523599745</updated>
+    </task>
+    <option name="localTasksCounter" value="118" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -660,11 +664,11 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="168" y="56" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1719179462790" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1727523286228">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1727523602153">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1727523286228" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1727523602153" />
     <state x="425" y="189" key="run.anything.popup" timestamp="1718948617709">
       <screen x="0" y="0" width="1536" height="834" />
     </state>

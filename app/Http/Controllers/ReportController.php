@@ -927,35 +927,60 @@ public function ledger2()
             ->groupBy('d.account_id','a.name')
             ->get();
 
+            $total_op_pct = $queries->sum('amount') ?? 0;
+            $incomeReports = [];
 
-
-            $total_op_pct = 0;
-            foreach ($queries as $query){
+            foreach ($queries as $query) {
                 $rec_id += 1;
-                $total_op_pct += $query->amount;
 
-                DB::table('income_reports')->insert([
+                $incomeReports[] = [
                     'id' => $rec_id,
-                    'company_id' => session::get('company_id'),
-                    'financial_year' => session::get('financial_year'),
+                    'company_id' => Session::get('company_id'),
+                    'financial_year' => Session::get('financial_year'),
                     'created_by' => auth()->id(),
-
                     'ordr1' => 9,
                     'ordr2' => 9,
                     'ordr3' => 9,
-
                     'txt' => $query->name ?? '',
-
                     'currency' => 'دينار',
                     'number1' => $query->amount,
                     'number1_2' => 0,
                     'number2' => $query->amount / $days,
-                    'number3' => (($query->amount /  ($operation_expenses)  )     * 100) ?? 0,
+                    'number3' => (($query->amount / ($operation_expenses)) * 100) ?? 0,
                     'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
-
                     'note' => 0,
-                ]);
+                ];
             }
+
+            DB::table('income_reports')->insert($incomeReports);
+
+//            $total_op_pct = $queries->sum('amount') ?? 0;
+//            foreach ($queries as $query){
+//                $rec_id += 1;
+////                $total_op_pct += $query->amount;
+//
+//                DB::table('income_reports')->insert([
+//                    'id' => $rec_id,
+//                    'company_id' => session::get('company_id'),
+//                    'financial_year' => session::get('financial_year'),
+//                    'created_by' => auth()->id(),
+//
+//                    'ordr1' => 9,
+//                    'ordr2' => 9,
+//                    'ordr3' => 9,
+//
+//                    'txt' => $query->name ?? '',
+//
+//                    'currency' => 'دينار',
+//                    'number1' => $query->amount,
+//                    'number1_2' => 0,
+//                    'number2' => $query->amount / $days,
+//                    'number3' => (($query->amount /  ($operation_expenses)  )     * 100) ?? 0,
+//                    'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
+//
+//                    'note' => 0,
+//                ]);
+//            }
 
         //--------------------------------------------------------------------------------------------------------------
         $rec_id += 1;
@@ -1017,33 +1042,59 @@ public function ledger2()
             ->groupBy('t.account_id','a.name')
             ->get();
 
-            $total_admin_pct = 0;
-        foreach ($queries as $query){
-            $rec_id += 1;
-            $total_admin_pct += $query->amount;
+            $total_admin_pct = $queries->sum('amount') ?? 0;
+            $incomeReports = [];
 
-            DB::table('income_reports')->insert([
-                'id' => $rec_id,
-                'company_id' => session::get('company_id'),
-                'financial_year' => session::get('financial_year'),
-                'created_by' => auth()->id(),
+            foreach ($queries as $query) {
+                $rec_id += 1;
 
-                'ordr1' => 12,
-                'ordr2' => 12,
-                'ordr3' => 12,
+                $incomeReports[] = [
+                    'id' => $rec_id,
+                    'company_id' => Session::get('company_id'),
+                    'financial_year' => Session::get('financial_year'),
+                    'created_by' => auth()->id(),
+                    'ordr1' => 12,
+                    'ordr2' => 12,
+                    'ordr3' => 12,
+                    'txt' => $query->name ?? '',
+                    'currency' => 'دينار',
+                    'number1' => $query->amount,
+                    'number1_2' => 0,
+                    'number2' => $query->amount / $days,
+                    'number3' => (($query->amount / ($adminExpenses)) * 100) ?? 0,
+                    'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
+                    'note' => 0,
+                ];
+            }
 
-                'txt' => $query->name ?? '',
+            DB::table('income_reports')->insert($incomeReports);
 
-                'currency' => 'دينار',
-                'number1' => $query->amount,
-                'number1_2' => 0,
-                'number2' => $query->amount / $days,
-                'number3' => (($query->amount /  ($adminExpenses )  )     * 100) ?? 0,
-                'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
-
-                'note' => 0,
-            ]);
-        }
+//            $total_admin_pct = $queries->sum('amount') ?? 0;
+//        foreach ($queries as $query){
+//            $rec_id += 1;
+//
+//            DB::table('income_reports')->insert([
+//                'id' => $rec_id,
+//                'company_id' => session::get('company_id'),
+//                'financial_year' => session::get('financial_year'),
+//                'created_by' => auth()->id(),
+//
+//                'ordr1' => 12,
+//                'ordr2' => 12,
+//                'ordr3' => 12,
+//
+//                'txt' => $query->name ?? '',
+//
+//                'currency' => 'دينار',
+//                'number1' => $query->amount,
+//                'number1_2' => 0,
+//                'number2' => $query->amount / $days,
+//                'number3' => (($query->amount /  ($adminExpenses )  )     * 100) ?? 0,
+//                'number4' => (($query->amount) / ($tot_in + $other_income_total + $faaed - $ajz)) * 100 ?? 0,
+//
+//                'note' => 0,
+//            ]);
+//        }
         //--------------------------------------------------------------------------------------------------------------
         $rec_id += 1;
         DB::table('income_reports')->insert([
@@ -1350,66 +1401,91 @@ public function ledger2()
 
 
         //--------------------------------------------------------------------------------------------------------------
-//        $queries = DB::table('partners as p')
-//            ->leftjoin('treasury_transactions as t', 'p.account_id', '=', 't.account_id')
-//            ->where('t.company_id', session::get('company_id'))
-//            ->where('t.financial_year', session::get('financial_year'))
-//            ->where('t.archived', 0)
-//            ->where('p.archived', 0)
-//            ->where('t.tag_id', 1)
-//            ->whereBetween('t.date', [$fromdate, $todate])
-//            ->select('p.id as id', DB::raw('SUM(t.amount) as total_amount'))
-//            ->groupBy('p.id')
-//            ->orderBy('p.id')
-//            ->get();
-//
-//        $total_from_party = $queries->sum('total_amount');
-
-
-
-            $queries = partner::where('company_id',session::get('company_id'))
-                ->where('archived',0)
-                ->get();
-
-            foreach ($queries as $query){
-                $rec_id += 1;
-
-                $total_partner_pulled = DB::table('treasury_transactions')
-                    ->where('company_id', session::get('company_id'))
+            $partnerQueries = partner::with(['treasuryTransactions' => function($query) use ($fromdate, $todate) {
+                $query->where('company_id', session::get('company_id'))
                     ->where('financial_year', session::get('financial_year'))
                     ->where('archived', 0)
                     ->where('tag_id', 1)
-                    ->where('account_id', $query->account_id)
-                    ->whereBetween('date', [$fromdate, $todate])
-                        ->sum('amount') ?? 0;
-//                    ->select(DB::raw('SUM(amount)'))->first() ?? 0;
-//                    ->sum('amount')->get();
+                    ->whereBetween('date', [$fromdate, $todate]);
+            }])
+                ->where('company_id', session::get('company_id'))
+                ->where('archived', 0)
+                ->get();
+
+            $incomeReports = [];
+
+            foreach ($partnerQueries as $query) {
+                $rec_id += 1;
+
+                $total_partner_pulled = $query->treasuryTransactions->sum('amount') ?? 0;
 
                 $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
-//dd($total_partner_pulled,$query->account_id,$query);
-                DB::table('income_reports')->insert([
+                $incomeReports[] = [
                     'id' => $rec_id,
                     'company_id' => session::get('company_id'),
                     'financial_year' => session::get('financial_year'),
                     'created_by' => auth()->id(),
-
                     'ordr1' => 24,
                     'ordr2' => 24,
                     'ordr3' => 24,
-
-                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
-
+                    'txt' => 'حصة: الـ ' . $partner_type_desc . ' ' . $query->name . ' (' . $query->win_percentage . ' % )',
                     'currency' => 'دينار',
-                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
+                    'number1' => ($query->win_percentage * (($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100)) - $dioon_expenses - $total_partner_pulled,
                     'number1_2' => 0,
                     'number2' => 0,
                     'number3' => 0,
                     'number4' => 0,
-
                     'note' => 0,
-                ]);
+                ];
             }
+
+            DB::table('income_reports')->insert($incomeReports);
+
+
+//            $queries = partner::where('company_id',session::get('company_id'))
+//                ->where('archived',0)
+//                ->get();
+//
+//            foreach ($queries as $query){
+//                $rec_id += 1;
+//
+//                $total_partner_pulled = DB::table('treasury_transactions')
+//                    ->where('company_id', session::get('company_id'))
+//                    ->where('financial_year', session::get('financial_year'))
+//                    ->where('archived', 0)
+//                    ->where('tag_id', 1)
+//                    ->where('account_id', $query->account_id)
+//                    ->whereBetween('date', [$fromdate, $todate])
+//                        ->sum('amount') ?? 0;
+////                    ->select(DB::raw('SUM(amount)'))->first() ?? 0;
+////                    ->sum('amount')->get();
+//
+//                $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
+//
+//
+//                DB::table('income_reports')->insert([
+//                    'id' => $rec_id,
+//                    'company_id' => session::get('company_id'),
+//                    'financial_year' => session::get('financial_year'),
+//                    'created_by' => auth()->id(),
+//
+//                    'ordr1' => 24,
+//                    'ordr2' => 24,
+//                    'ordr3' => 24,
+//
+//                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
+//
+//                    'currency' => 'دينار',
+//                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
+//                    'number1_2' => 0,
+//                    'number2' => 0,
+//                    'number3' => 0,
+//                    'number4' => 0,
+//
+//                    'note' => 0,
+//                ]);
+//            }
             //--------------------------------------------------------------------------------------------------------------
 
 
@@ -1455,11 +1531,6 @@ public function ledger2()
             ->with('todate',$todate);
         }
     }
-
-
-
-
-
 
 
     public function estimated_expense_report(){
@@ -1940,10 +2011,11 @@ public function ledger2()
 
 
 
-            $total_op_pct = 0;
+//            $total_op_pct = $queries->sum('amount');
             foreach ($queries as $query){
                 $rec_id += 1;
                 $total_op_pct += $query->amount;
+//                $total_op_pct += $query->amount;
 
                 DB::table('income_reports')->insert([
                     'id' => $rec_id,
@@ -2361,49 +2433,90 @@ public function ledger2()
 
             //--------------------------------------------------------------------------------------------------------------
 
-            $queries = partner::where('company_id',session::get('company_id'))
-                ->where('archived',0)
+            $partnerQueries = partner::with(['treasuryTransactions' => function($query) use ($fromdate, $todate) {
+                $query->where('company_id', session::get('company_id'))
+                    ->where('financial_year', session::get('financial_year'))
+                    ->where('archived', 0)
+                    ->where('tag_id', 1)
+                    ->whereBetween('date', [$fromdate, $todate]);
+            }])
+                ->where('company_id', session::get('company_id'))
+                ->where('archived', 0)
                 ->get();
 
-            foreach ($queries as $query){
+            $incomeReports = [];
+
+            foreach ($partnerQueries as $query) {
                 $rec_id += 1;
 
-                $total_partner_pulled = DB::table('treasury_transactions')
-                        ->where('company_id', session::get('company_id'))
-                        ->where('financial_year', session::get('financial_year'))
-                        ->where('archived', 0)
-                        ->where('tag_id', 1)
-                        ->where('account_id', $query->account_id)
-                        ->whereBetween('date', [$fromdate, $todate])
-                        ->sum('amount') ?? 0;
-//                    ->select(DB::raw('SUM(amount)'))->first() ?? 0;
-//                    ->sum('amount')->get();
+                $total_partner_pulled = $query->treasuryTransactions->sum('amount') ?? 0;
 
                 $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
 
-//dd($total_partner_pulled,$query->account_id,$query);
-                DB::table('income_reports')->insert([
+                $incomeReports[] = [
                     'id' => $rec_id,
                     'company_id' => session::get('company_id'),
                     'financial_year' => session::get('financial_year'),
                     'created_by' => auth()->id(),
-
                     'ordr1' => 24,
                     'ordr2' => 24,
                     'ordr3' => 24,
-
-                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
-
+                    'txt' => 'حصة: الـ ' . $partner_type_desc . ' ' . $query->name . ' (' . $query->win_percentage . ' % )',
                     'currency' => 'دينار',
-                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
+                    'number1' => ($query->win_percentage * (($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100)) - $dioon_expenses - $total_partner_pulled,
                     'number1_2' => 0,
                     'number2' => 0,
                     'number3' => 0,
                     'number4' => 0,
-
                     'note' => 0,
-                ]);
+                ];
             }
+
+            DB::table('income_reports')->insert($incomeReports);
+
+//            $queries = partner::where('company_id',session::get('company_id'))
+//                ->where('archived',0)
+//                ->get();
+//
+//            foreach ($queries as $query){
+//                $rec_id += 1;
+//
+//                $total_partner_pulled = DB::table('treasury_transactions')
+//                        ->where('company_id', session::get('company_id'))
+//                        ->where('financial_year', session::get('financial_year'))
+//                        ->where('archived', 0)
+//                        ->where('tag_id', 1)
+//                        ->where('account_id', $query->account_id)
+//                        ->whereBetween('date', [$fromdate, $todate])
+//                        ->sum('amount') ?? 0;
+////                    ->select(DB::raw('SUM(amount)'))->first() ?? 0;
+////                    ->sum('amount')->get();
+//
+//                $partner_type_desc = $query->partnership_type == 0 ? 'مستثمر' : 'شريك';
+//
+////dd($total_partner_pulled,$query->account_id,$query);
+//                DB::table('income_reports')->insert([
+//                    'id' => $rec_id,
+//                    'company_id' => session::get('company_id'),
+//                    'financial_year' => session::get('financial_year'),
+//                    'created_by' => auth()->id(),
+//
+//                    'ordr1' => 24,
+//                    'ordr2' => 24,
+//                    'ordr3' => 24,
+//
+//                    'txt' => 'حصة: الـ '.$partner_type_desc.' '.$query->name.' ('.$query->win_percentage.' % )',
+//
+//                    'currency' => 'دينار',
+//                    'number1' => ($query->win_percentage * (( $net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses - $total_partner_pulled   ,
+//                    'number1_2' => 0,
+//                    'number2' => 0,
+//                    'number3' => 0,
+//                    'number4' => 0,
+//
+//                    'note' => 0,
+//                ]);
+//            }
             //--------------------------------------------------------------------------------------------------------------
 
 
