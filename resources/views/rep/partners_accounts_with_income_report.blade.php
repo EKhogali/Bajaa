@@ -227,12 +227,12 @@
                 @php
                     $rec_id +=1;
 $trans_txt = '';
-{{--                    if($report->transaction_type_id == 1){--}}
-{{--                        $trans_txt = 'صادر';--}}
-{{--                        $tot_out += $report->amount;}--}}
-{{--                    else{--}}
-{{--                        $tot_in += $report->amount;--}}
-{{--                    $trans_txt = 'وارد';}--}}
+                    //if($report->transaction_type_id == 1){
+                      //  $trans_txt = 'صادر';
+                        //$tot_out += $report->amount;}
+                    //else{
+                      //  $tot_in += $report->amount;
+                    //$trans_txt = 'وارد';}
 
                 @endphp
 
