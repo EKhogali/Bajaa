@@ -2280,10 +2280,10 @@ public function ledger2()
 
 
 
-//            $total_op_pct = $queries->sum('amount');
+            $total_op_pct = $queries->sum('amount');
             foreach ($queries as $query){
                 $rec_id += 1;
-                $total_op_pct += $query->amount;
+//                $total_op_pct += $query->amount;
 //                $total_op_pct += $query->amount;
 
                 DB::table('income_reports')->insert([
