@@ -280,7 +280,7 @@ class ReportController extends Controller
             ->with('account_id', $account_id)
             ->with('profit', $profit)
             ->with('arr', $arr)
-//            ->with('reports', $reports)
+            ->with('reports', $reports)
             ->with('reports2', $reports2);
     }
 

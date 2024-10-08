@@ -11,7 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/trans/estimated_expense/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/trans/estimated_expense/create.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -238,14 +239,7 @@
       <workItem from="1727246163027" duration="5026000" />
       <workItem from="1727508431740" duration="6295000" />
       <workItem from="1727521142777" duration="11658000" />
-      <workItem from="1728157788110" duration="5348000" />
-    </task>
-    <task id="LOCAL-00071" summary="2024-07-26">
-      <created>1722029616981</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
-      <option name="project" value="LOCAL" />
-      <updated>1722029616982</updated>
+      <workItem from="1728157788110" duration="5653000" />
     </task>
     <task id="LOCAL-00072" summary="2024-07-26">
       <created>1722030110617</created>
@@ -583,7 +577,14 @@
       <option name="project" value="LOCAL" />
       <updated>1728404334920</updated>
     </task>
-    <option name="localTasksCounter" value="120" />
+    <task id="LOCAL-00120" summary="2024-10-08">
+      <created>1728404578397</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1728404578397</updated>
+    </task>
+    <option name="localTasksCounter" value="121" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -630,10 +631,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="2024-10-08" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="512" y="241" key="#Notifications" timestamp="1719181076114">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="512" y="241" key="#Notifications/0.0.1536.834@0.0.1536.834" timestamp="1719181076114" />
     <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1720389695703">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
@@ -647,10 +644,6 @@
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1727248260837" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1723495909097" />
-    <state x="549" y="172" key="FileChooserDialogImpl" timestamp="1718888533940">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="549" y="172" key="FileChooserDialogImpl/0.0.1536.834@0.0.1536.834" timestamp="1718888533940" />
     <state x="407" y="179" key="MultipleFileMergeDialog" timestamp="1720653099642">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
@@ -659,23 +652,14 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="604" y="341" key="NewPhpFileDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651373290" />
-    <state x="168" y="56" key="SettingsEditor" timestamp="1719179462790">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="168" y="56" key="SettingsEditor/0.0.1536.834@0.0.1536.834" timestamp="1719179462790" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1727731196231">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728404583022">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1727731196231" />
-    <state x="425" y="189" key="run.anything.popup" timestamp="1718948617709">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="425" y="189" key="run.anything.popup/0.0.1536.834@0.0.1536.834" timestamp="1718948617709" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1728404583022" />
     <state x="431" y="155" width="672" height="678" key="search.everywhere.popup" timestamp="1720650752627">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="431" y="155" width="672" height="678" key="search.everywhere.popup/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1719054837306" />
     <state x="431" y="155" width="672" height="678" key="search.everywhere.popup/0.0.1536.834@0.0.1536.834" timestamp="1720650752627" />
   </component>
 </project>

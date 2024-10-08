@@ -130,7 +130,7 @@
 
 
 
-            @foreach($reports2 as $report)
+            @foreach($reports as $report)
                 @php
                     $rec_id +=1;
 

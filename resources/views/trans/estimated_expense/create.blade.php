@@ -89,7 +89,7 @@
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">
-                    <button id="submitt2" type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="submit" class="btn btn-primary" onclick="this.disabled=true;">حفظ</button>
                 </div>
                 <div class="col"></div>
             </div>
