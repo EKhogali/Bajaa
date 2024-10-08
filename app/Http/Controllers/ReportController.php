@@ -19,6 +19,275 @@ use phpDocumentor\Reflection\Types\Integer;
 class ReportController extends Controller
 {
 
+    public function partners_accounts_with_income_report()
+    {
+        //-------------------------------------------------------------------------------------------------------------
+
+        $fromdate = \Carbon\Carbon::today()->startOfDay();
+        $todate = \Carbon\Carbon::today()->endOfDay();
+
+        if (request()->has('fromdate')) {
+            $fromdate = \Carbon\Carbon::parse(Request('fromdate'))->startOfDay();
+        }
+        if (request()->has('todate')) {
+            $todate = \Carbon\Carbon::parse(Request('todate'))->endOfDay();
+        }
+
+
+        $companyId = session::get('company_id');
+        $financialYear = session::get('financial_year');
+
+        $pulled_from_net_income_accounts_category = sitting::find(1)->value('pulled_from_net_income_accounts_category');
+        $pulled_from_net_income_accounts_array = DB::table('accounts')
+            ->where('category_id',$pulled_from_net_income_accounts_category)
+            ->pluck('id')
+            ->toArray();
+
+        $operation_expenses_category = sitting::where('id',1)->value('operation_accounts_category');
+        $operation_expenses_accounts_array = DB::table('accounts')
+            ->where('category_id',$operation_expenses_category)
+            ->where('archived',0)
+            ->pluck('id')
+            ->toArray();
+// ----------------
+        $admin_expenses_category = sitting::where('id',1)->value('administrative_accounts_category');
+        $admin_expenses_accounts_array = DB::table('accounts')
+            ->where('category_id',$admin_expenses_category)
+            ->where('archived',0)
+            ->pluck('id')
+            ->toArray();
+
+        $dioon_account_category = sitting::find(1)->value('dioon_account_category');
+        $dioon_expenses_accounts_array = DB::table('accounts')
+            ->where('category_id',$dioon_account_category)
+            ->pluck('id')
+            ->toArray();
+
+        $otherincome_category = sitting::find(1)->value('Other_Incom');
+        $otherincome_accounts_array = DB::table('accounts')
+            ->where('category_id',$otherincome_category)
+            ->pluck('id')
+            ->toArray();
+
+        $cashbox_faaed_account = sitting::where('id',1)->value('Cashbox_Faaed_Account');
+        $cashbox_ajz_account = sitting::where('id',1)->value('Cashbox_Ajz_Account');
+
+//===================+++++
+        $tot_in = DB::table('treasury_transactions')
+            ->where('transaction_type_id',0)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->where('account_id','<>', $cashbox_ajz_account)
+            ->where('account_id','<>', $cashbox_faaed_account)
+            ->wherenotin('account_id', $otherincome_accounts_array)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->sum('amount');
+
+        $other_income_total = DB::table('treasury_transactions')
+                ->where('transaction_type_id',0)
+                ->where('company_id', $companyId)
+                ->where('financial_year', $financialYear)
+                ->where('archived', 0)
+                ->whereIn('account_id', $otherincome_accounts_array)
+                ->whereBetween('date', [$fromdate, $todate])
+                ->sum('amount') ?? 0;
+
+        // -----------------
+        //فائض الخزينة
+        $faaed = DB::table('treasury_transactions')
+                ->where('transaction_type_id',0)
+                ->where('company_id', $companyId)
+                ->where('financial_year', $financialYear)
+                ->where('archived', 0)
+                ->where('account_id', $cashbox_faaed_account)
+                ->whereBetween('date', [$fromdate, $todate])
+                ->sum('amount') ?? 0;
+
+        // -----------------
+        //عجز الخزينة
+        $ajz = DB::table('treasury_transactions')
+            ->where('transaction_type_id',1)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->where('account_id', $cashbox_ajz_account)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->sum('amount');
+
+        $operation_expenses = DB::table('treasury_transactions')
+            ->where('transaction_type_id',1)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->where('tag_id','<>', 1)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->whereIn('account_id', $operation_expenses_accounts_array)
+            ->sum('amount');
+
+        // -------------------------------------------------------------------------------------------------------------
+        //(المصاريف الادارية)
+
+        $adminExpenses = DB::table('treasury_transactions')
+            ->where('transaction_type_id',1)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->whereIn('account_id', $admin_expenses_accounts_array)
+            ->where('tag_id','<>', 1)
+            ->sum('amount');
+
+        // -------------------------------------------------------------------------------------------------------------
+        //( Dioooooooon)
+
+        $dioon_expenses = DB::table('treasury_transactions')
+            ->where('transaction_type_id',1)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->whereIn('account_id', $dioon_expenses_accounts_array)
+            ->sum('amount');
+
+        $queries = DB::table('treasury_transactions as t')
+            ->leftjoin('accounts as a','a.id','t.account_id')
+            ->where('t.transaction_type_id',1)
+            ->where('t.company_id',session::get('company_id'))
+            ->where('t.financial_year',session::get('financial_year'))
+            ->where('t.archived',0)
+            ->wherein('t.account_id',$pulled_from_net_income_accounts_array)
+            ->whereBetween('t.date', [$fromdate, $todate])
+            ->where('t.tag_id','<>',1)
+            ->select(DB::raw('SUM(t.amount) as amount'),'t.account_id as account_id','a.name as name')
+            ->groupBy('t.account_id','a.name')
+            ->get();
+
+        $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses ;
+
+        $total_pulled_from_net_income = $queries->sum('amount');
+
+        $partners_array = partner::where('company_id',session::get('company_id'))
+            ->where('archived',0)
+            ->pluck('account_id')
+            ->toArray();
+
+        if(\request()->has('account_id')){$account_id = Request('account_id');}
+        else{$account_id = 0;}
+
+        $partners = partner::where('company_id',session::get('company_id'))
+            ->where('archived',0)
+            ->get();
+        $partner_pct = $partners->where('account_id',$account_id)->pluck('win_percentage')->first();
+        $partner_name = $partners->where('account_id',$account_id)->pluck('name')->first();
+
+        $profit = ((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
+
+        $profit_after_total_pulled_from_net_income = fdiv($net_profit,100)*$partner_pct;
+        $profit_pct_amount = fdiv($net_profit - $total_pulled_from_net_income,100)*$partner_pct;
+//        dd($net_profit,$partner_pct,$profit);
+
+
+        $reports2 = DB::table('treasury_transactions as t')
+            ->leftjoin('accounts as a','a.id','t.account_id')
+            ->where('t.transaction_type_id',1)
+            ->where('t.company_id',session::get('company_id'))
+            ->where('t.financial_year',session::get('financial_year'))
+            ->where('t.archived',0)
+            ->wherein('t.account_id',$pulled_from_net_income_accounts_array)
+            ->whereBetween('t.date', [$fromdate, $todate])
+            ->where('t.tag_id','<>',1)
+            ->select(DB::raw('SUM(t.amount) as amount'),'t.account_id as account_id','a.name as name')
+            ->groupBy('t.account_id','a.name')
+            ->get();
+
+//        foreach ($queries as $query){
+//            $rec_id += 1;
+//
+//            DB::table('income_reports')->insert([
+//                'id' => $rec_id,
+//                'company_id' => session::get('company_id'),
+//                'financial_year' => session::get('financial_year'),
+//                'created_by' => auth()->id(),
+//
+//                'ordr1' => 16,
+//                'ordr2' => 16,
+//                'ordr3' => 16,
+//
+//                'txt' => $query->name ?? '',
+//
+//                'currency' => 'دينار',
+//                'number1' => $query->amount,
+//                'number1_2' => 0,
+//                'number2' => $query->amount / $days,
+//                'number3' => (($query->amount /  ($adminExpenses + $operation_expenses)  )     * 100) ?? 0,
+//                'number4' => (($query->amount) / ($tot_in)) * 100 ?? 0,
+//
+//                'note' => 0,
+//            ]);
+//        }
+        //--------------------------------------------------------------------------------------------------------------
+
+        // عدد الايام للفترة
+        $days = DB::table('treasury_transactions')
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->select(
+                DB::raw('COUNT(DISTINCT DATE(date)) as distinct_days_count')
+            )
+            ->value('distinct_days_count');
+
+        $arr = array(
+            "net_profit" => $net_profit,
+            "total_pulled_from_net_income"=> $total_pulled_from_net_income,
+            "partner_pct" => $partner_pct,
+            "profit" => $profit,
+            "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
+            "profit_pct_amount" => $profit_pct_amount,
+            "partner_name" => $partner_name,
+            "title_amount" => $net_profit - $total_pulled_from_net_income,
+            "days" => $days,
+            "adminExpenses" => $adminExpenses,
+            "operation_expenses" => $operation_expenses,
+            "tot_in" => $tot_in,
+        );
+
+
+
+        $reports = DB::table('treasury_transactions as t')
+            ->leftjoin('accounts as a','a.id','t.account_id')
+            ->leftjoin('categories as c','a.id','a.category_id')
+            ->where('t.company_id', session::get('company_id'))
+            ->where('t.financial_year', session::get('financial_year'))
+            ->where('t.archived', 0)
+            ->where('t.account_id',$account_id)
+            ->whereBetween('date', [$fromdate, $todate])
+            ->get();
+
+        $decimal_octets = sitting::where('id', 1)->value('decimal_octets');
+
+        $accounts = account::where('archived',0)
+            ->wherein('id',$partners_array)
+            ->get();
+//dd('--09-09');
+        return view('rep.partners_accounts_with_income_report')
+            ->with('decimal_octets', $decimal_octets)
+            ->with('fromdate', $fromdate)
+            ->with('todate', $todate)
+            ->with('accounts', $accounts)
+            ->with('account_id', $account_id)
+            ->with('profit', $profit)
+            ->with('arr', $arr)
+//            ->with('reports', $reports)
+            ->with('reports2', $reports2);
+    }
+
+
+
+
+
     public function partners_accounts_report()
     {
         //-------------------------------------------------------------------------------------------------------------

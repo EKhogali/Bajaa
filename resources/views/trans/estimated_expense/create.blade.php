@@ -45,7 +45,7 @@
 
     </div>
     <div class="container col-10">
-        <form action="/estimated_expense" method="POST" >
+        <form action="/estimated_expense" method="POST">
             {{ csrf_field() }}
 
             <input type="text" name="transaction_type_id" value="{{Request('transaction_type_id')}}" hidden>
@@ -89,7 +89,7 @@
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">
-                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button id="submitt2" type="submit" class="btn btn-primary">حفظ</button>
                 </div>
                 <div class="col"></div>
             </div>
@@ -110,6 +110,8 @@
                 });
             });
         </script>
+
+
 </body>
 </html>
 @endsection

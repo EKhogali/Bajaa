@@ -66,6 +66,7 @@ Route::get('/category_percentage_report', [\App\Http\Controllers\CategoryPercent
 Route::get('/treasury_report', [ReportController::class, 'treasury_report']);
 Route::get('/ledger2', [ReportController::class, 'ledger2']);
 Route::get('/partners_accounts_report', [ReportController::class, 'partners_accounts_report']);
+Route::get('/partners_accounts_with_income_report', [ReportController::class, 'partners_accounts_with_income_report']);
 Route::get('/account_details_report', [ReportController::class, 'account_details_report']);
 //Route::get('/estimated_expense_report', [ReportController::class, 'estimated_expense_report']);
 
