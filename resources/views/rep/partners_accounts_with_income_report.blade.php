@@ -238,8 +238,8 @@ $trans_txt = '';
 
                 <tr>
                     <th scope="row">{{$rec_id ?? ''}}</th>
-                    <th scope="row">{{\Carbon\Carbon::parse($report->date)->format('yy-m-d') ?? ''}}</th>
-                    {{--                    <th scope="row">  </th>--}}
+{{--                    <th scope="row">{{\Carbon\Carbon::parse($report->date)->format('yy-m-d') ?? ''}}</th>--}}
+                                        <th scope="row">  </th>
                     <th scope="row"></th>
                     <th scope="row">{{ isset($report->amount) ? number_format($report->amount, $decimal_octets) : '' }}</th>
                     <th scope="row">{{$report->description ?? ''}}</th>
