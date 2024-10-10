@@ -185,8 +185,21 @@ class ReportController extends Controller
 
         $profit_after_total_pulled_from_net_income = fdiv($net_profit,100)*$partner_pct;
         $profit_pct_amount = fdiv($net_profit - $total_pulled_from_net_income,100)*$partner_pct;
-//        dd($net_profit,$partner_pct,$profit);
 
+
+
+//        $reports2 = DB::table('treasury_transactions as t')
+//            ->leftjoin('accounts as a','a.id','t.account_id')
+//            ->where('t.transaction_type_id',1)
+//            ->where('t.company_id',session::get('company_id'))
+//            ->where('t.financial_year',session::get('financial_year'))
+//            ->where('t.archived',0)
+//            ->wherein('t.account_id',$pulled_from_net_income_accounts_array)
+//            ->whereBetween('t.date', [$fromdate, $todate])
+//            ->where('t.tag_id','<>',1)
+//            ->select(DB::raw('SUM(t.amount) as amount'),'t.account_id as account_id','a.name as name')
+//            ->groupBy('t.account_id','a.name')
+//            ->get();
 
         $reports2 = DB::table('treasury_transactions as t')
             ->leftjoin('accounts as a','a.id','t.account_id')
@@ -197,35 +210,9 @@ class ReportController extends Controller
             ->wherein('t.account_id',$pulled_from_net_income_accounts_array)
             ->whereBetween('t.date', [$fromdate, $todate])
             ->where('t.tag_id','<>',1)
-            ->select(DB::raw('SUM(t.amount) as amount'),'t.account_id as account_id','a.name as name')
-            ->groupBy('t.account_id','a.name')
+            ->select('t.amount','t.account_id as account_id','a.name','t.transaction_type_id','t.date')
             ->get();
 
-//        foreach ($queries as $query){
-//            $rec_id += 1;
-//
-//            DB::table('income_reports')->insert([
-//                'id' => $rec_id,
-//                'company_id' => session::get('company_id'),
-//                'financial_year' => session::get('financial_year'),
-//                'created_by' => auth()->id(),
-//
-//                'ordr1' => 16,
-//                'ordr2' => 16,
-//                'ordr3' => 16,
-//
-//                'txt' => $query->name ?? '',
-//
-//                'currency' => 'دينار',
-//                'number1' => $query->amount,
-//                'number1_2' => 0,
-//                'number2' => $query->amount / $days,
-//                'number3' => (($query->amount /  ($adminExpenses + $operation_expenses)  )     * 100) ?? 0,
-//                'number4' => (($query->amount) / ($tot_in)) * 100 ?? 0,
-//
-//                'note' => 0,
-//            ]);
-//        }
         //--------------------------------------------------------------------------------------------------------------
 
         // عدد الايام للفترة
@@ -256,6 +243,15 @@ class ReportController extends Controller
 
 
 
+//        $reports = DB::table('treasury_transactions as t')
+//            ->leftjoin('accounts as a','a.id','t.account_id')
+//            ->leftjoin('categories as c','a.id','a.category_id')
+//            ->where('t.company_id', session::get('company_id'))
+//            ->where('t.financial_year', session::get('financial_year'))
+//            ->where('t.archived', 0)
+//            ->where('t.account_id',$account_id)
+//            ->whereBetween('date', [$fromdate, $todate])
+//            ->get();
         $reports = DB::table('treasury_transactions as t')
             ->leftjoin('accounts as a','a.id','t.account_id')
             ->leftjoin('categories as c','a.id','a.category_id')

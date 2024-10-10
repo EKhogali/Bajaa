@@ -130,16 +130,9 @@
 
 
 
-            @foreach($reports as $report)
+            @foreach($reports2 as $report)
                 @php
                     $rec_id +=1;
-
-                    if($report->transaction_type_id == 1){
-                        $trans_txt = 'صادر';
-                        $tot_out += $report->amount;}
-                    else{
-                        $tot_in += $report->amount;
-                    $trans_txt = 'وارد';}
 
                 @endphp
 
@@ -223,23 +216,16 @@
 
 
             @php $rec_id = 0;  $tot_in = 0; $tot_out = 0;@endphp
-            @foreach($reports2 as $report)
+            @foreach($reports as $report)
                 @php
                     $rec_id +=1;
-$trans_txt = '';
-                    //if($report->transaction_type_id == 1){
-                      //  $trans_txt = 'صادر';
-                        //$tot_out += $report->amount;}
-                    //else{
-                      //  $tot_in += $report->amount;
-                    //$trans_txt = 'وارد';}
 
                 @endphp
 
                 <tr>
                     <th scope="row">{{$rec_id ?? ''}}</th>
-{{--                    <th scope="row">{{\Carbon\Carbon::parse($report->date)->format('yy-m-d') ?? ''}}</th>--}}
-                                        <th scope="row">  </th>
+                    <th scope="row">{{\Carbon\Carbon::parse($report->created_at)->format('yy-m-d') ?? ''}}</th>
+{{--                                        <th scope="row">  </th>--}}
                     <th scope="row"></th>
                     <th scope="row">{{ isset($report->amount) ? number_format($report->amount, $decimal_octets) : '' }}</th>
                     <th scope="row">{{$report->description ?? ''}}</th>
@@ -255,7 +241,7 @@ $trans_txt = '';
 
             <tr style="background-color: #f2f2f2;">
                 <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات</td>
-                <td colspan="2" style="text-align: center;">{{ isset($reports2) ? number_format($reports2->sum('amount'), $decimal_octets) : '' }}</td>
+                <td colspan="2" style="text-align: center;">{{ isset($reports) ? number_format($reports->sum('amount'), $decimal_octets) : '' }}</td>
             </tr>
             </tfoot>
 

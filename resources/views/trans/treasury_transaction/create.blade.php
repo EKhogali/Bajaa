@@ -49,7 +49,7 @@
 
     </div>
     <div class="container col-10">
-        <form action="/treasury_transaction" method="POST" >
+        <form action="/treasury_transaction" method="POST" id="myForm">
             {{ csrf_field() }}
 
             <input type="text" name="trans_type" value="{{Request('trans_type')}}" hidden>
@@ -123,7 +123,7 @@
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">
-                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="submit" class="btn btn-primary" onclick="this.disabled=true; document.getElementById('myForm').submit();">حفظ</button>
                 </div>
                 <div class="col"></div>
             </div>
