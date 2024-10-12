@@ -11,7 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_with_income_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_with_income_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,28 +239,7 @@
       <workItem from="1727508431740" duration="6295000" />
       <workItem from="1727521142777" duration="11658000" />
       <workItem from="1728157788110" duration="9406000" />
-      <workItem from="1728727729867" duration="3498000" />
-    </task>
-    <task id="LOCAL-00089" summary="2024-08-08-">
-      <created>1723137704048</created>
-      <option name="number" value="00089" />
-      <option name="presentableId" value="LOCAL-00089" />
-      <option name="project" value="LOCAL" />
-      <updated>1723137704048</updated>
-    </task>
-    <task id="LOCAL-00090" summary="2024-08-08-">
-      <created>1723137953896</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1723137953896</updated>
-    </task>
-    <task id="LOCAL-00091" summary="2024-08-12-before implement Category_Percentage_Report">
-      <created>1723497318037</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1723497318038</updated>
+      <workItem from="1728727729867" duration="4033000" />
     </task>
     <task id="LOCAL-00092" summary="2024-08-17">
       <created>1723923212995</created>
@@ -584,7 +563,28 @@
       <option name="project" value="LOCAL" />
       <updated>1728731007118</updated>
     </task>
-    <option name="localTasksCounter" value="138" />
+    <task id="LOCAL-00138" summary="2024-10-11">
+      <created>1728731445165</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1728731445166</updated>
+    </task>
+    <task id="LOCAL-00139" summary="2024-10-11">
+      <created>1728731532996</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1728731532996</updated>
+    </task>
+    <task id="LOCAL-00140" summary="2024-10-11">
+      <created>1728731797119</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1728731797119</updated>
+    </task>
+    <option name="localTasksCounter" value="141" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -652,10 +652,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="604" y="341" key="NewPhpFileDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651373290" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728731008865">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728731798515">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728731008865" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728731798515" />
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1728589992106" />
     <state x="431" y="155" width="672" height="678" key="search.everywhere.popup" timestamp="1720650752627">
       <screen x="0" y="0" width="1536" height="834" />
