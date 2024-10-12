@@ -175,7 +175,7 @@
             <thead style="background-color: #f2f2f2; font-weight: bold;">
             <tr style="text-align: center; vertical-align: middle; background-color: #f6993f; height: 50px;">
                 <td  colspan="5" style="text-align: center; vertical-align: middle; background-color: transparent;">
-                    <h5>مسحوبات  {{' '.$arr['partnership_type_desc'].' '.$arr['partner_name']}}</h5>
+                    <h5>مسحوبات ال  {{' '.$arr['partnership_type_desc'].' '.$arr['partner_name']}}</h5>
                 </td>
             </tr>
             <tr>
@@ -202,7 +202,7 @@
                 <th scope="row">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</th>
                 <th scope="row"></th>
                 {{--                <th scope="row"></th>--}}
-                <th scope="row"> {{$arr['partner_pct'].' %'.' من صافي الربح' }} {{' ('.isset($arr['title_amount']) ? number_format($arr['title_amount'], $decimal_octets).')' : '' }} </th>
+                <th scope="row"> {{$arr['partner_pct'].' %'.' من صافي الربح' }} {{' // '.isset($arr['title_amount']) ? number_format($arr['title_amount'], $decimal_octets) : '' }} </th>
 
             </tr>
 
