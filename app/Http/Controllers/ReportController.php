@@ -213,7 +213,7 @@ class ReportController extends Controller
             ->where('t.tag_id','<>',1)
             ->select('t.amount','t.account_id as account_id','a.name','t.transaction_type_id','t.date')
             ->get();
-dd($fromdate, $todate);
+
         //--------------------------------------------------------------------------------------------------------------
 
         // عدد الايام للفترة
