@@ -142,7 +142,7 @@
 {{--                    <th scope="row">  </th>--}}
                     <th scope="row"></th>
                     <th scope="row">{{ isset($report->amount) ? number_format($report->amount, $decimal_octets) : '' }}</th>
-                    <th scope="row">{{$report->description ?? ''}}</th>
+                    <th scope="row">{{$report->account->name ?? ''}}</th>
 
                 </tr>
 
