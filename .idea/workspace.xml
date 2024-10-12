@@ -11,7 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_with_income_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_with_income_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,21 +239,7 @@
       <workItem from="1727508431740" duration="6295000" />
       <workItem from="1727521142777" duration="11658000" />
       <workItem from="1728157788110" duration="9406000" />
-      <workItem from="1728727729867" duration="327000" />
-    </task>
-    <task id="LOCAL-00077" summary="2024-07-26">
-      <created>1722030925984</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1722030925985</updated>
-    </task>
-    <task id="LOCAL-00078" summary="2024-07-27">
-      <created>1722070011089</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1722070011089</updated>
+      <workItem from="1728727729867" duration="786000" />
     </task>
     <task id="LOCAL-00079" summary="2024-07-31">
       <created>1722455672330</created>
@@ -584,7 +570,21 @@
       <option name="project" value="LOCAL" />
       <updated>1728589985717</updated>
     </task>
-    <option name="localTasksCounter" value="126" />
+    <task id="LOCAL-00126" summary="2024-10-11">
+      <created>1728728264356</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1728728264356</updated>
+    </task>
+    <task id="LOCAL-00127" summary="2024-10-11">
+      <created>1728728520336</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1728728520336</updated>
+    </task>
+    <option name="localTasksCounter" value="128" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -603,7 +603,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-24" />
     <MESSAGE value="2024-07-21--" />
     <MESSAGE value="2024-07-22" />
     <MESSAGE value="2024-07-23" />
@@ -628,7 +627,8 @@
     <MESSAGE value="2024-09-30" />
     <MESSAGE value="2024-10-08" />
     <MESSAGE value="2024-10-10" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-10-10" />
+    <MESSAGE value="2024-10-11" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-10-11" />
   </component>
   <component name="WindowStateProjectService">
     <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1720389695703">
@@ -652,10 +652,10 @@
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="604" y="341" key="NewPhpFileDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651373290" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728589992106">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728728521600">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1722070012260" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728728521600" />
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1728589992106" />
     <state x="431" y="155" width="672" height="678" key="search.everywhere.popup" timestamp="1720650752627">
       <screen x="0" y="0" width="1536" height="834" />
