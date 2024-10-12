@@ -234,7 +234,7 @@ class ReportController extends Controller
             "total_pulled_from_net_income"=> $total_pulled_from_net_income,
             "partner_pct" => $partner_pct,
             "partner_name" => $partner_name,
-            "partnership_type_desc" => $partnership_type_desc,
+            "partnership_type_desc" => $partnership_type_desc ?? '',
             "profit" => $profit,
             "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
             "profit_pct_amount" => $profit_pct_amount,
