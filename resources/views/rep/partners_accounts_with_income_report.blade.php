@@ -156,8 +156,18 @@
             </tr>
 
             <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">صافي الربح قبل المسحوبات</td>
+                <td colspan="2" style="text-align: center;">{{ isset($arr['net_profit']) ? number_format($arr['net_profit'], $decimal_octets) : ''  }}</td>
+            </tr>
+
+            <tr style="background-color: #f2f2f2;">
                 <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات من صافي الربح</td>
                 <td colspan="2" style="text-align: center;">{{ isset($reports2) ? number_format($reports2->sum('amount'), $decimal_octets) : '' }}</td>
+            </tr>
+
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">صافي الربح الخاضع للحصص</td>
+                <td colspan="2" style="text-align: center;">{{ number_format($arr['net_profit'] - $reports2->sum('amount'), $decimal_octets) }}</td>
             </tr>
 
             </tfoot>
