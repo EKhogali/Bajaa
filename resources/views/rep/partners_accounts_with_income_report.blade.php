@@ -175,7 +175,7 @@
             <thead style="background-color: #f2f2f2; font-weight: bold;">
             <tr style="text-align: center; vertical-align: middle; background-color: #f6993f; height: 50px;">
                 <td  colspan="5" style="text-align: center; vertical-align: middle; background-color: transparent;">
-                    <h5>مسحوبات  {{' '.$partnership_type_desc.' '.$arr['partner_name']}}</h5>
+{{--                    <h5>مسحوبات  {{' '.$partnership_type_desc.' '.$arr['partner_name']}}</h5>--}}
                 </td>
             </tr>
             <tr>
