@@ -154,8 +154,8 @@
             </tr>
 
             <tr style="background-color: #f2f2f2;">
-                <td colspan="2" style="font-weight: bold; text-align: center;">الوارد ({{$arr['partner_pct'].' %' }}) من صافي الربح</td>
-                <td colspan="2" style="text-align: center;">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</td>
+                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات من صافي الربح</td>
+                <td colspan="2" style="text-align: center;">{{ isset($reports2) ? number_format($reports2->sum('amount'), $decimal_octets) : '' }}</td>
             </tr>
             <tr style="background-color: #f2f2f2;">
                 <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات</td>
