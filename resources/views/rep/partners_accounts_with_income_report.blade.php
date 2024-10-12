@@ -121,10 +121,10 @@
             <tr>
                 <th scope="row">{{$rec_id ?? ''}}</th>
                 <th scope="row"></th>
-                <th scope="row">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</th>
+                <th scope="row">{{ isset($arr['net_profit']) ? number_format($arr['net_profit'], $decimal_octets) : '' }}</th>
                 <th scope="row"></th>
 {{--                <th scope="row"></th>--}}
-                <th scope="row"> {{$arr['partner_pct'].' %'.' من صافي الربح' }} </th>
+                <th scope="row"> {{'  صافي الربح' }} </th>
 
             </tr>
 
