@@ -86,9 +86,11 @@
                 <br>
                 <h5>من: {{ request()->get('fromdate') ?? '' }} إلى: {{ request()->get('todate') ?? '' }}</h5>
                 <br>
-                <h5> صافي الربح: {{$arr['net_profit']}}</h5>
+{{--                <h5> صافي الربح: {{$arr['net_profit']}}</h5>--}}
+                <h5> صافي الربح: {{isset($arr['net_profit']) ? number_format($arr['net_profit'], $decimal_octets) : '' }}</h5>
                 <br>
-                <h5> صافي الربح بعد المسحوبات: {{$arr['title_amount']}}</h5>
+{{--                <h5> صافي الربح بعد المسحوبات: {{$arr['title_amount']}}</h5>--}}
+                <h5> صافي الربح بعد المسحوبات: {{isset($arr['title_amount']) ? number_format($arr['title_amount'], $decimal_octets) : '' }}</h5>
             </div>
         </div>
 
@@ -157,17 +159,7 @@
                 <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات من صافي الربح</td>
                 <td colspan="2" style="text-align: center;">{{ isset($reports2) ? number_format($reports2->sum('amount'), $decimal_octets) : '' }}</td>
             </tr>
-            <tr style="background-color: #f2f2f2;">
-                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات</td>
-                <td colspan="2" style="text-align: center;">{{ isset($tot_out) ? number_format($tot_out, $decimal_octets) : '' }}</td>
-            </tr>
-            @php
-                $balance = $reports2->sum('amount') - $tot_out;
-            @endphp
-            <tr style="background-color: #f2f2f2;">
-                <td colspan="2" style="font-weight: bold; text-align: center;">الرصيد</td>
-                <td colspan="2" style="text-align: center;">{{ isset($balance) ? number_format($balance, $decimal_octets) : '' }}</td>
-            </tr>
+
             </tfoot>
 
         </table>
@@ -183,7 +175,7 @@
             <thead style="background-color: #f2f2f2; font-weight: bold;">
             <tr style="text-align: center; vertical-align: middle; background-color: #f6993f; height: 50px;">
                 <td  colspan="5" style="text-align: center; vertical-align: middle; background-color: transparent;">
-                    <h5>مسحوبات المستثمر/الشريك</h5>
+                    <h5>مسحوبات  {{' '.$partnership_type_desc.$arr['partner_name']}}</h5>
                 </td>
             </tr>
             <tr>
@@ -210,7 +202,7 @@
                 <th scope="row">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</th>
                 <th scope="row"></th>
                 {{--                <th scope="row"></th>--}}
-                <th scope="row"> {{$arr['partner_pct'].' %'.' من صافي الربح' }} </th>
+                <th scope="row"> {{$arr['partner_pct'].' %'.' من صافي الربح'.' ('.isset($arr['title_amount']) ? number_format($arr['title_amount'], $decimal_octets).') ' }} </th>
 
             </tr>
 
@@ -240,8 +232,16 @@
             </tr>
 
             <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي الوارد</td>
+                <td colspan="2" style="text-align: center;">{{ isset($arr['profit_pct_amount']) ? number_format($arr['profit_pct_amount'], $decimal_octets) : '' }}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
                 <td colspan="2" style="font-weight: bold; text-align: center;">اجمالي المسحوبات</td>
                 <td colspan="2" style="text-align: center;">{{ isset($reports) ? number_format($reports->sum('amount'), $decimal_octets) : '' }}</td>
+            </tr>
+            <tr style="background-color: #f2f2f2;">
+                <td colspan="2" style="font-weight: bold; text-align: center;"> الرصيد </td>
+                <td colspan="2" style="text-align: center;">{{  number_format($arr['profit_pct_amount'] - $reports->sum('amount'), $decimal_octets) ?? '' }}</td>
             </tr>
             </tfoot>
 

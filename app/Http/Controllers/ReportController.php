@@ -180,6 +180,7 @@ class ReportController extends Controller
             ->get();
         $partner_pct = $partners->where('account_id',$account_id)->pluck('win_percentage')->first();
         $partner_name = $partners->where('account_id',$account_id)->pluck('name')->first();
+        $partnership_type = $partners->where('account_id',$account_id)->pluck('partnership_type')->first();
 
         $profit = ((($net_profit - $dioon_expenses - $total_pulled_from_net_income) / 100) ) - $dioon_expenses;
 
@@ -226,10 +227,14 @@ class ReportController extends Controller
             )
             ->value('distinct_days_count');
 
+        if($partnership_type == 0){$partnership_type_desc ='مستثمر';}else{$partnership_type_desc = 'شريك';}
+
         $arr = array(
             "net_profit" => $net_profit,
             "total_pulled_from_net_income"=> $total_pulled_from_net_income,
             "partner_pct" => $partner_pct,
+            "partner_name" => $partner_name,
+            "partnership_type_desc" => $partnership_type_desc,
             "profit" => $profit,
             "profit_after_total_pulled_from_net_income" => $profit_after_total_pulled_from_net_income,
             "profit_pct_amount" => $profit_pct_amount,
