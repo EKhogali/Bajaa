@@ -43,6 +43,7 @@ Route::get('/treasury_transactions_show_in/{id}', 'TreasuryTransactionController
 
 Route::resource('/accounts', 'AccountController');
 Route::resource('/categories', 'CategoryController');
+Route::resource('/classifications', 'ClassificationController');
 Route::resource('/treasuries', 'TreasuryController');
 Route::resource('/journals', 'JournalmController');
 Route::resource('/journald', 'JournaldController');
@@ -68,6 +69,7 @@ Route::get('/ledger2', [ReportController::class, 'ledger2']);
 Route::get('/partners_accounts_report', [ReportController::class, 'partners_accounts_report']);
 Route::get('/partners_accounts_with_income_report', [ReportController::class, 'partners_accounts_with_income_report']);
 Route::get('/account_details_report', [ReportController::class, 'account_details_report']);
+Route::get('/daily_report', [ReportController::class, 'daily_report']);
 //Route::get('/estimated_expense_report', [ReportController::class, 'estimated_expense_report']);
 
 Auth::routes(['register' => true]);

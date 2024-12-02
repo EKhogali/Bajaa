@@ -7,7 +7,7 @@
 
 <br>
 <div class="container">
-    <h3 >Edit Account</h3>
+    <h3>تعديل بيانات حساب</h3>
 </div>
 <br>
 <div class="container row">
@@ -20,13 +20,13 @@
             {{ csrf_field() }}
             <div class="container-fluid row ">
                 <div class="col-6">
-                    <label for="code" class="form-label">Account Code</label>
+                    <label for="code" class="form-label">كود الحساب</label>
                     <input type="text" class="form-control" id="code" name="code" value="{{$account->code}}"></div>
             </div>
             <br>
             <div class="container-fluid row ">
                 <div class="col-6">
-                    <label for="name" class="form-label">Account Name</label>
+                    <label for="name" class="form-label">اسم الحساب</label>
                     <input type="text" class="form-control" id="name" name="name" value="{{$account->name}}"></div>
             </div>
             <br>
@@ -53,11 +53,41 @@
 {{--                        @endforeach--}}
 {{--                    </select>--}}
 {{--            </div>--}}
-            <br>
             <div class="container-fluid row ">
                 <div class="col-6">
-                    <label for="category_id" class="form-label">Account Category</label>
-                    <select name="category_id" >
+                    <label for="classification_id" class="form-label">تصنيف الحساب</label>
+                    <select name="classification_id" class="form-control" >
+{{--                        <option value="0">none</option>--}}
+                        @foreach($classifications as $classification)
+                            <option value="{{$classification->id}}" @if($classification->id == $account->classification_id) selected @endif >
+                                {{$classification->name}}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <br>
+
+
+{{--            <br>--}}
+{{--            <div class="container-fluid row ">--}}
+{{--                <div class="col-6">--}}
+{{--                    <label for="categorytxt2_list" class="form-label">تصنيف المشتريات</label>--}}
+{{--                    <input list="categorytxt2_list" name="categorytxt2" id="categorytxt2" class="form-control" value="{{$account->categorytxt2}}">--}}
+{{--                    <datalist id="categorytxt2_list">--}}
+{{--                        @foreach($categorytxt2_list as $categorytxt2)--}}
+{{--                            <option value="{{$categorytxt2->categorytxt2}}" >--}}
+{{--                        @endforeach--}}
+{{--                    </datalist>--}}
+{{--            </div>--}}
+{{--            </div>--}}
+{{--            <br>--}}
+
+
+            <div class="container-fluid row ">
+                <div class="col-6">
+                    <label for="category_id" class="form-label">مجموعة الحساب</label>
+                    <select name="category_id" class="form-control" >
 {{--                        <option value="0">none</option>--}}
                         @foreach($categories as $category)
                             <option value="{{$category->id}}" @if($category->id == $account->category_id) selected @endif >
@@ -65,12 +95,13 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
             </div>
             <br>
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">حفـــظ</button>
                 </div>
                 <div class="col"></div>
             </div>

@@ -51,6 +51,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="/categories">مجموعات الحسابات</a></li>
+                                <li><a class="dropdown-item" href="/classifications">تصنيفات الحسابات</a></li>
                                 <li><a class="dropdown-item" href="/accounts?acc_type={{0}}" id="acc0" onclick="changeAccType(0)">دليل الحسابات</a></li>
                                 <li><a class="dropdown-item" href="/accounts?acc_type={{1}}" id="acc1" onclick="changeAccType(1)">دليل الاصول الثابتة</a></li>
                                 <li><a class="dropdown-item" href="/accounts?acc_type={{2}}" id="acc2" onclick="changeAccType(2)">دليل الحسابات التفصيلية</a></li>
@@ -93,6 +94,7 @@
                             <li><a class="dropdown-item" href="/pulled_from_net_income_report">تقرير مسحوبات من صافي الربح</a></li>
                             <li><a class="dropdown-item" href="/partners_accounts_report">تقرير حساب المستثمر والشريك</a></li>
                             <li><a class="dropdown-item" href="/partners_accounts_with_income_report">تقرير مسحوبات من صافي الربح وحصص المستثمر والشريك</a></li>
+                            <li><a class="dropdown-item" href="/daily_report">التقرير اليومي</a></li>
                         </ul>
                     </li>
 

@@ -54,6 +54,8 @@
                 <th scope="col">اسم الحساب</th>
 {{--                <th scope="col">فئة الحساب</th>--}}
                 <th scope="col">تصنيف الحساب</th>
+                <th scope="col">تصنيف المشتريات</th>
+                <th scope="col">تصنيف الحساب</th>
 {{--                <th scope="col">الحساب الرئيسي</th>--}}
                 <th scope="col" width="7%">تعديل</th>
                 <th scope="col" width="7%">الغاء</th>
@@ -68,6 +70,8 @@
                     <th scope="row">{{$account->code ?? ''}}</th>
                     <th scope="row">{{$account->name ?? ''}}</th>
                     <th scope="row">{{$account->category->name ?? ''}}</th>
+                    <th scope="row">{{$account->categorytxt2 ?? ''}}</th>
+                    <th scope="row">{{$account->classification->name ?? ''}}</th>
 {{--                    <th scope="row">--}}
 {{--                        @if($account->classification_id == 1)--}}
 {{--                            Creditor--}}

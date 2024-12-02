@@ -285,9 +285,7 @@ class ReportController extends Controller
             ->with('reports2', $reports2);
     }
 
-
-
-
+    //##################################################################################################################
 
     public function partners_accounts_report()
     {
@@ -541,10 +539,7 @@ class ReportController extends Controller
             ->with('reports', $reports);
     }
 
-
-
-
-
+    //##################################################################################################################
 
     public function pulled_from_net_income_report()
     {
@@ -594,6 +589,7 @@ class ReportController extends Controller
             ->with('reports', $reports);
     }
 
+    //##################################################################################################################
 
     public function account_details_report(){
         //-------------------------------------------------------------------------------------------------------------
@@ -657,16 +653,9 @@ class ReportController extends Controller
         }
     }
 
+    //##################################################################################################################
 
-
-
-//##################################################################################################################
-//##################################################################################################################
-//##################################################################################################################
-//##################################################################################################################
-//##################################################################################################################
-//
-public function ledger2()
+    public function ledger2()
 {
     //-------------------------------------------------------------------------------------------------------------
 
@@ -713,13 +702,7 @@ public function ledger2()
         ->with('ledger2', $ledger2);
 }
 
-
-//##################################################################################################################
-//##################################################################################################################
-//##################################################################################################################
-//##################################################################################################################
-//##################################################################################################################
-
+    //##################################################################################################################
 
     public function income_report(){
 
@@ -959,15 +942,6 @@ public function ledger2()
         $net_profit =  ($tot_in + $other_income_total + $faaed - $ajz) - $operation_expenses - $adminExpenses ;
         //-------------------------------------------------------------------------------------------------------------
 
-//            dd(
-//                '$net_profit: '.$net_profit,
-//                '$total_in: '.$total_in,
-//                '$other_income_total: '.$other_income_total,
-//                '$operation_expenses: '.$operation_expenses,
-//                '$adminExpenses: '.$adminExpenses,
-//                '$ajz: '.$ajz,
-//                '$faaed: '.$faaed
-//            );
 
         //-------------------------------------------------------------------------------------------------------------
         if($adminExpenses == 0){ $adminExpenses = 1;}
@@ -1153,7 +1127,8 @@ public function ledger2()
             'currency' => 'دينار',
             'number1' => 0,
             'number1_2' => $tot_in + $other_income_total + $faaed - $ajz ?? 0,
-            'number2' => ($tot_in + $faaed - $ajz)/$days,
+            'number2' => ($tot_in + $other_income_total + $faaed - $ajz)/$days,
+//            'number2' => ($tot_in + $faaed - $ajz)/$days,
             'number3' => 0,
             'number4' => 0,
             'note' => 0,
@@ -1802,6 +1777,7 @@ public function ledger2()
         }
     }
 
+    //##################################################################################################################
 
     public function estimated_expense_report(){
 
@@ -2832,8 +2808,7 @@ public function ledger2()
         }
     }
 
-
-
+    //##################################################################################################################
 
     public function gl_index(){
         $fromdate = \Carbon\Carbon::now();
@@ -2856,6 +2831,100 @@ public function ledger2()
             ->with('total_creditor',$total_creditor);
     }
 
+    //##################################################################################################################
+
+    public function daily_report(){
+        if(!Request()->has('date')){
+            $date = Carbon::today()->format('d-m-yy');
+        }else{
+            $date = Request('date');
+        }
+
+        $companyId = session::get('company_id');
+        $financialYear = session::get('financial_year');
+
+        // -----------------
+        // (مبيعات الفترة)
+        $total_sales = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a','a.id','t.account_id')
+            ->where('t.transaction_type_id',0)
+            ->where('t.company_id', $companyId)
+            ->where('t.financial_year', $financialYear)
+            ->where('t.archived', 0)
+            ->where('a.category_id',7)
+            ->whereBetween('t.date', [$date, $date])
+            ->sum('t.amount');
+
+        $row_id = 1;
+        $data_arr = [];
+        $data_arr[] = [
+            "row_id"=>$row_id,
+            "desc"=>"المبيعات",
+            "pct"=>"",
+            "sub-total"=>"",
+            "total"=> $total_sales,
+            "net-total"=>"",
+        ];
+
+        $row_id +=1;
+        $data_arr[] =['row_id'=> $row_id,
+            "desc"=>"المصروفات",
+            "pct"=>"",
+            "sub-total"=>"",
+            "total"=> "",
+            "net-total"=>"",];
+
+        $expenses = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a','a.id','t.account_id')
+            ->leftJoin('classifications as c','c.id','a.classification_id')
+            ->where('t.transaction_type_id',1)
+            ->where('t.company_id', $companyId)
+            ->where('t.financial_year', $financialYear)
+            ->where('t.archived', 0)
+            ->where('a.category_id',7)
+//            ->whereBetween('t.date', [$date, $date])
+            ->groupby('c.name')
+            ->select('c.name as classification', DB::raw('SUM(t.amount) as total'))->get();
+
+
+        $row_id +=1;
+        foreach ($expenses as $expense){
+            $data_arr[] =[
+                'row_id'=> $row_id,
+                "desc"=>$expense->classification,
+                "pct"=>($total_sales/100) * $expense->total,
+//                "pct"=>($expense->total/100) * $total_sales,
+                "sub-total"=>$expense->total,
+                "total"=> "",
+                "net-total"=>"",];
+        }
+
+        $totalexpense = $expenses->sum('total');
+        $row_id +=1;
+        $data_arr[] =[
+            'row_id'=> $row_id,
+            "desc"=>"اجمالي المصروفات",
+            "pct"=>"",
+            "sub-total"=>"",
+            "total"=> $totalexpense,
+            "net-total"=>"",];
+
+
+        $row_id +=1;
+        $data_arr[] =[
+            'row_id'=> $row_id,
+            "desc"=>"صافي الربح أو الخسارة",
+            "pct"=>"",
+            "sub-total"=>"",
+            "total"=> "",
+            "net-total"=>$total_sales - $totalexpense,];
+
+//        dd($date, $total_sales,$data_arr,$totalexpense,$expenses);
+        return view('rep.daily_report')
+            ->with('data_arr',$data_arr);
+    }
+
+    //##################################################################################################################
 
     public function l_index(){
         $fromdate = Request()->fromdate ?? \Carbon\Carbon::now();
@@ -2881,6 +2950,7 @@ public function ledger2()
             ->with('account_id',Request()->account_id);
     }
 
+    //##################################################################################################################
 
     public function treasury_report()
     {
@@ -2920,6 +2990,8 @@ public function ledger2()
         }
     }
 
+    //##################################################################################################################
+
     public function tr_index()
     {
 
@@ -2931,7 +3003,7 @@ public function ledger2()
             ->with('trailbalances',$trailbalance);
     }
 
-
+    //##################################################################################################################
 
     public function exe_g_ledger(){
 
@@ -2965,6 +3037,7 @@ public function ledger2()
             ->with('todate',$todate);
     }
 
+    //##################################################################################################################
 
     public function exe_ledger(){
 
@@ -3006,7 +3079,7 @@ public function ledger2()
             ->with('account_id',$account_id);
     }
 
-
+    //##################################################################################################################
 
     public function tr_exec()
     {
@@ -3079,7 +3152,7 @@ public function ledger2()
             ->with('trailbalances',$trailbalances);
     }
 
-
+    //##################################################################################################################
 
     public function account_name_indent( $level){
         $indents = '';
@@ -3090,6 +3163,8 @@ public function ledger2()
         $indents = $indents.'>';
         return $indents;
     }
+
+    //##################################################################################################################
 
     public function account_level( $account){
 

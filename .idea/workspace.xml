@@ -11,7 +11,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change beforePath="$PROJECT_DIR$/resources/views/rep/partners_accounts_with_income_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/partners_accounts_with_income_report.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/classifications/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/classifications/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/classifications/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/rep/daily_report.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/account.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/account.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,10 +162,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\rep" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\estimated_expense" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction\treasury_transaction_details" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\sys" />
-      <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction" />
     </key>
   </component>
   <component name="RunManager" selected="PHPUnit.phpunit.xml">
@@ -239,14 +251,20 @@
       <workItem from="1727508431740" duration="6295000" />
       <workItem from="1727521142777" duration="11658000" />
       <workItem from="1728157788110" duration="9406000" />
-      <workItem from="1728727729867" duration="4033000" />
-    </task>
-    <task id="LOCAL-00092" summary="2024-08-17">
-      <created>1723923212995</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1723923212995</updated>
+      <workItem from="1728727729867" duration="4708000" />
+      <workItem from="1728937445605" duration="596000" />
+      <workItem from="1729324177324" duration="594000" />
+      <workItem from="1729328502577" duration="673000" />
+      <workItem from="1729365327253" duration="931000" />
+      <workItem from="1729794161215" duration="253000" />
+      <workItem from="1729794531492" duration="881000" />
+      <workItem from="1731433422109" duration="643000" />
+      <workItem from="1731491310569" duration="974000" />
+      <workItem from="1732516163802" duration="7409000" />
+      <workItem from="1732537407641" duration="22407000" />
+      <workItem from="1732995085619" duration="1007000" />
+      <workItem from="1733160522226" duration="1253000" />
+      <workItem from="1733166178866" duration="2649000" />
     </task>
     <task id="LOCAL-00093" summary="2024-09-02">
       <created>1725231255362</created>
@@ -584,7 +602,14 @@
       <option name="project" value="LOCAL" />
       <updated>1728731797119</updated>
     </task>
-    <option name="localTasksCounter" value="141" />
+    <task id="LOCAL-00141" summary="2024-10-11">
+      <created>1728737644554</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1728737644555</updated>
+    </task>
+    <option name="localTasksCounter" value="142" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -631,35 +656,15 @@
     <option name="LAST_COMMIT_MESSAGE" value="2024-10-11" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1720389695703">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="366" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.834@0.0.1536.834" timestamp="1720389695703" />
-    <state x="499" y="164" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1720651363755">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="499" y="164" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651363755" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1727248260837">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1732538637110">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1727248260837" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1723495909097" />
-    <state x="407" y="179" key="MultipleFileMergeDialog" timestamp="1720653099642">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1732538637110" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728737645970">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="407" y="179" key="MultipleFileMergeDialog/0.0.1536.834@0.0.1536.834" timestamp="1720653099642" />
-    <state x="604" y="341" key="NewPhpFileDialog" timestamp="1720651373290">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="604" y="341" key="NewPhpFileDialog/0.0.1536.834@0.0.1536.834" timestamp="1720651373290" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728731798515">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728731798515" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728737645970" />
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1728589992106" />
-    <state x="431" y="155" width="672" height="678" key="search.everywhere.popup" timestamp="1720650752627">
-      <screen x="0" y="0" width="1536" height="834" />
-    </state>
-    <state x="431" y="155" width="672" height="678" key="search.everywhere.popup/0.0.1536.834@0.0.1536.834" timestamp="1720650752627" />
   </component>
 </project>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\account;
 use App\category;
+use App\Classification;
 use Illuminate\Http\Request;
 use app\http\controllers\SittingsController;
 use Illuminate\Support\Facades\Session;
@@ -29,7 +30,9 @@ class AccountController extends Controller
                     $accounts = account::where('is_fixed_assets',0)->where('is_details',0)->get();
                     $search_accounts = account::where('is_fixed_assets',0)->where('is_details',0)->get();
                 }
-                return view('chartofaccounts.index')->with('accounts',$accounts)->with('search_accounts',$search_accounts);
+                return view('chartofaccounts.index')
+                    ->with('accounts',$accounts)
+                    ->with('search_accounts',$search_accounts);
             break;
             case 1:
                 if(Request('is_search') == true){
@@ -65,8 +68,12 @@ class AccountController extends Controller
     {
         $parents = account::all();
         $categories = category::all();
+        $categorytxt2_list = account::select('categorytxt2')->distinct()->get();
+        $classifications = Classification::where('archived',0)->get();
         return view('chartofaccounts.create')
+            ->with('categorytxt2_list',$categorytxt2_list)
             ->with('parents',$parents)
+            ->with('classifications',$classifications)
             ->with('acc_type',Request('acc_type'))
             ->with('categories',$categories);
     }
@@ -106,6 +113,7 @@ class AccountController extends Controller
                 'company_id'=>session::get('company_id'),
                 'name'=>Request('name'),
                 'code'=>Request('code'),
+                'categorytxt2'=>Request('categorytxt2') ?? '',
                 'parent_id'=>Request('parent_id'),
                 'category_id'=>Request('category_id'),
                 'classification_id'=>Request('classification_id') ?? 1,
@@ -156,11 +164,15 @@ class AccountController extends Controller
 
         $parents = account::all();
         $categories = category::all();
+        $categorytxt2_list = account::select('categorytxt2')->distinct()->get();
+        $classifications = Classification::where('archived',0)->get();
         return view('chartofaccounts.edit')
             ->with('account',$account)
             ->with('parents',$parents)
             ->with('acc_type',Request('acc_type'))
             ->with('categories',$categories)
+            ->with('classifications',$classifications)
+            ->with('categorytxt2_list',$categorytxt2_list)
             ;
     }
 
@@ -190,6 +202,7 @@ class AccountController extends Controller
             ->update([
                 'name' => Request('name')
                 ,'code' => Request('code')
+                ,'categorytxt2' => Request('categorytxt2')
                 ,'parent_id' => Request('parent_id')
                 ,'category_id' => Request('category_id')
                 ,'classification_id' => Request('classification_id') ?? 1
