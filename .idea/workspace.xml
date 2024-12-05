@@ -11,19 +11,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change afterPath="$PROJECT_DIR$/resources/views/classifications/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/classifications/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/classifications/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/rep/daily_report.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/account.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/account.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -264,14 +257,8 @@
       <workItem from="1732537407641" duration="22407000" />
       <workItem from="1732995085619" duration="1007000" />
       <workItem from="1733160522226" duration="1253000" />
-      <workItem from="1733166178866" duration="2649000" />
-    </task>
-    <task id="LOCAL-00093" summary="2024-09-02">
-      <created>1725231255362</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1725231255362</updated>
+      <workItem from="1733166178866" duration="3350000" />
+      <workItem from="1733425255883" duration="4596000" />
     </task>
     <task id="LOCAL-00094" summary="2024-09-02-2">
       <created>1725271085818</created>
@@ -609,7 +596,14 @@
       <option name="project" value="LOCAL" />
       <updated>1728737644555</updated>
     </task>
-    <option name="localTasksCounter" value="142" />
+    <task id="LOCAL-00142" summary="2024-12-02">
+      <created>1733169201135</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1733169201143</updated>
+    </task>
+    <option name="localTasksCounter" value="143" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -628,7 +622,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-21--" />
     <MESSAGE value="2024-07-22" />
     <MESSAGE value="2024-07-23" />
     <MESSAGE value="2024-07-25" />
@@ -653,7 +646,8 @@
     <MESSAGE value="2024-10-08" />
     <MESSAGE value="2024-10-10" />
     <MESSAGE value="2024-10-11" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-10-11" />
+    <MESSAGE value="2024-12-02" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-12-02" />
   </component>
   <component name="WindowStateProjectService">
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1732538637110">
@@ -661,10 +655,10 @@
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1727248260837" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1732538637110" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1728737645970">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1733169204467">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728737645970" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1728589992106" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1733169204467" />
   </component>
 </project>

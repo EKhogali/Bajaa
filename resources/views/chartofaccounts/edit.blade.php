@@ -97,7 +97,16 @@
                     </select>
                 </div>
             </div>
-            <br>
+            @if(Request('acc_type') == 2)
+                <br>
+                <div class="container-fluid row ">
+                    <div class="col-6">
+                        <input type="checkbox" value="{{$account->show_in_daily_report}}" id="show_in_daily_report" name="show_in_daily_report">
+                        <label for="name" class="form-label">اظهار في التقرير</label>
+                    </div>
+                </div>
+                <br>
+            @endif
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">

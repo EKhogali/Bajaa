@@ -50,7 +50,8 @@
                 <th scope="col">كود الحساب</th>
                 <th scope="col">اسم الحساب</th>
                 <th scope="col">فئة الحساب</th>
-{{--                <th scope="col">تصنيف الحساب</th>--}}
+                <th scope="col">تقرير</th>
+                <th scope="col">تصنيف الحساب</th>
 {{--                <th scope="col">الحساب الرئيسي</th>--}}
                 <th scope="col" width="10%">تعديل</th>
                 <th scope="col" width="10%">الغاء</th>
@@ -74,6 +75,14 @@
 {{--                            n/a--}}
 {{--                        @endif--}}
 {{--                    </th>--}}
+                    <th scope="row">
+                        @if($account->show_in_daily_report == 1)
+                            اظهار
+                            @else
+                            /
+                        @endif
+                    </th>
+                    <th scope="row">{{$account->classification->name ?? ''}}</th>
 {{--                    <th scope="row">{{$account->parentR->name ?? ''}}</th>--}}
                     <th scope="row"><a href="/accounts/{{$account->id}}/edit?acc_type={{Request('acc_type')}}" class="btn btn-warning">تعديل</a></th>
                     <th scope="row"><form method="post" class="delete_form" action="{{action('AccountController@destroy', $account->id)}}">

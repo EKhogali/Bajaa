@@ -117,6 +117,7 @@ class AccountController extends Controller
                 'parent_id'=>Request('parent_id'),
                 'category_id'=>Request('category_id'),
                 'classification_id'=>Request('classification_id') ?? 1,
+                'show_in_daily_report'=> Request()->has('show_in_daily_report'),
                 'is_fixed_assets'=>$is_fixed_assets,
                 'is_details'=>$is_details,
                 'created_by'=> auth()->id(),
@@ -206,6 +207,7 @@ class AccountController extends Controller
                 ,'parent_id' => Request('parent_id')
                 ,'category_id' => Request('category_id')
                 ,'classification_id' => Request('classification_id') ?? 1
+                ,'show_in_daily_report'=> Request()->has('show_in_daily_report')
                 ,'updated_by' => auth()->id()
             ]);
 

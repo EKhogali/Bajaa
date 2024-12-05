@@ -103,7 +103,16 @@
                     </div>
                 </div>
             </div>
-            <br>
+            @if(Request('acc_type') == 2)
+                <br>
+                <div class="container-fluid row ">
+                    <div class="col-6">
+                        <input type="checkbox" id="show_in_daily_report" name="show_in_daily_report">
+                        <label for="show_in_daily_report" class="form-label">اظهار في التقارير</label>
+                    </div>
+                </div>
+                <br>
+            @endif
             <br>
             <br>
             <div class="row ">

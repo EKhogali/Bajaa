@@ -2881,8 +2881,10 @@ class ReportController extends Controller
             ->where('t.company_id', $companyId)
             ->where('t.financial_year', $financialYear)
             ->where('t.archived', 0)
-            ->where('a.category_id',7)
-//            ->whereBetween('t.date', [$date, $date])
+            ->where('c.show_in_daily_report',1)
+            ->where('a.show_in_daily_report',1)
+            ->where('a.is_details',1)
+            ->whereBetween('t.date', [$date, $date])
             ->groupby('c.name')
             ->select('c.name as classification', DB::raw('SUM(t.amount) as total'))->get();
 
@@ -2892,7 +2894,7 @@ class ReportController extends Controller
             $data_arr[] =[
                 'row_id'=> $row_id,
                 "desc"=>$expense->classification,
-                "pct"=>($total_sales/100) * $expense->total,
+                "pct"=>number_format((($expense->total/$total_sales ?? -1) * 100) ?? 0,2).'%' ,
 //                "pct"=>($expense->total/100) * $total_sales,
                 "sub-total"=>$expense->total,
                 "total"=> "",
