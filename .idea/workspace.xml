@@ -16,7 +16,8 @@
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index_details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rep/daily_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/daily_report.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -258,14 +259,10 @@
       <workItem from="1732995085619" duration="1007000" />
       <workItem from="1733160522226" duration="1253000" />
       <workItem from="1733166178866" duration="3350000" />
-      <workItem from="1733425255883" duration="4596000" />
-    </task>
-    <task id="LOCAL-00094" summary="2024-09-02-2">
-      <created>1725271085818</created>
-      <option name="number" value="00094" />
-      <option name="presentableId" value="LOCAL-00094" />
-      <option name="project" value="LOCAL" />
-      <updated>1725271085819</updated>
+      <workItem from="1733425255883" duration="10953000" />
+      <workItem from="1733854603953" duration="592000" />
+      <workItem from="1734070079168" duration="586000" />
+      <workItem from="1734885051236" duration="4134000" />
     </task>
     <task id="LOCAL-00095" summary="2024-09-03">
       <created>1725313252262</created>
@@ -603,7 +600,14 @@
       <option name="project" value="LOCAL" />
       <updated>1733169201143</updated>
     </task>
-    <option name="localTasksCounter" value="143" />
+    <task id="LOCAL-00143" summary="2024-12-05">
+      <created>1733430959967</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1733430959967</updated>
+    </task>
+    <option name="localTasksCounter" value="144" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -622,7 +626,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-22" />
     <MESSAGE value="2024-07-23" />
     <MESSAGE value="2024-07-25" />
     <MESSAGE value="2024-07-26" />
@@ -647,7 +650,8 @@
     <MESSAGE value="2024-10-10" />
     <MESSAGE value="2024-10-11" />
     <MESSAGE value="2024-12-02" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-12-02" />
+    <MESSAGE value="2024-12-05" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-12-05" />
   </component>
   <component name="WindowStateProjectService">
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1732538637110">
@@ -655,10 +659,10 @@
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1727248260837" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1732538637110" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1733169204467">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1733430964460">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728737645970" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1733169204467" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1733430964460" />
   </component>
 </project>

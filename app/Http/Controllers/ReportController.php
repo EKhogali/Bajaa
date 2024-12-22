@@ -2883,12 +2883,12 @@ class ReportController extends Controller
             ->where('t.archived', 0)
             ->where('c.show_in_daily_report',1)
             ->where('a.show_in_daily_report',1)
-            ->where('a.is_details',1)
+//            ->where('a.is_details',1)
             ->whereBetween('t.date', [$date, $date])
             ->groupby('c.name')
             ->select('c.name as classification', DB::raw('SUM(t.amount) as total'))->get();
 
-
+//dd($companyId,$financialYear,$date,$expenses);
         $row_id +=1;
         foreach ($expenses as $expense){
             $data_arr[] =[

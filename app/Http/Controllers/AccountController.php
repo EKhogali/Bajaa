@@ -69,9 +69,11 @@ class AccountController extends Controller
         $parents = account::all();
         $categories = category::all();
         $categorytxt2_list = account::select('categorytxt2')->distinct()->get();
+        $categoryTxt_list = account::select('CategoryTxt')->distinct()->get();
         $classifications = Classification::where('archived',0)->get();
         return view('chartofaccounts.create')
             ->with('categorytxt2_list',$categorytxt2_list)
+            ->with('categoryTxt_list',$categoryTxt_list)
             ->with('parents',$parents)
             ->with('classifications',$classifications)
             ->with('acc_type',Request('acc_type'))
@@ -114,6 +116,7 @@ class AccountController extends Controller
                 'name'=>Request('name'),
                 'code'=>Request('code'),
                 'categorytxt2'=>Request('categorytxt2') ?? '',
+                'CategoryTxt'=>Request('CategoryTxt') ?? '',
                 'parent_id'=>Request('parent_id'),
                 'category_id'=>Request('category_id'),
                 'classification_id'=>Request('classification_id') ?? 1,
@@ -166,6 +169,7 @@ class AccountController extends Controller
         $parents = account::all();
         $categories = category::all();
         $categorytxt2_list = account::select('categorytxt2')->distinct()->get();
+        $categoryTxt_list = account::select('CategoryTxt')->distinct()->get();
         $classifications = Classification::where('archived',0)->get();
         return view('chartofaccounts.edit')
             ->with('account',$account)
@@ -174,6 +178,7 @@ class AccountController extends Controller
             ->with('categories',$categories)
             ->with('classifications',$classifications)
             ->with('categorytxt2_list',$categorytxt2_list)
+            ->with('categoryTxt_list',$categoryTxt_list)
             ;
     }
 
@@ -204,6 +209,7 @@ class AccountController extends Controller
                 'name' => Request('name')
                 ,'code' => Request('code')
                 ,'categorytxt2' => Request('categorytxt2')
+                ,'CategoryTxt' => Request('CategoryTxt')
                 ,'parent_id' => Request('parent_id')
                 ,'category_id' => Request('category_id')
                 ,'classification_id' => Request('classification_id') ?? 1

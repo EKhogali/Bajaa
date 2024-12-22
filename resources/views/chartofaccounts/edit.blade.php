@@ -98,6 +98,29 @@
                 </div>
             </div>
             @if(Request('acc_type') == 2)
+
+                <br>
+                <div class="container-fluid row ">
+                    <div class="col-6">
+                        <label for="categoryTxt_list" class="form-label">فئة الحساب التفصيلي</label>
+                        <input
+                            list="categoryTxt_list"
+                            name="CategoryTxt"
+                            id="CategoryTxt"
+                            class="form-control"
+                            value="{{ old('CategoryTxt', $account->CategoryTxt) }}"
+                        >
+                        <datalist id="categoryTxt_list">
+                            @foreach($categoryTxt_list as $CategoryTxt)
+                                <option value="{{$CategoryTxt->CategoryTxt}}" >{{ $CategoryTxt->CategoryTxt }}</option>
+                            @endforeach
+                        </datalist>
+                    </div>
+                </div>
+                <br>
+            @endif
+
+
                 <br>
                 <div class="container-fluid row ">
                     <div class="col-6">
@@ -106,7 +129,6 @@
                     </div>
                 </div>
                 <br>
-            @endif
             <div class="row ">
                 <div class="col"></div>
                 <div class="col-3">

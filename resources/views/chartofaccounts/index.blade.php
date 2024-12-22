@@ -1,7 +1,7 @@
 @extends('layout.master')
 @section('content')
     <!doctype html>
-<html lang="en">
+<html lang="ar">
 
 <body>
 <br>
@@ -24,7 +24,7 @@
                 @endif
 <br>
 <div class="container row">
-    <div class="container col-3">
+    <div class="container col-2">
         <div class="d-grid gap-2 col mx-auto">
 {{--            <button class="btn btn-secondary" type="button"><a href="$accounts/create">Add Category</a></button>--}}
             <a class="btn btn-primary" href="/accounts/create?acc_type={{Request('acc_type')}}" role="button">اضافة حساب</a>
@@ -44,7 +44,7 @@
             <button type="submit" name="filter" id="filter" class="btn btn-primary">بحث</button>
         </form>
     </div>
-    <div class="container col-9">
+    <div class="container col-10">
         <table class="table">
             <thead>
             <tr>
@@ -56,6 +56,7 @@
                 <th scope="col">تصنيف الحساب</th>
                 <th scope="col">تصنيف المشتريات</th>
                 <th scope="col">تصنيف الحساب</th>
+                <th scope="col">تقرير</th>
 {{--                <th scope="col">الحساب الرئيسي</th>--}}
                 <th scope="col" width="7%">تعديل</th>
                 <th scope="col" width="7%">الغاء</th>
@@ -82,6 +83,13 @@
 {{--                        @endif--}}
 {{--                    </th>--}}
 {{--                    <th scope="row">{{$account->parentR->name ?? ''}}</th>--}}
+                    <th scope="row">
+                        @if($account->show_in_daily_report == 1)
+                            اظهار
+                        @else
+                            /
+                        @endif
+                    </th>
                     <th scope="row"><a href="/accounts/{{$account->id}}/edit?acc_type={{Request('acc_type')}}" class="btn btn-warning">تعديل</a></th>
                     <th scope="row"><form method="post" class="delete_form" action="{{action('AccountController@destroy', $account->id)}}">
                             {{csrf_field()}}

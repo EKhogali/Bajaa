@@ -85,9 +85,14 @@
 {{--                        <th scope="row" width="4%">{{ $report['row_id'] }}</th>--}}
                         <th scope="row" width="4%">{{ $report['desc'] }}</th>
                         <th scope="row" width="4%">{{ $report['pct'] }}</th>
-                        <th scope="row" width="4%">{{ $report['sub-total'] }}</th>
-                        <th scope="row" width="4%">{{ $report['total'] }}</th>
-                        <th scope="row" width="4%">{{ $report['net-total'] }}</th>
+                        <th scope="row" width="4%">{{ number_format(floatval($report['sub-total']) ?? 0,2) == 0 ? '' : number_format(floatval($report['sub-total']) ?? 0,2) }}</th>
+                        <th scope="row" width="4%">{{ number_format(floatval($report['total']) ?? 0,2) == 0 ? '' : number_format(floatval($report['total']) ?? 0,2) }}</th>
+                        <th scope="row" width="4%">{{ number_format(floatval($report['net-total']) ?? 0,2) == 0 ? '' : number_format(floatval($report['net-total']) ?? 0,2) }}</th>
+{{--                        <th scope="row" width="4%">{{ number_format(floatval($report['sub-total']) ?? 0,2) }}</th>--}}
+{{--                        <th scope="row" width="4%">{{ number_format(floatval($report['total']) ?? 0,2) }}</th>--}}
+{{--                        <th scope="row" width="4%">{{ number_format(floatval($report['net-total']) ?? 0,2) }}</th>--}}
+{{--                        <th scope="row" width="4%">{{ $report['total'] }}</th>--}}
+{{--                        <th scope="row" width="4%">{{ $report['net-total'] }}</th>--}}
                     </tr>
 
                 @endforeach
