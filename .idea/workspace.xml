@@ -11,6 +11,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
+      <change afterPath="$PROJECT_DIR$/app/Department.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Employee.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Employee_constant_payroll_item.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/DepartmentController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeConstantPayrollItemController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/JobController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrolProccessing.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrollItemTypeController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrollTransactionController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Job.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Payroll_item_type.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Payroll_transaction.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/DepartmentFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/EmployeeConstantPayrollItemFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/EmployeeFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/JobFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/PayrollFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/PayrollItemTypeFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/PayrollTransactionFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183512_create_departments_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183832_create_jobs_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183906_create_employees_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183943_create_payroll_item_types_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_184020_create_payroll_transactions_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_29_212914_create_employee_constant_payroll_items_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/DepartmentSeeder.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/EmployeeConstantPayrollItemSeeder.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/EmployeeSeeder.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/JobSeeder.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/PayrollItemTypeSeeder.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/seeds/PayrollTransactionSeeder.php" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/create.blade.php" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/edit.blade.php" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/index.blade.php" afterDir="false" />
@@ -283,14 +315,7 @@
       <workItem from="1735055991447" duration="48000" />
       <workItem from="1735393998919" duration="14991000" />
       <workItem from="1735572854969" duration="21728000" />
-      <workItem from="1736016205899" duration="14685000" />
-    </task>
-    <task id="LOCAL-00096" summary="2024-09-03">
-      <created>1725313507959</created>
-      <option name="number" value="00096" />
-      <option name="presentableId" value="LOCAL-00096" />
-      <option name="project" value="LOCAL" />
-      <updated>1725313507959</updated>
+      <workItem from="1736016205899" duration="15190000" />
     </task>
     <task id="LOCAL-00097" summary="2024-09-03-4">
       <created>1725441148748</created>
@@ -628,7 +653,14 @@
       <option name="project" value="LOCAL" />
       <updated>1734889575165</updated>
     </task>
-    <option name="localTasksCounter" value="145" />
+    <task id="LOCAL-00145" summary="2025-01-07-first payroll push">
+      <created>1736233964644</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1736233964647</updated>
+    </task>
+    <option name="localTasksCounter" value="146" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -647,7 +679,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-25" />
     <MESSAGE value="2024-07-26" />
     <MESSAGE value="2024-07-27" />
     <MESSAGE value="2024-07-31" />
@@ -672,7 +703,8 @@
     <MESSAGE value="2024-12-02" />
     <MESSAGE value="2024-12-05" />
     <MESSAGE value="2024-12-22-finshing daily report" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-12-22-finshing daily report" />
+    <MESSAGE value="2025-01-07-first payroll push" />
+    <option name="LAST_COMMIT_MESSAGE" value="2025-01-07-first payroll push" />
   </component>
   <component name="WindowStateProjectService">
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1736018813305">
@@ -680,10 +712,10 @@
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1735577114296" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1736018813305" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1734889581485">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1736233969426">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728737645970" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1734889581485" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1736233969426" />
   </component>
 </project>
