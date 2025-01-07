@@ -1,6 +1,8 @@
 <?php
 
 use App\estimated_expense;
+use App\Http\Controllers\JournalmController;
+use App\Http\Controllers\PayrolProccessing;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 
@@ -55,6 +57,19 @@ Route::resource('/users', 'UserController');
 Route::resource('/treasury_transaction', 'TreasuryTransactionController');
 Route::resource('/treasury_transaction_details', 'TreasuryTransactionDetailController');
 Route::resource('/estimated_expense', 'EstimatedExpenseController');
+//payroll
+Route::resource('/employees', 'EmployeeController');
+Route::resource('/jobs', 'JobController');
+Route::resource('/departments', 'DepartmentController');
+Route::resource('/payroll_item_type', 'PayrollItemTypeController');
+Route::resource('/employee_constant_payroll_items', 'EmployeeConstantPayrollItemController');
+Route::resource('/payroll_transaction', 'PayrollTransactionController');
+//Route::resource('/payroll.generate', 'PayrolProccessing');
+Route::get('/payroll.generate', [PayrolProccessing::class,'generateMonthlyPayroll'])->name('payroll.generate');
+//Route::get('/payroll.printAll', [PayrolProccessing::class,'printAll'])->name('payroll.printAll');
+//Route::get('/payroll.showSlip', [PayrolProccessing::class,'showSlip'])->name('payroll.showSlip');
+Route::get('/payroll/slip/{employee_id}/{year}/{month}', [PayrolProccessing::class, 'showSlip'])->name('payroll.showSlip');
+Route::get('/payroll/printAll/{year}/{month}', [PayrolProccessing::class, 'printAll'])->name('payroll.printAll');
 
 Route::get('treasury_transaction/{id}/print', [\App\Http\Controllers\TreasuryTransactionController::class, 'print'])->name('treasury_transaction.print');
 Route::get('treasury_transaction__details_print/{id}/print', [\App\Http\Controllers\TreasuryTransactionDetailController::class, 'print'])->name('treasury_transaction__details_print');

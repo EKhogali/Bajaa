@@ -74,6 +74,20 @@
                             <li><a class="dropdown-item" href="/estimated_expense?transaction_type_id={{1}}">المصروفات الإدارية التقديرية</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                         المرتبات
+                    </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/jobs">الوظائف</a></li>
+                            <li><a class="dropdown-item" href="/departments">الوحدات الادارية</a></li>
+                            <li><a class="dropdown-item" href="/payroll_item_type">مفردات الراتب</a></li>
+                            <li><a class="dropdown-item" href="/employees">بيانات الموظفون</a></li>
+                            <li><a class="dropdown-item" href="/payroll_transaction">الحركة الشهرية</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/payroll.generate">مرتبات الشهر</a></li>
+                        </ul>
+                    </li>
                     @if(auth()->id() == 1 or auth()->id() == 2)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

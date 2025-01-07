@@ -11,13 +11,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/show.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/jobs/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/jobs/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/jobs/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_items/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_items/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_items/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_transactions/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_transactions/edit.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_transactions/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payslip.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/payroll/print_all_payslips.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AccountController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/edit.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/chartofaccounts/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/rep/daily_report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rep/daily_report.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +155,9 @@
     </include_path>
   </component>
   <component name="ProjectId" id="23xMsAcUDdMbDwWcQWCIf2xGwVU" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -148,18 +165,18 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/rep" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/payroll" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\payroll" />
+      <recent name="C:\wamp64\www\Accounting-Online\resources\views\payroll\employees" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\rep" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views" />
       <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\estimated_expense" />
-      <recent name="C:\wamp64\www\Accounting-Online\resources\views\trans\treasury_transaction\treasury_transaction_details" />
-      <recent name="C:\wamp64\www\Accounting-Online\resources\views\sys" />
     </key>
   </component>
   <component name="RunManager" selected="PHPUnit.phpunit.xml">
@@ -262,14 +279,11 @@
       <workItem from="1733425255883" duration="10953000" />
       <workItem from="1733854603953" duration="592000" />
       <workItem from="1734070079168" duration="586000" />
-      <workItem from="1734885051236" duration="4134000" />
-    </task>
-    <task id="LOCAL-00095" summary="2024-09-03">
-      <created>1725313252262</created>
-      <option name="number" value="00095" />
-      <option name="presentableId" value="LOCAL-00095" />
-      <option name="project" value="LOCAL" />
-      <updated>1725313252263</updated>
+      <workItem from="1734885051236" duration="10213000" />
+      <workItem from="1735055991447" duration="48000" />
+      <workItem from="1735393998919" duration="14991000" />
+      <workItem from="1735572854969" duration="21728000" />
+      <workItem from="1736016205899" duration="14685000" />
     </task>
     <task id="LOCAL-00096" summary="2024-09-03">
       <created>1725313507959</created>
@@ -607,7 +621,14 @@
       <option name="project" value="LOCAL" />
       <updated>1733430959967</updated>
     </task>
-    <option name="localTasksCounter" value="144" />
+    <task id="LOCAL-00144" summary="2024-12-22-finshing daily report'">
+      <created>1734889575164</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1734889575165</updated>
+    </task>
+    <option name="localTasksCounter" value="145" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -626,7 +647,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-23" />
     <MESSAGE value="2024-07-25" />
     <MESSAGE value="2024-07-26" />
     <MESSAGE value="2024-07-27" />
@@ -651,18 +671,19 @@
     <MESSAGE value="2024-10-11" />
     <MESSAGE value="2024-12-02" />
     <MESSAGE value="2024-12-05" />
-    <option name="LAST_COMMIT_MESSAGE" value="2024-12-05" />
+    <MESSAGE value="2024-12-22-finshing daily report" />
+    <option name="LAST_COMMIT_MESSAGE" value="2024-12-22-finshing daily report" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1732538637110">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1736018813305">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1727248260837" />
-    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1732538637110" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1733430964460">
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1735577114296" />
+    <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1736018813305" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1734889581485">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728737645970" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1733430964460" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1734889581485" />
   </component>
 </project>
