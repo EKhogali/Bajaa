@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Department;
 use App\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,16 +12,28 @@ class PayrolProccessing extends Controller
 {
     public function generateMonthlyPayroll(Request $request)
     {
-        $year = $request->year ?? now()->year;
-        $month = $request->month ?? now()->month;
+//        $year = $request->year ?? now()->year;
+//        $month = $request->month ?? now()->month;
+        $month = $request->input('month', now()->format('Y-m')); // Default to the current month
+        $year = date('Y', strtotime($month));
+        $month = date('m', strtotime($month));
 
-        // Fetch active employees with their job and department details
+
         $employees = Employee::with(['job', 'department'])
             ->whereHas('department', function ($query) {
                 $query->where('company_id', session('company_id'));
             })
             ->where('archived', 0)
             ->get();
+        if ($request->filled('department')) {
+            $employees = Employee::with(['job', 'department'])
+                ->whereHas('department', function ($query) {
+                    $query->where('company_id', session('company_id'));
+                })
+                ->where('archived', 0)
+                ->where('department_id', $request->input('department'))
+                ->get();
+        }
 
         // Fetch constant additions and deductions
         $constAdditions = DB::table('employee_constant_payroll_items as c')
@@ -91,10 +104,12 @@ class PayrolProccessing extends Controller
         });
 
 
+        $departments = Department::all();
         return view('payroll.payroll', [
             'payrollData' => $payrollData,
             'year' => $year,
             'month' => $month,
+            'departments' => $departments,
         ]);
     }
 
@@ -105,39 +120,74 @@ class PayrolProccessing extends Controller
         $year = $request->year ?? now()->year;
         $month = $request->month ?? now()->month;
 
-        // Fetch employees and their related payroll data
-        $employees = Employee::with(['job', 'department', 'constantPayrollItems', 'payrollTransactions' => function ($query) use ($year, $month) {
-            $query->where('year', $year)->where('month', $month);
-        }])->get();
+        $employees = Employee::where('company_id',\session()->get('company_id'))
+            ->where('archived',0)
+            ->get();
+        foreach ($employees as $employee){
+            $constantAdditions = DB::table('employee_constant_payroll_items as ec')
+                ->leftJoin('payroll_item_types as pit','pit.id','ec.payroll_item_type_id')
+                ->where('ec.employee_id',$employee->id)
+                ->where('pit.type',0)
+                ->where('pit.archived',0)
+                ->get();
 
-        $payrollData = $employees->map(function ($employee) use ($month, $year) {
-            $additions = $employee->constantPayrollItems->where('type', 0)->sum('amount')
-                + $employee->payrollTransactions->where('payroll_item_type_id', 0)->sum('amount');
-            $deductions = $employee->constantPayrollItems->where('type', 1)->sum('amount')
-                + $employee->payrollTransactions->where('payroll_item_type_id', 1)->sum('amount');
-            $dueAmount = $employee->basic_salary + $additions - $deductions;
+            $constantDeductions = DB::table('employee_constant_payroll_items as ec')
+                ->leftJoin('payroll_item_types as pit','pit.id','ec.payroll_item_type_id')
+                ->where('ec.employee_id',$employee->id)
+                ->where('pit.type',1)
+                ->where('pit.archived',0)
+                ->get();
 
-            return [
+            $changedAdditions = DB::table('payroll_transactions as t')
+                ->leftJoin('payroll_item_types as pit','pit.id','t.payroll_item_type_id')
+                ->where('t.employee_id',$employee->id)
+                ->where('pit.type',0)
+                ->where('pit.archived',0)
+                ->get();
+
+            $changedDeductions = DB::table('payroll_transactions as t')
+                ->leftJoin('payroll_item_types as pit','pit.id','t.payroll_item_type_id')
+                ->where('t.employee_id',$employee->id)
+                ->where('pit.type',1)
+                ->where('pit.archived',0)
+                ->get();
+
+            // Calculate totals for additions and deductions
+            $totalConstantAdditions = $constantAdditions->sum('amount');
+            $totalChangedAdditions = $changedAdditions->sum('amount');
+            $totalConstantDeductions = $constantDeductions->sum('amount');
+            $totalChangedDeductions = $changedDeductions->sum('amount');
+            $dueAmount = $employee->basic_salary + $totalConstantAdditions + $totalChangedAdditions
+                - $totalConstantDeductions - $totalChangedDeductions;
+
+            $payrollData = [
                 'code' => $employee->code,
                 'name' => $employee->name,
                 'job' => $employee->job->name,
                 'department' => $employee->department->name,
                 'basic_salary' => $employee->basic_salary,
-                'additions' => $additions,
-                'deductions' => $deductions,
+                'const_additions' => $totalConstantAdditions,
+                'changed_additions' => $totalChangedAdditions,
+                'const_deductions' => $totalConstantDeductions,
+                'changed_deductions' => $totalChangedDeductions,
                 'due_amount' => $dueAmount,
                 'employee_id' => $employee->id,
                 'year' => $year,
                 'month' => $month,
             ];
-        });
-//        dd($payrollData,$employees,$year,$month);
-        return view('payroll.payroll', compact('payrollData', 'year', 'month'));
+        }
+
+
+        dd($departments);
+        $departments = Department::all();
+        return view('payroll.payroll', compact('payrollData', 'year', 'month'))
+            ->with('departments',$departments);
     }
 
 
     public function showSlip($employee_id, $year, $month)
     {
+        $month = date('m', strtotime($month));
         $employee = Employee::with([
             'job',
             'department',
@@ -146,10 +196,37 @@ class PayrolProccessing extends Controller
         ])->findOrFail($employee_id);
 
         // Group additions and deductions
-        $constantAdditions = $employee->constantPayrollItems->where('type', 0);
-        $constantDeductions = $employee->constantPayrollItems->where('type', 1);
-        $changedAdditions = $employee->payrollTransactions->where('type', 0);
-        $changedDeductions = $employee->payrollTransactions->where('type', 1);
+//        $constantAdditions = $employee->constantPayrollItems->where('type', 0);
+        $constantAdditions = DB::table('employee_constant_payroll_items as ec')
+            ->leftJoin('payroll_item_types as pit','pit.id','ec.payroll_item_type_id')
+            ->where('ec.employee_id',$employee_id)
+            ->where('pit.type',0)
+            ->where('pit.archived',0)
+            ->get();
+
+//        $constantDeductions = $employee->constantPayrollItems->where('type', 1);
+        $constantDeductions = DB::table('employee_constant_payroll_items as ec')
+            ->leftJoin('payroll_item_types as pit','pit.id','ec.payroll_item_type_id')
+            ->where('ec.employee_id',$employee_id)
+            ->where('pit.type',1)
+            ->where('pit.archived',0)
+            ->get();
+
+//        $changedAdditions = $employee->payrollTransactions->where('type', 0);
+        $changedAdditions = DB::table('payroll_transactions as t')
+            ->leftJoin('payroll_item_types as pit','pit.id','t.payroll_item_type_id')
+            ->where('t.employee_id',$employee_id)
+            ->where('pit.type',0)
+            ->where('pit.archived',0)
+            ->get();
+
+//        $changedDeductions = $employee->payrollTransactions->where('type', 1);
+        $changedDeductions = DB::table('payroll_transactions as t')
+            ->leftJoin('payroll_item_types as pit','pit.id','t.payroll_item_type_id')
+            ->where('t.employee_id',$employee_id)
+            ->where('pit.type',1)
+            ->where('pit.archived',0)
+            ->get();
 
         // Calculate totals for additions and deductions
         $totalConstantAdditions = $constantAdditions->sum('amount');

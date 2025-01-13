@@ -11,60 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change afterPath="$PROJECT_DIR$/app/Department.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Employee.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Employee_constant_payroll_item.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/DepartmentController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeConstantPayrollItemController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/JobController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrolProccessing.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrollItemTypeController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrollTransactionController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Job.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Payroll_item_type.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Payroll_transaction.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/DepartmentFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/EmployeeConstantPayrollItemFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/EmployeeFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/JobFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/PayrollFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/PayrollItemTypeFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/PayrollTransactionFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183512_create_departments_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183832_create_jobs_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183906_create_employees_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_183943_create_payroll_item_types_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_22_184020_create_payroll_transactions_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2024_12_29_212914_create_employee_constant_payroll_items_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/DepartmentSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/EmployeeConstantPayrollItemSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/EmployeeSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/JobSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/PayrollItemTypeSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/PayrollTransactionSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/departments/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/employees/show.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/jobs/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/jobs/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/jobs/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_items/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_items/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_items/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_transactions/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_transactions/edit.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payroll_transactions/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/payslip.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/payroll/print_all_payslips.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PayrolProccessing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PayrolProccessing.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/payroll/employees/edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/payroll/employees/edit.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/payroll/employees/show.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/payroll/employees/show.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/payroll/payroll.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/payroll/payroll.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/payroll/payslip.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/payroll/payslip.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -315,14 +268,8 @@
       <workItem from="1735055991447" duration="48000" />
       <workItem from="1735393998919" duration="14991000" />
       <workItem from="1735572854969" duration="21728000" />
-      <workItem from="1736016205899" duration="15190000" />
-    </task>
-    <task id="LOCAL-00097" summary="2024-09-03-4">
-      <created>1725441148748</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1725441148748</updated>
+      <workItem from="1736016205899" duration="16107000" />
+      <workItem from="1736713054111" duration="12127000" />
     </task>
     <task id="LOCAL-00098" summary="2024-09-04">
       <created>1725468427337</created>
@@ -660,7 +607,14 @@
       <option name="project" value="LOCAL" />
       <updated>1736233964647</updated>
     </task>
-    <option name="localTasksCounter" value="146" />
+    <task id="LOCAL-00146" summary="2025-01-07-first payroll push">
+      <created>1736234216893</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1736234216893</updated>
+    </task>
+    <option name="localTasksCounter" value="147" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -712,10 +666,10 @@
     </state>
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1735577114296" />
     <state x="499" y="172" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.834@0.0.1536.834" timestamp="1736018813305" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1736233969426">
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2" timestamp="1736234218367">
       <screen x="0" y="0" width="1536" height="834" />
     </state>
     <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834/1920.0.1920.1050@0.0.1536.834" timestamp="1728737645970" />
-    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1736233969426" />
+    <state x="361" y="137" key="Vcs.Push.Dialog.v2/0.0.1536.834@0.0.1536.834" timestamp="1736234218367" />
   </component>
 </project>

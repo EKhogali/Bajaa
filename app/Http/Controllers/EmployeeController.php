@@ -104,7 +104,10 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
-        //
+        $departments = Department::all();
+        $jobs = Job::all();
+
+        return view('payroll.employees.edit', compact('employee', 'departments', 'jobs'));
     }
 
     /**
@@ -116,7 +119,24 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, Employee $employee)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $employee->update([
+            'name' => $request->name,
+            'basic_salary' => $request->basic_salary ?? 0,
+            'job_id' => $request->job_id,
+            'department_id' => $request->department_id,
+            'gender' => $request->gender,
+            'dob' => $request->dob,
+            'hire_date' => $request->hire_date,
+            'marital_state_id' => $request->marital_state_id,
+            'archived' => $request->archived,
+            'updated_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
 
     /**

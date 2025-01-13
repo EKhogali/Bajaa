@@ -13,12 +13,12 @@
                     <input type="text" class="form-control" id="name" name="name" value="{{ $employee->name }}" required>
                 </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-2">
-                    <label for="code" class="form-label">الرمز</label>
-                    <input type="text" class="form-control" id="code" name="code" value="{{ $employee->code }}" required>
-                </div>
-            </div>
+{{--            <div class="row mb-3">--}}
+{{--                <div class="col-md-2">--}}
+{{--                    <label for="code" class="form-label">الرمز</label>--}}
+{{--                    <input type="text" class="form-control" id="code" name="code" value="{{ $employee->code }}" required>--}}
+{{--                </div>--}}
+{{--            </div>--}}
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="job_id" class="form-label">الوظيفة</label>

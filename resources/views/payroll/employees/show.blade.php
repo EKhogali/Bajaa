@@ -94,13 +94,6 @@
                             <label for="amount" class="form-label">المبلغ</label>
                             <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="type" class="form-label">النوع</label>
-                            <select class="form-select" id="type" name="type">
-                                <option value="0" selected>زيادة</option>
-                                <option value="1">خصم</option>
-                            </select>
-                        </div>
                         <input type="hidden" name="employee_id" value="{{ $employee->id }}">
                     </div>
                     <div class="modal-footer">
