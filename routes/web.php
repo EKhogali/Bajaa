@@ -64,6 +64,18 @@ Route::resource('/departments', 'DepartmentController');
 Route::resource('/payroll_item_type', 'PayrollItemTypeController');
 Route::resource('/employee_constant_payroll_items', 'EmployeeConstantPayrollItemController');
 Route::resource('/payroll_transaction', 'PayrollTransactionController');
+Route::resource('/loan_headers', 'LoanHeaderController');
+Route::resource('/loan_details', 'LoanDetailController');
+//Route::resource('/loan_details.generate', 'LoanDetailController.generate')->name('loan_details.generate');
+Route::post('/loan_details.generate', 'LoanDetailController@generate')->name('loan_details.generate');
+//Route::post('/loans/generate', [LoanController::class, 'generate'])->name('loan_details.generate');
+
+
+
+
+
+
+
 //Route::resource('/payroll.generate', 'PayrolProccessing');
 Route::get('/payroll.generate', [PayrolProccessing::class,'generateMonthlyPayroll'])->name('payroll.generate');
 //Route::get('/payroll.printAll', [PayrolProccessing::class,'printAll'])->name('payroll.printAll');

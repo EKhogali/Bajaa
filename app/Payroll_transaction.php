@@ -10,6 +10,10 @@ class Payroll_transaction extends Model
         'notes','year', 'month', 'amount', 'company_id', 'employee_id', 'payroll_item_type_id', 'archived', 'created_by', 'updated_by'
     ];
 
+    public static function where(string $string, $id)
+    {
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Department;
 use App\Employee;
+use App\Employee_constant_payroll_item;
 use App\Job;
 use App\Payroll_item_type;
+use App\Payroll_transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -147,6 +149,29 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        //
+        try {
+
+            if(
+            \DB::table('payroll_transactions')->where('employee_id',$employee->id)->doesntExist() &&
+            \DB::table('employee_constant_payroll_items')->where('employee_id',$employee->id)->doesntExist()
+            ){
+
+                \DB::table('employees')->where('id',$employee->id)->delete();
+                $msg = 'تمت العملية بنجاح';
+                session::put('msgtype','success') ;
+            }else {
+                $msg = 'عفواً، لا يمكن اجراء عملية الالغاء لارتباط العنصر ببيانات اخرى';
+                session::put('msgtype','notsuccess') ;
+            }
+
+            return back()->with('message', $msg);
+
+
+        } catch (ModelNotFoundException $e) {
+            return back()->with('message', $msg);
+        } catch (\Exception $e) {
+            return back()->with('message', $msg);
+        }
+
     }
 }

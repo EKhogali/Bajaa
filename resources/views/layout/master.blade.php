@@ -86,6 +86,8 @@
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/employees">بيانات الموظفون</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/loan_headers">السُّلــــــف</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/payroll_transaction">الحركة الشهرية</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/payroll.generate">مرتبات الشهر</a></li>

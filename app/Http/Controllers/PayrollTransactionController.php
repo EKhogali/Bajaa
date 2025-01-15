@@ -20,9 +20,9 @@ class PayrollTransactionController extends Controller
         $monthYear = request()->query('month', now()->format('Y-m'));
         [$year, $month] = explode('-', $monthYear);
 
-        $transactions = Payroll_transaction::where('year', $year)
+        $transactions = Payroll_transaction::with(['employee', 'company', 'payrollItemType'])
+            ->where('year', $year)
             ->where('month', $month)
-            ->with(['employee', 'company', 'payrollItemType'])
             ->get();
 
         return view('payroll.payroll_transactions.index', compact('transactions'));
