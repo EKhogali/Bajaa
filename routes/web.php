@@ -88,6 +88,7 @@ Route::get('treasury_transaction__details_print/{id}/print', [\App\Http\Controll
 
 Route::get('/journaldd/{id}', [JournalmController::class,'show']);
 Route::get('/income_report', [ReportController::class, 'income_report']);
+Route::get('/income_report2', [\App\Http\Controllers\IncomReportController::class, 'income_report2']);
 Route::get('/estimated_expense_report', [ReportController::class, 'estimated_expense_report']);
 Route::get('/pulled_from_net_income_report', [ReportController::class, 'pulled_from_net_income_report']);
 Route::get('/category_percentage_report', [\App\Http\Controllers\CategoryPercentageReportController::class, 'category_percentage_report']);

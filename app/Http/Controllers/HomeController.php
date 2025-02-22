@@ -54,8 +54,17 @@ class homeController extends Controller
 
         $companyRec = $companies->first();
         $financial_yearRec = $financial_years->first();
-        session::put('company_name',$companyRec->name);
-        session::put('financial_year',$financial_yearRec->year);
+//        session::put('company_name',$companyRec->name);
+//        session::put('financial_year',$financial_yearRec->year);
+
+        if ($companyRec && $financial_yearRec) {
+            Session::put('company_name', $companyRec->name);
+            Session::put('financial_year', $financial_yearRec->year);
+        } else {
+            // Handle the null case gracefully
+//            dd('Company or financial year not found!');
+        }
+
 
         return view('home/home',[
             'companyRec' => $companyRec

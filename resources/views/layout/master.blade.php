@@ -105,6 +105,8 @@
     {{--                        <li><a class="dropdown-item" href="/tr_index">ميزان المراجعـــة</a></li>--}}
                             <li><a class="dropdown-item" href="/income_report">تقرير الدخل</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/income_report2">تقرير الدخل2</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/estimated_expense_report">تقرير الدخل التقديري</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/treasury_report">تقرير الخزينة</a></li>
