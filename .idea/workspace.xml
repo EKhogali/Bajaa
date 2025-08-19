@@ -13,16 +13,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2024-07-16">
-      <change afterPath="$PROJECT_DIR$/resources/views/rep/income_report2.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Accounting-Online.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Accounting-Online.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="ab13d80d-f754-4569-8f30-4d076f3edfdd" name="Default Changelist" comment="2025-02-23">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layout/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layout/master.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IncomReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IncomReportController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -304,7 +297,7 @@
       <workItem from="1736016205899" duration="16107000" />
       <workItem from="1736713054111" duration="33298000" />
       <workItem from="1739996521589" duration="3126000" />
-      <workItem from="1740223190397" duration="8603000" />
+      <workItem from="1740223190397" duration="17217000" />
     </task>
     <task id="LOCAL-00099" summary="2024-09-04">
       <created>1725469453648</created>
@@ -649,7 +642,7 @@
       <option name="project" value="LOCAL" />
       <updated>1736728765775</updated>
     </task>
-    <option name="localTasksCounter" value="148" />
+    <option name="localTasksCounter" value="149" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -667,7 +660,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="2024-07-27" />
     <MESSAGE value="2024-07-31" />
     <MESSAGE value="2024-08-01" />
     <MESSAGE value="2024-08-01-night" />
@@ -692,6 +684,7 @@
     <MESSAGE value="2024-12-22-finshing daily report" />
     <MESSAGE value="2025-01-07-first payroll push" />
     <MESSAGE value="2025-01-13" />
-    <option name="LAST_COMMIT_MESSAGE" value="2025-01-13" />
+    <MESSAGE value="2025-02-23" />
+    <option name="LAST_COMMIT_MESSAGE" value="2025-02-23" />
   </component>
 </project>
