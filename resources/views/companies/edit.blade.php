@@ -51,6 +51,20 @@
             <br>
             <div class="container-fluid row ">
                 <div class="col-6">
+                    <label for="tel" class="form-label">الايجار اليومي التقديري</label>
+                    <input type="text" value="{{$company->daily_rent_amount}}" class="form-control" id="daily_rent_amount" name="daily_rent_amount">
+                </div>
+            </div>
+            <br>
+            <div class="container-fluid row ">
+                <div class="col-6">
+                    <label for="tel" class="form-label">المرتبات اليومية التقديرية</label>
+                    <input type="text" value="{{$company->daily_salary_amount}}" class="form-control" id="daily_salary_amount" name="daily_salary_amount">
+                </div>
+            </div>
+            <br>
+            <div class="container-fluid row ">
+                <div class="col-6">
                     <label for="tel" class="form-label">المستخدم</label>
                     <select name="user_id"  class="form-control" >
                         @foreach($users as $user)

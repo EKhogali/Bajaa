@@ -27,6 +27,8 @@
                         <th scope="col">اسم الشركة</th>
                         <th scope="col">العنوان</th>
                         <th scope="col">الهاتف</th>
+                        <th scope="col">الايجار اليومي التقديري</th>
+                        <th scope="col">المرتبات اليومية التقديرية</th>
                         <th scope="col">الحالة</th>
                         <th scope="col">المستخدم</th>
                         <th scope="col">تعديل</th>
@@ -44,6 +46,8 @@
                             </th>
                             <th scope="row">{{$company->address ?? ''}}</th>
                             <th scope="row">{{$company->tel ?? ''}}</th>
+                            <th scope="row">{{$company->daily_rent_amount ?? ''}}</th>
+                            <th scope="row">{{$company->daily_salary_amount ?? ''}}</th>
                             <th scope="row">
                                 @if($company->active == 1)
                                     Active

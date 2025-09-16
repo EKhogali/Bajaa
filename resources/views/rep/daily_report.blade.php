@@ -35,8 +35,14 @@
                 <br><br>
 
                 <div class="col-12">
-                    <label for="date" class="form-label"><strong>اليوم:</strong></label>
+                    <label for="date" class="form-label"><strong>من:</strong></label>
                     <input type="date" value="{{request()->has('date') ? Request('date') : \Carbon\Carbon::now()->startOfDay('')}}" class="form-control" id="date" name="date">
+                </div>
+                <br><br>
+
+                <div class="col-12">
+                    <label for="date" class="form-label"><strong>الى:</strong></label>
+                    <input type="date" value="{{request()->has('date') ? Request('date2') : \Carbon\Carbon::now()->startOfDay('')}}" class="form-control" id="date" name="date2">
                 </div>
             </div>
             <br>
@@ -59,7 +65,7 @@
                 <br>
                 <h4>التقرير اليومي</h4>
                 <br>
-                <h5>اليــــوم: {{ request()->get('date') ?? '' }}</h5>
+                <h5>اليــــوم من: {{ request()->get('date') ?? '' }} إلى {{ request()->get('date2') ?? '' }}</h5>
                 <br>
             </div>
         </div>
@@ -80,19 +86,13 @@
                 @endphp
                 @foreach($data_arr as $report)
                     @php $counter +=1; @endphp
-                    <tr style="{{ in_array($report['row_id'], [1, 4, 5]) ? 'background-color: #e0e0e0; font-weight: bold; text-decoration: underline;' : '' }}">
+                    <tr style="{{ in_array($report['row_id'], [1,6,8,7]) ? 'background-color: #e0e0e0; font-weight: bold; text-decoration: underline;' : '' }}">
                         <th scope="row" width="4%">{{ $counter }}</th>
-{{--                        <th scope="row" width="4%">{{ $report['row_id'] }}</th>--}}
                         <th scope="row" width="4%">{{ $report['desc'] }}</th>
                         <th scope="row" width="4%">{{ $report['pct'] }}</th>
                         <th scope="row" width="4%">{{ number_format(floatval($report['sub-total']) ?? 0,2) == 0 ? '' : number_format(floatval($report['sub-total']) ?? 0,2) }}</th>
                         <th scope="row" width="4%">{{ number_format(floatval($report['total']) ?? 0,2) == 0 ? '' : number_format(floatval($report['total']) ?? 0,2) }}</th>
                         <th scope="row" width="4%">{{ number_format(floatval($report['net-total']) ?? 0,2) == 0 ? '' : number_format(floatval($report['net-total']) ?? 0,2) }}</th>
-{{--                        <th scope="row" width="4%">{{ number_format(floatval($report['sub-total']) ?? 0,2) }}</th>--}}
-{{--                        <th scope="row" width="4%">{{ number_format(floatval($report['total']) ?? 0,2) }}</th>--}}
-{{--                        <th scope="row" width="4%">{{ number_format(floatval($report['net-total']) ?? 0,2) }}</th>--}}
-{{--                        <th scope="row" width="4%">{{ $report['total'] }}</th>--}}
-{{--                        <th scope="row" width="4%">{{ $report['net-total'] }}</th>--}}
                     </tr>
 
                 @endforeach

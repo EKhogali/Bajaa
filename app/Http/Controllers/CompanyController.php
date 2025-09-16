@@ -68,6 +68,8 @@ class CompanyController extends Controller
                 'name' => request('name'),
                 'address' => request('address') ?? '',
                 'tel' => request('tel') ?? '',
+                'daily_rent_amount' => request('daily_rent_amount') ?? 0,
+                'daily_salary_amount' => request('daily_salary_amount') ?? 0,
                 'active' => 1,
                 'user_id' => request('user_id'),
                 'created_by' => auth()->id(),
@@ -152,6 +154,8 @@ class CompanyController extends Controller
                 'name' => Request('name')
                 ,'address' => Request('address') ?? ''
                 ,'tel' => Request('tel') ?? ''
+                ,'daily_rent_amount' => Request('daily_rent_amount') ?? 0
+                ,'daily_salary_amount' => Request('daily_salary_amount') ?? 0
                 ,'user_id' => Request('user_id') ?? ''
             ]);
         return redirect('/companies');
