@@ -2951,7 +2951,7 @@ class ReportController extends Controller
         $data_arr[] = [
             'row_id' => $row_id,
             "desc" => 'المصروف التقديري للايجارات',
-            "pct" => number_format((($daily_rent_amount / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+            "pct" => number_format((($daily_rent_amount / ($total_sales ?? -1) ?? -1) * 100) ?? 0, 2) . '%',
             //                "pct"=>($expense->total/100) * $total_sales,
             "sub-total" => $daily_rent_amount,
             "total" => "",
