@@ -2971,8 +2971,14 @@ class ReportController extends Controller
         $data_arr[] = [
             'row_id' => $row_id,
             "desc" => 'المصروف التقديري للمرتبات',
-            "pct" => number_format((($daily_salary_amount / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+            // "pct" => number_format((($daily_salary_amount / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
             //                "pct"=>($expense->total/100) * $total_sales,
+
+            "pct" => number_format(
+                ($total_sales > 0 ? ($daily_salary_amount / $total_sales) * 100 : 0),
+                2
+            ) . '%',
+
             "sub-total" => $daily_salary_amount,
             "total" => "",
             "net-total" => "",
