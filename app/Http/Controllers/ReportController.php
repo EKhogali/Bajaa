@@ -2931,6 +2931,7 @@ class ReportController extends Controller
             ->groupby('c.name', 'a.name')
             ->select('c.name as classification', 'a.name as account_name', DB::raw('SUM(t.amount) as total'))->get();
 
+            $totalexpense = $expenses->sum('total') ;//dd($expenses,$totalexpense);
         $row_id += 1;
         foreach ($expenses as $expense) {
             $data_arr[] = [
@@ -2944,9 +2945,52 @@ class ReportController extends Controller
             ];
         }
 
+
+        $expenses_details = DB::table('treasury_transaction_details as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->leftJoin('treasury_transactions as mastertbl', 'mastertbl.id', 't.master_id')
+            ->leftJoin('classifications as c', 'c.id', 'a.classification_id')
+            ->where('mastertbl.transaction_type_id', 1)
+            ->where('mastertbl.company_id', $companyId)
+            ->where('mastertbl.financial_year', $financialYear)
+            ->where('mastertbl.archived', 0)
+            ->where('c.show_in_daily_report', 1)
+            ->where('a.show_in_daily_report', 1)
+            ->whereNotIn('t.account_id', [41, 55, 64, 108, 165, 256, 259]) // استبعاد حسابات الخزينة والبنك
+            ->whereBetween('mastertbl.date', [$date, $date2])
+            ->groupby( 'a.name')
+            ->select( 'a.name as account_name', DB::raw('SUM(t.amount) as total'))->get();
+
+        $row_id += 1;
+        $expenses_details_total = 0;
+        foreach ($expenses_details as $expense) {
+            $expenses_details_total += $expense->total;
+            $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" => '   --| ' . $expense->account_name,
+                "pct" => number_format((($expense->total / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+                //                "pct"=>($expense->total/100) * $total_sales,
+                "sub-total" => $expense->total,
+                "total" => "",
+                "net-total" => "",
+            ];
+        }
+// dd( $expenses_details_total);
+        $row_id += 1;
+        // $expenses_details_total = $expenses_details->sum('total');
+        $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" =>  'اجمالي تفاصيل المصروفات',
+                "pct" => '',
+                "sub-total" => 0,
+                "total" =>  $expenses_details_total,
+                "net-total" => "",
+            ];
+
+    $days = Carbon::parse($date)->diffInDays(Carbon::parse($date2)) + 1;
         $daily_rent_amount = db::table('companies')
             ->where('id', $companyId)
-            ->value('daily_rent_amount') ?? 0;
+            ->value('daily_rent_amount') ?? -1;
         $row_id += 1;
         $data_arr[] = [
             'row_id' => $row_id,
@@ -2954,12 +2998,12 @@ class ReportController extends Controller
             // "pct" => number_format((($daily_rent_amount / ($total_sales ?? -1) ?? -1) * 100) ?? 0, 2) . '%',
             //                "pct"=>($expense->total/100) * $total_sales,
             "pct" => number_format(
-                ($total_sales > 0 ? ($daily_rent_amount / $total_sales) * 100 : 0),
+                ($total_sales > 0 ? (($daily_rent_amount  * $days) / $total_sales) * 100 : 0),
                 2
             ) . '%',
 
 
-            "sub-total" => $daily_rent_amount,
+            "sub-total" => $daily_rent_amount * $days,
             "total" => "",
             "net-total" => "",
         ];
@@ -2975,18 +3019,18 @@ class ReportController extends Controller
             //                "pct"=>($expense->total/100) * $total_sales,
 
             "pct" => number_format(
-                ($total_sales > 0 ? ($daily_salary_amount / $total_sales) * 100 : 0),
+                ($total_sales > 0 ? (($daily_salary_amount * $days) / $total_sales) * 100 : 0),
                 2
             ) . '%',
 
-            "sub-total" => $daily_salary_amount,
+            "sub-total" => $daily_salary_amount * $days,
             "total" => "",
             "net-total" => "",
         ];
 
 
 
-        $totalexpense = $expenses->sum('total') ;
+        
         $row_id += 1;
         $data_arr[] = [
             'row_id' => $row_id,
@@ -3004,7 +3048,7 @@ class ReportController extends Controller
             "desc" => "اجمالي المصروفات التقديرية",
             "pct" => "",
             "sub-total" => "",
-            "total" => $estimated_total_expense,
+            "total" => $estimated_total_expense  * $days,
             "net-total" => "",
         ];
 
