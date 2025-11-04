@@ -546,7 +546,7 @@ class CategoryPercentageReportController extends Controller
                     'number2' => $transaction->sub_qty_total ?? 0,
                     'number3' => 0,
                     'number4' => 0,
-                    'note' => $Unit_description,
+                    'note' => $Unit_description ?? '',
                 ]);
             }
 
