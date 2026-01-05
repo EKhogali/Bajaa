@@ -54,6 +54,8 @@ Route::resource('/financial_years', 'FinancialYearController');
 Route::resource('/partners', 'PartnerController');
 Route::resource('/sitting', 'SittingController');
 Route::resource('/users', 'UserController');
+Route::resource('/user_permissions', 'UserPermissionController')
+    ->only(['store', 'destroy']);
 Route::resource('/treasury_transaction', 'TreasuryTransactionController');
 Route::resource('/treasury_transaction_details', 'TreasuryTransactionDetailController');
 Route::resource('/estimated_expense', 'EstimatedExpenseController');

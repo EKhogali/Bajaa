@@ -36,7 +36,13 @@
                     @foreach($users as $user)
                         <tr>
                             <th scope="row">{{$user->id ?? ''}}</th>
-                            <th scope="row">{{$user->name ?? ''}}</th>
+                            
+                            <th scope="row">
+                                <a href="/users/{{$user->id}}">
+                                    {{$user->name ?? ''}}
+                                </a>
+                            </th>
+                            <!-- <th scope="row">{{$user->name ?? ''}}</th> -->
                             <th scope="row">
                                 @if($user->type == 1)     مدير النظام
                                 @elseif($user->type == 2) مشرف النظام
