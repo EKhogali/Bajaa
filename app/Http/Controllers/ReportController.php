@@ -3070,6 +3070,266 @@ class ReportController extends Controller
 
     //##################################################################################################################
 
+
+
+
+
+    //##################################################################################################################
+
+    public function daily_report002()
+    {
+        if (!Request()->has('date')) {
+            $date = Carbon::today()->format('d-m-yy');
+        } else {
+            $date = Request('date');
+        }
+
+        if (!Request()->has('date2')) {
+            $date2 = Carbon::today()->format('d-m-yy');
+        } else {
+            $date2 = Request('date2');
+        }
+
+        $companyId = session::get('company_id');
+        $financialYear = session::get('financial_year');
+
+        // -----------------
+        // (مبيعات الفترة)
+        $total_sales = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->where('t.transaction_type_id', 0)
+            ->where('t.company_id', $companyId)
+            ->where('t.financial_year', $financialYear)
+            ->where('t.archived', 0)
+            ->where('a.category_id', 7)
+            ->whereBetween('t.date', [$date, $date2])
+            ->sum('t.amount');
+        // dd($total_sales);
+        $row_id = 1;
+        $data_arr = [];
+        $data_arr[] = [
+            "row_id" => $row_id,
+            "desc" => "المبيعات",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $total_sales,
+            "net-total" => "",
+        ];
+
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => "المصروفات",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => "",
+            "net-total" => "",
+        ];
+
+        $expenses = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->leftJoin('classifications as c', 'c.id', 'a.classification_id')
+            ->where('t.transaction_type_id', 1)
+            ->where('t.company_id', $companyId)
+            ->where('t.financial_year', $financialYear)
+            ->where('t.archived', 0)
+            ->where('c.show_in_daily_report', 1)
+            ->where('a.show_in_daily_report', 1)
+            ->whereNotIn('t.account_id', [41, 55, 64, 108, 165, 256, 259]) // استبعاد حسابات الخزينة والبنك
+            ->whereNotIn('a.category_id', [1,5,6])
+            ->whereBetween('t.date', [$date, $date2])
+            ->groupby('c.name', 'a.name')
+            ->select('c.name as classification', 'a.name as account_name', DB::raw('SUM(t.amount) as total'))->get();
+
+            $totalexpense = $expenses->sum('total') ;//dd($expenses,$totalexpense);
+        $row_id += 1;
+        foreach ($expenses as $expense) {
+            $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" => $expense->account_name,
+                "pct" => number_format((($expense->total / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+                //                "pct"=>($expense->total/100) * $total_sales,
+                "sub-total" => $expense->total,
+                "total" => "",
+                "net-total" => "",
+            ];
+        }
+
+
+        $expenses_details = DB::table('treasury_transaction_details as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->leftJoin('treasury_transactions as mastertbl', 'mastertbl.id', 't.master_id')
+            ->leftJoin('classifications as c', 'c.id', 'a.classification_id')
+            ->where('mastertbl.transaction_type_id', 1)
+            ->where('mastertbl.company_id', $companyId)
+            ->where('mastertbl.financial_year', $financialYear)
+            ->where('mastertbl.archived', 0)
+            ->where('c.show_in_daily_report', 1)
+            ->where('a.show_in_daily_report', 1)
+            ->whereNotIn('t.account_id', [41, 55, 64, 108, 165, 256, 259]) // استبعاد حسابات الخزينة والبنك
+            ->whereNotIn('a.category_id', [1,5,6])
+            ->whereBetween('mastertbl.date', [$date, $date2])
+            ->groupby( 'a.name')
+            ->select( 'a.name as account_name', DB::raw('SUM(t.amount) as total'))->get();
+
+        $row_id += 1;
+        $expenses_details_total = 0;
+        foreach ($expenses_details as $expense) {
+            $expenses_details_total += $expense->total;
+            $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" => '   --| ' . $expense->account_name,
+                "pct" => number_format((($expense->total / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+                //                "pct"=>($expense->total/100) * $total_sales,
+                "sub-total" => $expense->total,
+                "total" => "",
+                "net-total" => "",
+            ];
+        }
+
+        $row_id += 1;
+        // $expenses_details_total = $expenses_details->sum('total');
+        $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" =>  'اجمالي تفاصيل المصروفات',
+                "pct" => '',
+                "sub-total" => 0,
+                "total" =>  $expenses_details_total,
+                "net-total" => "",
+            ];
+
+    $days = Carbon::parse($date)->diffInDays(Carbon::parse($date2)) + 1;
+        $daily_rent_amount = db::table('companies')
+            ->where('id', $companyId)
+            ->value('daily_rent_amount') ?? -1;
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => 'المصروف التقديري للايجارات',
+            // "pct" => number_format((($daily_rent_amount / ($total_sales ?? -1) ?? -1) * 100) ?? 0, 2) . '%',
+            //                "pct"=>($expense->total/100) * $total_sales,
+            "pct" => number_format(
+                ($total_sales > 0 ? (($daily_rent_amount  * $days) / $total_sales) * 100 : 0),
+                2
+            ) . '%',
+
+
+            "sub-total" => $daily_rent_amount * $days,
+            "total" => "",
+            "net-total" => "",
+        ];
+
+        $daily_salary_amount = db::table('companies')
+            ->where('id', $companyId)
+            ->value('daily_salary_amount') ?? 0;
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => 'المصروف التقديري للمرتبات',
+            // "pct" => number_format((($daily_salary_amount / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+            //                "pct"=>($expense->total/100) * $total_sales,
+
+            "pct" => number_format(
+                ($total_sales > 0 ? (($daily_salary_amount * $days) / $total_sales) * 100 : 0),
+                2
+            ) . '%',
+
+            "sub-total" => $daily_salary_amount * $days,
+            "total" => "",
+            "net-total" => "",
+        ];
+
+
+
+        
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => "اجمالي المصروفات الفعلية",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $totalexpense,
+            "net-total" => "",
+        ];
+
+        $estimated_total_expense = $daily_rent_amount + $daily_salary_amount;
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => "اجمالي المصروفات التقديرية",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $estimated_total_expense  * $days,
+            "net-total" => "",
+        ];
+
+
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => "صافي الربح أو الخسارة",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => "",
+            "net-total" => $total_sales - $totalexpense - $estimated_total_expense,
+        ];
+
+
+        // مسحوبات من صافي الربح
+        
+
+                $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => "مسحوبات من صافي الربح",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => "",
+            "net-total" => "",
+        ];
+
+        $expenses_details2= DB::table('treasury_transaction_details as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->leftJoin('treasury_transactions as mastertbl', 'mastertbl.id', 't.master_id')
+            ->leftJoin('classifications as c', 'c.id', 'a.classification_id')
+            ->where('mastertbl.transaction_type_id', 1)
+            ->where('mastertbl.company_id', $companyId)
+            ->where('mastertbl.financial_year', $financialYear)
+            ->where('mastertbl.archived', 0)
+            ->where('c.show_in_daily_report', 1)
+            ->where('a.show_in_daily_report', 1)
+            // ->whereNotIn('t.account_id', [41, 55, 64, 108, 165, 256, 259]) // استبعاد حسابات الخزينة والبنك
+            ->where('a.category_id', [1,5,6])
+            ->whereBetween('mastertbl.date', [$date, $date2])
+            ->groupby( 'a.name')
+            ->select( 'a.name as account_name', DB::raw('SUM(t.amount) as total'))->get();
+
+        $row_id += 1;
+        $expenses_details2total = 0;
+        foreach ($expenses_details2 as $expense2) {
+            $expenses_details2total += $expense2->total;
+            $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" => '   --| ' . $expense2->account_name,
+                "pct" => number_format((($expense2->total / $total_sales ?? -1) * 100) ?? 0, 2) . '%',
+                //                "pct"=>($expense->total/100) * $total_sales,
+                "sub-total" => $expense2->total,
+                "total" => "",
+                "net-total" => "",
+            ];
+        }
+
+
+
+
+
+        //        dd($date, $total_sales,$data_arr,$totalexpense,$expenses);
+        return view('rep.daily_report002')
+            ->with('data_arr', $data_arr);
+    }
+
+    //##################################################################################################################
+
     public function l_index()
     {
         $fromdate = Request()->fromdate ?? \Carbon\Carbon::now();

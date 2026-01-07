@@ -100,6 +100,7 @@ Route::get('/partners_accounts_report', [ReportController::class, 'partners_acco
 Route::get('/partners_accounts_with_income_report', [ReportController::class, 'partners_accounts_with_income_report']);
 Route::get('/account_details_report', [ReportController::class, 'account_details_report']);
 Route::get('/daily_report', [ReportController::class, 'daily_report']);
+Route::get('/daily_report002', [ReportController::class, 'daily_report002']);
 //Route::get('/estimated_expense_report', [ReportController::class, 'estimated_expense_report']);
 
 Auth::routes(['register' => true]);

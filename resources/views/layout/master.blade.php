@@ -169,6 +169,7 @@
                                         </a>
                                 <li><a class="dropdown-item" href="/ledger2">تقرير حركة حساب</a></li>
                                 <li><a class="dropdown-item" href="/daily_report">التقرير اليومي</a></li>
+                                <li><a class="dropdown-item" href="/daily_report002">التقرير اليومي 2</a></li>
                                     </li>
                                 @endif
 
