@@ -36,6 +36,8 @@
             ->exists();
 @endphp
 
+
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
 
@@ -131,6 +133,34 @@
                                 <li><a class="dropdown-item" href="/treasury_report">تقرير الخزينة</a></li>
                                 <li><a class="dropdown-item" href="/ledger2">تقرير حركة حساب</a></li>
 
+                                <!-- {{-- ✅ Only show this report if Admin/Supervisor OR has permission --}}
+                                @if($isAdminOrSupervisor || $hasAccountDetailsReportPermission)
+                                    <li>
+                                        <a class="dropdown-item" href="/account_details_report">
+                                            تقرير الحركة التفصيلية لحساب
+                                        </a>
+                                    </li>
+                                @endif -->
+
+                                <li><a class="dropdown-item" href="/category_percentage_report">تقرير نسبة المصروفات من اجمالي المبيعات</a></li>
+                                <li><a class="dropdown-item" href="/pulled_from_net_income_report">تقرير مسحوبات من صافي الربح</a></li>
+                                <li><a class="dropdown-item" href="/partners_accounts_report">تقرير حساب المستثمر والشريك</a></li>
+                                <li><a class="dropdown-item" href="/partners_accounts_with_income_report">تقرير مسحوبات من صافي الربح وحصص المستثمر والشريك</a></li>
+                                <li><a class="dropdown-item" href="/daily_report">التقرير اليومي</a></li>
+                            </ul>
+                        </li>
+                    @endif
+
+{{-- التقارير --}}
+                    @if($isAdminOrSupervisor || $hasAccountDetailsReportPermission)
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                تقرير الحسابات التفصيلية
+                            </a>
+                            <ul class="dropdown-menu">
+                                
+
                                 {{-- ✅ Only show this report if Admin/Supervisor OR has permission --}}
                                 @if($isAdminOrSupervisor || $hasAccountDetailsReportPermission)
                                     <li>
@@ -140,11 +170,6 @@
                                     </li>
                                 @endif
 
-                                <li><a class="dropdown-item" href="/category_percentage_report">تقرير نسبة المصروفات من اجمالي المبيعات</a></li>
-                                <li><a class="dropdown-item" href="/pulled_from_net_income_report">تقرير مسحوبات من صافي الربح</a></li>
-                                <li><a class="dropdown-item" href="/partners_accounts_report">تقرير حساب المستثمر والشريك</a></li>
-                                <li><a class="dropdown-item" href="/partners_accounts_with_income_report">تقرير مسحوبات من صافي الربح وحصص المستثمر والشريك</a></li>
-                                <li><a class="dropdown-item" href="/daily_report">التقرير اليومي</a></li>
                             </ul>
                         </li>
                     @endif
