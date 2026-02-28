@@ -31,7 +31,7 @@
         <br>
         <div class="container row">
             <div class="container col-3">
-                <form action="/daily_report?date={{Request('date')}}" method="get">
+                <form action="/daily_report002?date={{Request('date')}}" method="get">
                     {{ csrf_field() }}
                     <div class="container-fluid row ">
 
@@ -70,7 +70,7 @@
                     <div class="col-12 text-center">
                         <h4>{{ session('company_name') }}</h4>
                         <br>
-                        <h4>التقرير اليومي</h4>
+                        <h4>التقرير اليومي 2</h4>
                         <br>
                         <h5>اليــــوم من: {{ request()->get('date') ?? '' }} إلى {{ request()->get('date2') ?? '' }}</h5>
                         <br>

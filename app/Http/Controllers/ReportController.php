@@ -3198,6 +3198,72 @@ class ReportController extends Controller
                 "net-total" => "",
             ];
 
+
+        // إضافة المصروفات الإدارية 
+        $admin_expenses_category = sitting::where('id', 1)->value('administrative_accounts_category');
+        $admin_expenses_accounts_array = DB::table('accounts')
+            ->where('category_id', $admin_expenses_category)
+            ->where('archived', 0)
+            ->pluck('id')
+            ->toArray();
+
+        $adminExpenses = DB::table('treasury_transactions as t')
+            ->where('transaction_type_id', 1)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->whereBetween('date', [$date, $date2])
+            ->whereIn('account_id', $admin_expenses_accounts_array)
+            ->sum('amount');
+
+        $row_id += 1;
+        $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" =>  'اجمالي المصروفات الإدارية',
+                "pct" => '',
+                "sub-total" => 0,
+                "total" =>  $adminExpenses ?? 0,
+                "net-total" => "",
+            ];
+
+
+
+
+               // إضافة المصروفات التشغيلية 
+        $operation_expenses_category = sitting::where('id', 1)->value('operation_accounts_category');
+            $operation_expenses_accounts_array = DB::table('accounts')
+                ->where('category_id', $operation_expenses_category)
+                ->where('archived', 0)
+                ->pluck('id')
+                ->toArray();
+
+        $operationExpenses = DB::table('treasury_transactions as t')
+            ->where('transaction_type_id', 1)
+            ->where('company_id', $companyId)
+            ->where('financial_year', $financialYear)
+            ->where('archived', 0)
+            ->whereBetween('date', [$date, $date2])
+            ->whereIn('account_id', $operation_expenses_accounts_array)
+            ->sum('amount');
+
+        $row_id += 1;
+        $data_arr[] = [
+                'row_id' => $row_id,
+                "desc" =>  'اجمالي المصروفات التشغيلية',
+                "pct" => '',
+                "sub-total" => 0,
+                "total" =>  $operationExpenses ?? 0,
+                "net-total" => "",
+            ];     
+
+
+
+
+
+
+
+
+
     $days = Carbon::parse($date)->diffInDays(Carbon::parse($date2)) + 1;
         $daily_rent_amount = db::table('companies')
             ->where('id', $companyId)
