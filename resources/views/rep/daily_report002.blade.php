@@ -94,7 +94,7 @@
                         @foreach($data_arr as $report)
                             @php $counter += 1; @endphp
                             <tr
-                                style="{{ in_array($report['row_id'], [1, 6, 8, 7]) ? 'background-color: #e0e0e0; font-weight: bold; text-decoration: underline;' : '' }}">
+                                style="{{ in_array($report['row_id'], [1, 5, 6, 9, 10, 12, 13,14]) ? 'background-color: #e0e0e0; font-weight: bold; text-decoration: underline;' : '' }}">
                                 <th scope="row" width="4%">{{ $counter }}</th>
                                 <th scope="row" width="4%">{{ $report['desc'] }}</th>
                                 <th scope="row" width="4%">{{ $report['pct'] }}</th>

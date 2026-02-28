@@ -3215,7 +3215,7 @@ class ReportController extends Controller
             ->whereBetween('date', [$date, $date2])
             ->whereIn('account_id', $admin_expenses_accounts_array)
             ->sum('amount');
-
+// dd($admin_expenses_accounts_array,$adminExpenses);
         $row_id += 1;
         $data_arr[] = [
                 'row_id' => $row_id,
@@ -3229,32 +3229,32 @@ class ReportController extends Controller
 
 
 
-               // إضافة المصروفات التشغيلية 
-        $operation_expenses_category = sitting::where('id', 1)->value('operation_accounts_category');
-            $operation_expenses_accounts_array = DB::table('accounts')
-                ->where('category_id', $operation_expenses_category)
-                ->where('archived', 0)
-                ->pluck('id')
-                ->toArray();
+        //        // إضافة المصروفات التشغيلية 
+        // $operation_expenses_category = sitting::where('id', 1)->value('operation_accounts_category');
+        // $operation_expenses_accounts_array = DB::table('accounts')
+        //     ->where('category_id', $operation_expenses_category)
+        //     ->where('archived', 0)
+        //     ->pluck('id')
+        //     ->toArray();
 
-        $operationExpenses = DB::table('treasury_transactions as t')
-            ->where('transaction_type_id', 1)
-            ->where('company_id', $companyId)
-            ->where('financial_year', $financialYear)
-            ->where('archived', 0)
-            ->whereBetween('date', [$date, $date2])
-            ->whereIn('account_id', $operation_expenses_accounts_array)
-            ->sum('amount');
+        // $operationExpenses = DB::table('treasury_transactions as t')
+        //     ->where('transaction_type_id', 1)
+        //     ->where('company_id', $companyId)
+        //     ->where('financial_year', $financialYear)
+        //     ->where('archived', 0)
+        //     ->whereBetween('date', [$date, $date2])
+        //     ->whereIn('account_id', $operation_expenses_accounts_array)
+        //     ->sum('amount');
 
-        $row_id += 1;
-        $data_arr[] = [
-                'row_id' => $row_id,
-                "desc" =>  'اجمالي المصروفات التشغيلية',
-                "pct" => '',
-                "sub-total" => 0,
-                "total" =>  $operationExpenses ?? 0,
-                "net-total" => "",
-            ];     
+        // $row_id += 1;
+        // $data_arr[] = [
+        //         'row_id' => $row_id,
+        //         "desc" =>  'اجمالي المصروفات التشغيلية',
+        //         "pct" => '',
+        //         "sub-total" => 0,
+        //         "total" =>  $operationExpenses ?? 0,
+        //         "net-total" => "",
+        //     ];     
 
 
 
@@ -3308,15 +3308,15 @@ class ReportController extends Controller
 
 
         
-        $row_id += 1;
-        $data_arr[] = [
-            'row_id' => $row_id,
-            "desc" => "اجمالي المصروفات الفعلية",
-            "pct" => "",
-            "sub-total" => "",
-            "total" => $totalexpense,
-            "net-total" => "",
-        ];
+        // $row_id += 1;
+        // $data_arr[] = [
+        //     'row_id' => $row_id,
+        //     "desc" => "اجمالي المصروفات الفعلية",
+        //     "pct" => "",
+        //     "sub-total" => "",
+        //     "total" => $totalexpense,
+        //     "net-total" => "",
+        // ];
 
         $estimated_total_expense = $daily_rent_amount + $daily_salary_amount;
         $row_id += 1;
@@ -3337,14 +3337,15 @@ class ReportController extends Controller
             "pct" => "",
             "sub-total" => "",
             "total" => "",
-            "net-total" => $total_sales - $totalexpense - $estimated_total_expense,
+            "net-total" => $total_sales - $expenses_details_total - ($estimated_total_expense * $days),
+            // "net-total" => $total_sales - $totalexpense - ($estimated_total_expense * $days),
         ];
 
 
         // مسحوبات من صافي الربح
         
 
-                $row_id += 1;
+        $row_id += 1;
         $data_arr[] = [
             'row_id' => $row_id,
             "desc" => "مسحوبات من صافي الربح",
@@ -3386,6 +3387,25 @@ class ReportController extends Controller
         }
 
 
+            $row_id += 1;
+            $data_arr[] = [
+                    'row_id' => $row_id,
+                    "desc" =>  'اجمالي مسحوبات من صافي الربح',
+                    "pct" => '',
+                    "sub-total" => 0,
+                    "total" =>  $expenses_details2total,
+                    "net-total" => "",
+                ];
+    
+            $row_id += 1;
+            $data_arr[] = [
+                    'row_id' => $row_id,
+                    "desc" =>  'صافي الربح أو الخسارة بعد المسحوبات',
+                    "pct" => '',
+                    "sub-total" => '',
+                    "total" => '',
+                    "net-total" => ($total_sales - $expenses_details_total - ($estimated_total_expense * $days)) - $expenses_details2total,
+                ];
 
 
 
