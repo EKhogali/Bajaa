@@ -3104,7 +3104,7 @@ class ReportController extends Controller
             ->where('a.category_id', 7)
             ->whereBetween('t.date', [$date, $date2])
             ->sum('t.amount');
-        // dd($total_sales);
+        
         $row_id = 1;
         $data_arr = [];
         $data_arr[] = [
@@ -3115,6 +3115,61 @@ class ReportController extends Controller
             "total" => $total_sales,
             "net-total" => "",
         ];
+
+        // الفائض
+        $faed = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->where('t.transaction_type_id', 0)
+            ->where('t.company_id', $companyId)
+            ->where('t.financial_year', $financialYear)
+            ->where('t.archived', 0)
+            ->where('t.account_id', 169)
+            ->whereBetween('t.date', [$date, $date2])
+            ->sum('t.amount');
+        
+        $row_id += 1;
+        $data_arr[] = [
+            "row_id" => $row_id,
+            "desc" => "فائض الفترة",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $faed,
+            "net-total" => "",
+        ];
+        // dd($data_arr);
+
+        //العجز
+        $ajz = DB::table('treasury_transactions as t')
+            ->leftJoin('accounts as a', 'a.id', 't.account_id')
+            ->where('t.transaction_type_id', 1)
+            ->where('t.company_id', $companyId)
+            ->where('t.financial_year', $financialYear)
+            ->where('t.archived', 0)
+            ->where('t.account_id', 147)
+            ->whereBetween('t.date', [$date, $date2])
+            ->sum('t.amount');
+        
+        $row_id += 1;
+        $data_arr[] = [
+            "row_id" => $row_id,
+            "desc" => "عجز الفترة",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $ajz,
+            "net-total" => "",
+        ];
+
+        $total_sales = $total_sales + $faed - $ajz;
+       $row_id += 1;
+        $data_arr[] = [
+            "row_id" => $row_id,
+            "desc" => "صافي المبيعات",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $total_sales,
+            "net-total" => "",
+        ];
+
 
         $row_id += 1;
         $data_arr[] = [
@@ -3200,31 +3255,31 @@ class ReportController extends Controller
 
 
         // إضافة المصروفات الإدارية 
-        $admin_expenses_category = sitting::where('id', 1)->value('administrative_accounts_category');
-        $admin_expenses_accounts_array = DB::table('accounts')
-            ->where('category_id', $admin_expenses_category)
-            ->where('archived', 0)
-            ->pluck('id')
-            ->toArray();
+        // $admin_expenses_category = sitting::where('id', 1)->value('administrative_accounts_category');
+        // $admin_expenses_accounts_array = DB::table('accounts')
+        //     ->where('category_id', $admin_expenses_category)
+        //     ->where('archived', 0)
+        //     ->pluck('id')
+        //     ->toArray();
 
-        $adminExpenses = DB::table('treasury_transactions as t')
-            ->where('transaction_type_id', 1)
-            ->where('company_id', $companyId)
-            ->where('financial_year', $financialYear)
-            ->where('archived', 0)
-            ->whereBetween('date', [$date, $date2])
-            ->whereIn('account_id', $admin_expenses_accounts_array)
-            ->sum('amount');
-// dd($admin_expenses_accounts_array,$adminExpenses);
-        $row_id += 1;
-        $data_arr[] = [
-                'row_id' => $row_id,
-                "desc" =>  'اجمالي المصروفات الإدارية',
-                "pct" => '',
-                "sub-total" => 0,
-                "total" =>  $adminExpenses ?? 0,
-                "net-total" => "",
-            ];
+        // $adminExpenses = DB::table('treasury_transactions as t')
+        //     ->where('transaction_type_id', 1)
+        //     ->where('company_id', $companyId)
+        //     ->where('financial_year', $financialYear)
+        //     ->where('archived', 0)
+        //     ->whereBetween('date', [$date, $date2])
+        //     ->whereIn('account_id', $admin_expenses_accounts_array)
+        //     ->sum('amount');
+
+        // $row_id += 1;
+        // $data_arr[] = [
+        //         'row_id' => $row_id,
+        //         "desc" =>  'اجمالي المصروفات الإدارية',
+        //         "pct" => '',
+        //         "sub-total" => 0,
+        //         "total" =>  $adminExpenses ?? 0,
+        //         "net-total" => "",
+        //     ];
 
 
 
@@ -3328,6 +3383,17 @@ class ReportController extends Controller
             "total" => $estimated_total_expense  * $days,
             "net-total" => "",
         ];
+
+        $estimated_total_expense = $daily_rent_amount + $daily_salary_amount;
+        $row_id += 1;
+        $data_arr[] = [
+            'row_id' => $row_id,
+            "desc" => "اجمالي المصروفات التفصيلية والتقديرية",
+            "pct" => "",
+            "sub-total" => "",
+            "total" => $expenses_details_total + ($estimated_total_expense  * $days),
+            "net-total" => "",
+        ];        
 
 
         $row_id += 1;
