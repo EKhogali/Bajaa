@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-    /* Full screen background fix */
+    /* تثبيت الخلفية لتغطية كامل الشاشة */
     .login-wrapper {
         background: url("images/bg02.jpg") no-repeat center center fixed;
         background-size: cover;
@@ -14,22 +14,21 @@
         z-index: -1;
     }
     
-    /* Optional: Slight transparency for the card to see the calculator background */
+    /* شفافية خفيفة للكارت لتناسب الخلفية */
     .card {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 15px;
     }
 </style>
 
 <div class="login-wrapper"></div>
 
 <div class="container">
-    {{-- vh-100 centers the card vertically on the screen --}}
     <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
         <div class="col-md-5">
             <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center fw-bold">
-                    {{ __('Login') }}
+                <div class="card-header bg-primary text-white text-center fw-bold py-3">
+                    {{ __('تسجيل الدخول') }}
                 </div>
 
                 <div class="card-body p-4">
@@ -37,7 +36,7 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="email" class="form-label">{{ __('E-Mail Address') }}</label>
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
                             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" 
                                    name="email" value="{{ old('email') }}" required autofocus>
                             @error('email')
@@ -46,7 +45,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label">{{ __('Password') }}</label>
+                            <label for="password" class="form-label">كلمة المرور</label>
                             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
                                    name="password" required>
                             @error('password')
@@ -54,21 +53,21 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3 form-check">
-                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="remember">{{ __('Remember Me') }}</label>
+                        <div class="mb-3 form-check d-flex align-items-center gap-2">
+                            <input class="form-check-input mt-0" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="remember">تذكرني</label>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                {{ __('Login') }}
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                دخول
                             </button>
                         </div>
 
                         @if (Route::has('password.request'))
                             <div class="text-center mt-3">
-                                <a class="btn btn-link btn-sm" href="{{ route('password.request') }}">
-                                    {{ __('Forgot Your Password?') }}
+                                <a class="btn btn-link btn-sm text-decoration-none" href="{{ route('password.request') }}">
+                                    نسيت كلمة المرور؟
                                 </a>
                             </div>
                         @endif
