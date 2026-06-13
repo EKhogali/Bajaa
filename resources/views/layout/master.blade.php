@@ -51,6 +51,27 @@
                 {{-- Menu --}}
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
+                <li class="nav-item">
+    <a href="{{ route('vendors.index') }}" class="nav-link">
+        <i class="nav-icon fas fa-boxes"></i>
+        <p>الموردين</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('transactions.index') }}" class="nav-link">
+        <i class="nav-icon fas fa-file-invoice-dollar"></i>
+        <p>حركات الموردين</p>
+    </a>
+</li>
+
+<li class="nav-item">
+    <a href="{{ route('reports.vendor_report') }}" class="nav-link">
+        <i class="nav-icon fas fa-chart-line"></i>
+        <p>تقرير الموردين</p>
+    </a>
+</li>
+
                     <li class="nav-item">
                         <a class="nav-link active" href="/">الرئيسية</a>
                     </li>

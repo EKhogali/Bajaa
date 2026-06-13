@@ -6,6 +6,8 @@ use App\Http\Controllers\PayrolProccessing;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -106,3 +108,29 @@ Route::get('/daily_report002', [ReportController::class, 'daily_report002']);
 Auth::routes(['register' => true]);
 
 Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
+
+
+
+
+
+// Vendor Management Routes
+Route::get('vendors', 'VendorsController@index')->name('vendors.index');
+Route::get('vendors/create', 'VendorsController@create')->name('vendors.create');
+Route::post('vendors/store', 'VendorsController@store')->name('vendors.store');
+Route::post('vendors/recalculate', 'VendorsController@recalculateBalances')->name('vendors.recalculate');
+
+// Add these three lines if they are missing or commented out:
+Route::get('vendors/{id}/edit', 'VendorsController@edit')->name('vendors.edit');
+Route::put('vendors/{id}/update', 'VendorsController@update')->name('vendors.update');
+Route::delete('vendors/{id}/delete', 'VendorsController@destroy')->name('vendors.destroy');
+
+// Transaction Framework Pathways
+Route::get('transactions', 'VendorTransactionController@index')->name('transactions.index');
+Route::get('transactions/create', 'VendorTransactionController@create')->name('transactions.create');
+Route::post('transactions/store', 'VendorTransactionController@store')->name('transactions.store');
+Route::get('transactions/{id}/edit', 'VendorTransactionController@edit')->name('transactions.edit');
+Route::put('transactions/{id}/update', 'VendorTransactionController@update')->name('transactions.update');
+Route::delete('transactions/{id}/delete', 'VendorTransactionController@destroy')->name('transactions.destroy');
+
+// Multi-Filter Report Matrix Pathway
+Route::get('reports/vendor-report', 'VendorReportController@index')->name('reports.vendor_report');
