@@ -85,19 +85,24 @@ class VendorTransactionController extends Controller
         return redirect()->route('transactions.index')->with('success', 'تم تسجيل الحركة المالية وتحديث الرصيد بنجاح.');
     }
 
-    // 4. نموذج تعديل الحركة المالية
-    public function edit($id)
-    {
-        $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::where('company_id', $companyId)->get();
+public function edit($id)
+{
+    $companyId    = session('company_id');
+    $transaction  = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
+    $vendors      = Vendor::where('company_id', $companyId)->get();
+    $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
-        // تحديد المبلغ الحالي ونوع الحركة للعرض في الاستمارة
-        $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
-        $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
+    $currentType   = $transaction->debit > 0 ? 'debit' : 'credit';
+    $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
 
-        return view('vendor_transactions.edit', compact('transaction', 'vendors', 'currentAmount', 'currentType'));
-    }
+    return view('vendor_transactions.edit', compact(
+        'transaction',
+        'vendors',
+        'existingTags',
+        'currentType',
+        'currentAmount'
+    ));
+}
 
     // 5. تحديث بيانات الحركة المالية
     public function update(Request $request, $id)

@@ -30,21 +30,21 @@
                             <div class="form-group row mb-3">
                                 <label for="name" class="col-sm-3 col-form-label font-weight-bold">إسم المورد <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="name" name="name" required placeholder="مثال: شركة الأنوار للإلكترونيات">
+                                    <input type="text" class="form-control" id="name" name="name" required >
                                 </div>
                             </div>
 
                             <div class="form-group row mb-3">
                                 <label for="tel" class="col-sm-3 col-form-label font-weight-bold">رقم الهاتف</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control text-left" id="tel" name="tel" placeholder="مثال: 091XXXXXXX" dir="ltr">
+                                    <input type="text" class="form-control text-left" id="tel" name="tel" >
                                 </div>
                             </div>
 
                             <div class="form-group row mb-3">
                                 <label for="tags" class="col-sm-3 col-form-label font-weight-bold">الوسوم / التصنيفات</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="tags" name="tags" placeholder="VIP, محلي, جملة">
+                                    <input type="text" class="form-control" id="tags" name="tags" >
                                     <small class="form-text text-muted mt-1">اكتب الأسماء مفصولة بفاصلة عادية ( , ).</small>
                                 </div>
                             </div>

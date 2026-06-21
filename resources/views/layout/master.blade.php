@@ -51,7 +51,7 @@
                 {{-- Menu --}}
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <li class="nav-item">
+                <!-- <li class="nav-item">
     <a href="{{ route('vendors.index') }}" class="nav-link">
         <i class="nav-icon fas fa-boxes"></i>
         <p>الموردين</p>
@@ -68,7 +68,7 @@
 <li class="nav-item">
     <a href="{{ route('reports.vendor_report') }}" class="nav-link">
         <i class="nav-icon fas fa-chart-line"></i>
-        <p>تقرير الموردين</p>
+        <p>تقرير الموردين</p> -->
     </a>
 </li>
 
@@ -115,6 +115,31 @@
                                     </li>
                                     <li><a class="dropdown-item" href="/estimated_expense?transaction_type_id=1">المصروفات
                                             الإدارية التقديرية</a></li>
+                                </ul>
+                            </li>
+
+                            {{-- الحركة --}}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    حركة الموردين
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/transactions">حركة الموردين</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                    </li>
                                 </ul>
                             </li>
 
