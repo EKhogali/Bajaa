@@ -5,224 +5,255 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تقرير الموردين</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            font-size: 14px;
-            color: #1a1a1a;
-            background: #fff;
-            direction: rtl;
-        }
+    @page {
+        size: A4 landscape;
+        margin: 12mm 10mm;
+    }
 
-        .page {
-            width: 100%;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 10mm 8mm;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+        font-size: 13px;
+        color: #1a1a1a;
+        background: #fff;
+        direction: rtl;
+    }
 
-        /* ── Header ── */
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 3px solid #2c3e50;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
-        .company-block .company-name {
-            font-size: 24px;
-            font-weight: 800;
-            color: #2c3e50;
-        }
-        .company-block .report-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #666;
-            margin-top: 4px;
-        }
-        .meta-block {
-            text-align: left;
-            font-size: 13px;
-            color: #555;
-            line-height: 1.9;
-        }
-        .meta-block strong { color: #2c3e50; }
+    .page {
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+    }
 
-        /* ── Filter bar ── */
-        .filter-bar {
-            background: #f4f6f8;
-            border: 1px solid #dde1e6;
-            border-radius: 5px;
-            padding: 9px 14px;
-            margin-bottom: 14px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px 24px;
-            font-size: 13px;
-            color: #444;
-        }
-        .filter-bar .filter-label { font-weight: 700; color: #2c3e50; margin-left: 4px; }
+    /* ── Header ── */
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 3px solid #2c3e50;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+    }
+    .company-block .company-name {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2c3e50;
+    }
+    .company-block .report-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        margin-top: 4px;
+    }
+    .meta-block {
+        text-align: left;
+        font-size: 12px;
+        color: #555;
+        line-height: 1.9;
+    }
+    .meta-block strong { color: #2c3e50; }
 
-        /* ── Summary cards ── */
-        .summary-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .summary-card {
-            border: 1px solid #dde1e6;
-            border-radius: 6px;
-            padding: 10px 12px;
-            text-align: center;
-        }
-        .summary-card .s-label {
-            font-size: 12px;
-            color: #777;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .summary-card .s-value {
-            font-size: 20px;
-            font-weight: 800;
-            display: block;
-        }
-        .summary-card.dark { background: #2c3e50; border-color: #2c3e50; }
-        .summary-card.dark .s-label { color: #99aabb; }
-        .summary-card.dark .s-value { color: #f1c40f; }
-        .text-success { color: #27ae60; }
-        .text-danger  { color: #c0392b; }
-        .text-muted   { color: #999; }
+    /* ── Filter bar ── */
+    .filter-bar {
+        background: #f4f6f8;
+        border: 1px solid #dde1e6;
+        border-radius: 5px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 22px;
+        font-size: 12px;
+        color: #444;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .filter-bar .filter-label { font-weight: 700; color: #2c3e50; margin-left: 4px; }
 
-        /* ── Table ── */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            margin-bottom: 16px;
-            table-layout: fixed;
-        }
-        thead tr {
-            background: #2c3e50;
-            color: #fff;
-        }
-        thead th {
-            padding: 10px 8px;
-            font-weight: 700;
-            text-align: center;
-            border: 1px solid #1a252f;
-            font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        tbody tr { border-bottom: 1px solid #e8eaed; }
-        tbody tr:nth-child(even) { background: #f9fafb; }
-        tbody tr.opening-row { background: #eef2f7; font-style: italic; color: #666; }
-        tbody tr.total-row {
-            background: #edf2f7;
-            font-weight: 800;
-            border-top: 2px solid #2c3e50;
-        }
-        tbody td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #e0e3e8;
-            vertical-align: middle;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-        td.desc-cell {
-            text-align: right;
-            padding-right: 10px;
-            font-size: 13px;
-            line-height: 1.5;
-            color: #444;
-        }
-        td.amount-cell {
-            font-weight: 700;
-            font-size: 13px;
-            white-space: nowrap;
-            font-variant-numeric: tabular-nums;
-        }
-        td.balance-cell {
-            font-weight: 800;
-            font-size: 13px;
-            white-space: nowrap;
-            font-variant-numeric: tabular-nums;
-        }
+    /* ── Summary cards ── */
+    .summary-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+    .summary-card {
+        border: 1px solid #dde1e6;
+        border-radius: 6px;
+        padding: 8px 10px;
+        text-align: center;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .summary-card .s-label {
+        font-size: 11px;
+        color: #777;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .summary-card .s-value {
+        font-size: 18px;
+        font-weight: 800;
+        display: block;
+    }
+    .summary-card.dark {
+        background: #2c3e50;
+        border-color: #2c3e50;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .summary-card.dark .s-label { color: #99aabb; }
+    .summary-card.dark .s-value { color: #f1c40f; }
+    .text-success { color: #27ae60; }
+    .text-danger  { color: #c0392b; }
+    .text-muted   { color: #999; }
 
-        /* Column widths */
-        .col-num     { width: 40px; }
-        .col-date    { width: 95px; }
-        .col-vendor  { width: 130px; }
-        .col-desc    { width: auto; }      /* takes remaining space */
-        .col-debit   { width: 115px; }
-        .col-credit  { width: 115px; }
-        .col-balance { width: 125px; }
+    /* ── Table ── */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin-bottom: 14px;
+        table-layout: auto;   /* let browser size columns by content */
+    }
+    thead tr {
+        background: #2c3e50;
+        color: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    thead th {
+        padding: 9px 10px;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid #1a252f;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #e8eaed; }
+    tbody tr:nth-child(even) {
+        background: #f9fafb;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    tbody tr.opening-row {
+        background: #eef2f7;
+        font-style: italic;
+        color: #555;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    tbody tr.total-row {
+        background: #edf2f7;
+        font-weight: 800;
+        border-top: 2px solid #2c3e50;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    tbody td {
+        padding: 7px 10px;
+        text-align: center;
+        border: 1px solid #e0e3e8;
+        vertical-align: middle;
+    }
 
-        /* ── Footer ── */
-        .report-footer {
-            border-top: 2px solid #2c3e50;
-            padding-top: 9px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #888;
-            margin-top: 12px;
-        }
+    /* # column — tiny */
+    .col-num { width: 30px; white-space: nowrap; }
 
-        /* ── Print ── */
-        @media print {
-            body { background: #fff; padding-top: 0; }
-            .page { padding: 8mm 6mm; width: 100%; }
-            .no-print { display: none !important; }
-            table { page-break-inside: auto; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
-            thead { display: table-header-group; }
-        }
+    /* Date — fixed narrow */
+    .col-date { width: 88px; white-space: nowrap; }
 
-        /* ── Screen toolbar ── */
-        .print-toolbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: #2c3e50;
-            color: #fff;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 999;
-            font-size: 13px;
-        }
-        .print-toolbar .btn-print {
-            background: #27ae60;
-            color: #fff;
-            border: none;
-            padding: 7px 22px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .print-toolbar .btn-print:hover { background: #219a52; }
-        .print-toolbar .btn-back {
-            background: #c0392b;
-            color: #fff;
-            border: none;
-            padding: 7px 18px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-right: auto;
-        }
-        .print-toolbar .btn-back:hover { background: #a93226; }
+    /* Vendor — fixed medium */
+    .col-vendor { width: 120px; white-space: nowrap; font-weight: 700; color: #2980b9; }
 
-        body { padding-top: 50px; }
-    </style>
+    /* البيان — gets all remaining space, wraps freely */
+    .col-desc {
+        text-align: right;
+        padding-right: 12px;
+        line-height: 1.6;
+        color: #333;
+        min-width: 200px;   /* never collapses below this */
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* Amount columns — wide enough for 000,000.00 */
+    .col-debit, .col-credit {
+        width: 110px;
+        white-space: nowrap;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Balance — slightly wider for running total */
+    .col-balance {
+        width: 120px;
+        white-space: nowrap;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Footer ── */
+    .report-footer {
+        border-top: 2px solid #2c3e50;
+        padding-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #888;
+        margin-top: 10px;
+    }
+
+    /* ── Screen toolbar ── */
+    .print-toolbar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        background: #2c3e50;
+        color: #fff;
+        padding: 9px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 999;
+        font-size: 13px;
+    }
+    .print-toolbar .btn-print {
+        background: #27ae60;
+        color: #fff;
+        border: none;
+        padding: 7px 22px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .print-toolbar .btn-print:hover { background: #219a52; }
+    .print-toolbar .btn-back {
+        background: #c0392b;
+        color: #fff;
+        border: none;
+        padding: 7px 18px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-right: auto;
+    }
+    .print-toolbar .btn-back:hover { background: #a93226; }
+
+    @media print {
+        body { background: #fff; padding-top: 0 !important; }
+        .no-print { display: none !important; }
+        .page { padding: 0; }
+        table { page-break-inside: auto; }
+        tr { page-break-inside: avoid; }
+        thead { display: table-header-group; }
+    }
+
+    body { padding-top: 48px; }
+</style>
 </head>
 <body>
 

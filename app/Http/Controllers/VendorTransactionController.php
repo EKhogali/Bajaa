@@ -66,7 +66,8 @@ class VendorTransactionController extends Controller
 
                 foreach ($tagNames as $name) {
                     $trimmedName = trim($name);
-                    if (empty($trimmedName)) continue;
+                    if (empty($trimmedName))
+                        continue;
 
                     $tag = TransactionTag::firstOrCreate([
                         'company_id' => $companyId,
@@ -85,24 +86,24 @@ class VendorTransactionController extends Controller
         return redirect()->route('transactions.index')->with('success', 'تم تسجيل الحركة المالية وتحديث الرصيد بنجاح.');
     }
 
-public function edit($id)
-{
-    $companyId    = session('company_id');
-    $transaction  = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-    $vendors      = Vendor::where('company_id', $companyId)->get();
-    $existingTags = TransactionTag::where('company_id', $companyId)->get();
+    public function edit($id)
+    {
+        $companyId = session('company_id');
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
+        $vendors = Vendor::where('company_id', $companyId)->get();
+        $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
-    $currentType   = $transaction->debit > 0 ? 'debit' : 'credit';
-    $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
+        $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
+        $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
 
-    return view('vendor_transactions.edit', compact(
-        'transaction',
-        'vendors',
-        'existingTags',
-        'currentType',
-        'currentAmount'
-    ));
-}
+        return view('vendor_transactions.edit', compact(
+            'transaction',
+            'vendors',
+            'existingTags',
+            'currentType',
+            'currentAmount'
+        ));
+    }
 
     // 5. تحديث بيانات الحركة المالية
     public function update(Request $request, $id)
@@ -139,7 +140,8 @@ public function edit($id)
 
                 foreach ($tagNames as $name) {
                     $trimmedName = trim($name);
-                    if (empty($trimmedName)) continue;
+                    if (empty($trimmedName))
+                        continue;
 
                     $tag = TransactionTag::firstOrCreate([
                         'company_id' => $companyId,
@@ -189,4 +191,18 @@ public function edit($id)
 
         DB::table('vendors')->where('id', $vendorId)->update(['balance' => $calculatedBalance]);
     }
+
+
+    public function receipt($id)
+    {
+        $companyId = session('company_id');
+        $transaction = VendorTransaction::where('company_id', $companyId)
+            ->with(['vendor', 'tags'])
+            ->findOrFail($id);
+
+        return view('vendor_transactions.receipt', compact('transaction'));
+    }
+
+
+
 }

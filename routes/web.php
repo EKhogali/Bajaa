@@ -135,3 +135,5 @@ Route::delete('transactions/{id}/delete', 'VendorTransactionController@destroy')
 // Multi-Filter Report Matrix Pathway
 Route::get('reports/vendor-report', 'VendorReportController@index')->name('reports.vendor_report');
 Route::get('reports/vendor-report/print', 'VendorReportController@print')->name('reports.vendor_report_print');
+Route::get('transactions/{id}/receipt', 'VendorTransactionController@receipt')
+    ->name('transactions.receipt');
