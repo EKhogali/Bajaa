@@ -20,6 +20,24 @@
 
     {{-- Select2 --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+
+
+    <style>
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            display: none;
+        }
+
+        .dropdown-submenu:hover>.dropdown-menu {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
@@ -51,7 +69,7 @@
                 {{-- Menu --}}
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <!-- <li class="nav-item">
+                    <!-- <li class="nav-item">
     <a href="{{ route('vendors.index') }}" class="nav-link">
         <i class="nav-icon fas fa-boxes"></i>
         <p>الموردين</p>
@@ -69,8 +87,8 @@
     <a href="{{ route('reports.vendor_report') }}" class="nav-link">
         <i class="nav-icon fas fa-chart-line"></i>
         <p>تقرير الموردين</p> -->
-    </a>
-</li>
+                    </a>
+                    </li>
 
                     <li class="nav-item">
                         <a class="nav-link active" href="/">الرئيسية</a>
@@ -119,26 +137,67 @@
                             </li>
 
                             {{-- الحركة --}}
+                            <!-- <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    حركة الموردين
+                                                </a>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
+                                                    </li>
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="/transactions">حركة الموردين</a>
+                                                    </li>
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                                    </li>
+                                                </ul>
+                                            </li> -->
+
+                            {{-- تصنيفات الموردين --}}
+                            {{-- تصنيفات الموردين --}}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
-                                    حركة الموردين
+                                    الحسابات العامة
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="/transactions">حركة الموردين</a>
-                                    </li>
+                                    @if($isAdminOrSupervisor)
+                                        <li><a class="dropdown-item" href="{{ route('vendor_groups.index') }}">إدارة التصنيفات</a>
+                                        </li>
+                                    @endif
+
+                                    <li><a class="dropdown-item" href="{{ route('vendors.index') }}">قائمة الحسابات</a></li>
+
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
+
+                                    @foreach(\App\VendorGroup::where('company_id', session('company_id'))->orderBy('name')->get() as $vg)
+                                        <li>
+                                            <a class="dropdown-item"
+                                                href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
+                                                {{ $vg->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+
                                     <li>
                                         <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('reports.debt_statement') }}">كشف المديونية</a>
                                     </li>
                                 </ul>
                             </li>
@@ -175,7 +234,7 @@
                             @endif
 
                             {{-- التقارير --}}
-                            @if($isAdminOrSupervisor )
+                            @if($isAdminOrSupervisor)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                         aria-expanded="false">

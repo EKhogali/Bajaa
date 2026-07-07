@@ -42,6 +42,20 @@
                                 </div>
                             </div>
 
+<div class="form-group row mb-3">
+    <label for="vendor_group_id" class="col-sm-3 col-form-label font-weight-bold">تصنيف المورد</label>
+    <div class="col-sm-9">
+        <select class="form-control" name="vendor_group_id" id="vendor_group_id">
+            <option value="">-- بدون تصنيف --</option>
+            @foreach($groups as $g)
+                <option value="{{ $g->id }}" {{ old('vendor_group_id', $vendor->vendor_group_id) == $g->id ? 'selected' : '' }}>
+                    {{ $g->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+</div>
+
                             <div class="form-group row mb-3">
                                 <label for="tags" class="col-sm-3 col-form-label font-weight-bold">الوسوم / التصنيفات</label>
                                 <div class="col-sm-9">

@@ -45,6 +45,19 @@
                         </div>
 
                         <div class="card-body table-responsive p-0">
+
+<div class="p-3 border-bottom">
+    <form method="GET" class="d-flex align-items-center" style="gap:10px; max-width:400px;">
+        <label class="font-weight-bold mb-0">تصفية حسب التصنيف:</label>
+        <select name="vendor_group_id" class="form-control form-control-sm" onchange="this.form.submit()">
+            <option value="">-- كل التصنيفات --</option>
+            @foreach($groups as $g)
+                <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+            @endforeach
+        </select>
+    </form>
+</div>
+
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
                                     <tr>
@@ -53,6 +66,7 @@
                                         <th>رقم الهاتف</th>
                                         <th>الرصيد الحالي</th>
                                         <th>التصنيفات والوسوم</th>
+                                        <th>تصنيف المورد</th>
                                         <th style="width: 180px;">العمليات</th>
                                     </tr>
                                 </thead>
@@ -76,6 +90,13 @@
                                                 @endforelse
                                             </td>
                                             <td>
+    @if($vendor->group)
+        <span class="badge badge-info px-2 py-1 text-dark font-weight-bold">{{ $vendor->group->name }}</span>
+    @else
+        <span class="text-muted small">بدون تصنيف</span>
+    @endif
+</td>
+                                            <td>
                                                 <!-- <a href="#" class="btn btn-sm btn-info ml-1" title="عرض الحركات">
                                                         <i class="fas fa-eye ml-1"></i> عرض
                                                     </a> -->
@@ -97,7 +118,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4 text-muted">
+                                            <td colspan="7" class="text-center py-4 text-muted">
                                                 <i class="fas fa-folder-open d-block mb-2 fa-2x text-secondary"></i>
                                                 لا يوجد أي موردين مسجلين حالياً.
                                             </td>

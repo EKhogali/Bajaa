@@ -11061,42 +11061,32 @@ class VendorReportController extends Controller
     public function index(Request $request)
     {
         $companyId = session('company_id');
-        
-        // باني استعلام تقرير الحركات الأساسي
+
         $query = VendorTransaction::where('company_id', $companyId)
             ->with(['vendor.tags', 'tags']);
 
-        // 1. الفلترة حسب المورد المختار
         if ($request->filled('vendor_id')) {
             $query->where('vendor_id', $request->vendor_id);
         }
-
-        // 2. الفلترة حسب النطاق الزمني للمستندات
         if ($request->filled('from_date')) {
             $query->where('date', '>=', $request->from_date);
         }
         if ($request->filled('to_date')) {
             $query->where('date', '<=', $request->to_date);
         }
-
-        // 3. الفلترة المتقدمة بحسب وسوم الموردين (Vendor Tags)
-        if ($request->filled('vendor_tag_id')) {
+        if ($request->filled('vendor_tag_ids')) {
             $query->whereHas('vendor.tags', function ($q) use ($request) {
-                $q->where('vendor_tags.id', $request->vendor_tag_id);
+                $q->whereIn('vendor_tags.id', $request->vendor_tag_ids);
             });
         }
-
-        // 4. الفلترة المتقدمة بحسب وسوم الحركات المباشرة (Transaction Tags)
-        if ($request->filled('transaction_tag_id')) {
+        if ($request->filled('transaction_tag_ids')) {
             $query->whereHas('tags', function ($q) use ($request) {
-                $q->where('transaction_tags.id', $request->transaction_tag_id);
+                $q->whereIn('transaction_tags.id', $request->transaction_tag_ids);
             });
         }
 
-        // جلب النتائج النهائية مصنفة حسب تاريخ القيد المالي
         $transactions = $query->orderBy('date', 'asc')->get();
 
-        // حساب الرصيد السابق التراكمي (الافتتاحي قبل تاريخ البداية من أجل صحة الحسابات)
         $previousBalance = 0;
         if ($request->filled('vendor_id') && $request->filled('from_date')) {
             $prevTotals = DB::table('vendor_transactions')
@@ -11104,16 +11094,13 @@ class VendorReportController extends Controller
                 ->where('date', '<', $request->from_date)
                 ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
                 ->first();
-
             $previousBalance = ($prevTotals->total_debit ?? 0) - ($prevTotals->total_credit ?? 0);
         }
 
-        // حساب مجاميع الحركات الحالية المعروضة بالفترة للتلخيص
         $totalDebit = $transactions->sum('debit');
         $totalCredit = $transactions->sum('credit');
         $finalBalance = $previousBalance + $totalDebit - $totalCredit;
 
-        // جلب جميع بيانات القوائم المنسدلة المربوطة بالشركة المحددة لعرض الفلاتر
         $vendors = Vendor::where('company_id', $companyId)->get();
         $vendorTags = VendorTag::where('company_id', $companyId)->get();
         $transactionTags = TransactionTag::where('company_id', $companyId)->get();
@@ -11127,6 +11114,84 @@ class VendorReportController extends Controller
             'totalDebit',
             'totalCredit',
             'finalBalance'
+        ));
+    }
+
+    public function print(Request $request)
+    {
+        $companyId = session('company_id');
+
+        $query = VendorTransaction::where('company_id', $companyId)
+            ->with(['vendor.tags', 'tags']);
+
+        if ($request->filled('vendor_id')) {
+            $query->where('vendor_id', $request->vendor_id);
+        }
+        if ($request->filled('from_date')) {
+            $query->where('date', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->where('date', '<=', $request->to_date);
+        }
+        if ($request->filled('vendor_tag_ids')) {
+            $query->whereHas('vendor.tags', function ($q) use ($request) {
+                $q->whereIn('vendor_tags.id', $request->vendor_tag_ids);
+            });
+        }
+        if ($request->filled('transaction_tag_ids')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('transaction_tags.id', $request->transaction_tag_ids);
+            });
+        }
+
+        $transactions = $query->orderBy('date', 'asc')->get();
+
+        $previousBalance = 0;
+        if ($request->filled('vendor_id') && $request->filled('from_date')) {
+            $prevTotals = DB::table('vendor_transactions')
+                ->where('vendor_id', $request->vendor_id)
+                ->where('date', '<', $request->from_date)
+                ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
+                ->first();
+            $previousBalance = ($prevTotals->total_debit ?? 0) - ($prevTotals->total_credit ?? 0);
+        }
+
+        $totalDebit = $transactions->sum('debit');
+        $totalCredit = $transactions->sum('credit');
+        $finalBalance = $previousBalance + $totalDebit - $totalCredit;
+
+        $filterVendor = null;
+        if ($request->filled('vendor_id')) {
+            $v = Vendor::find($request->vendor_id);
+            $filterVendor = $v ? $v->name : null;  // ← PHP 7 compatible
+        }
+
+        $filterVendorTags = null;
+        if ($request->filled('vendor_tag_ids')) {
+            $filterVendorTags = VendorTag::whereIn('id', $request->vendor_tag_ids)
+                ->pluck('name')->implode('، ');
+        }
+
+        $filterTransactionTags = null;
+        if ($request->filled('transaction_tag_ids')) {
+            $filterTransactionTags = TransactionTag::whereIn('id', $request->transaction_tag_ids)
+                ->pluck('name')->implode('، ');
+        }
+
+        $filterFromDate = $request->from_date;
+        $filterToDate = $request->to_date;
+
+        return view('rep.vendor_report_print', compact(
+            'transactions',
+            'previousBalance',
+            'totalDebit',
+            'totalCredit',
+            'finalBalance',
+            'filterVendor',
+            'filterFromDate',
+            'filterToDate',
+            'filterVendorTags',
+            'filterTransactionTags'
         ));
     }
 }
@@ -11290,7 +11355,8 @@ class VendorTransactionController extends Controller
 
                 foreach ($tagNames as $name) {
                     $trimmedName = trim($name);
-                    if (empty($trimmedName)) continue;
+                    if (empty($trimmedName))
+                        continue;
 
                     $tag = TransactionTag::firstOrCreate([
                         'company_id' => $companyId,
@@ -11309,18 +11375,23 @@ class VendorTransactionController extends Controller
         return redirect()->route('transactions.index')->with('success', 'تم تسجيل الحركة المالية وتحديث الرصيد بنجاح.');
     }
 
-    // 4. نموذج تعديل الحركة المالية
     public function edit($id)
     {
         $companyId = session('company_id');
         $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
         $vendors = Vendor::where('company_id', $companyId)->get();
+        $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
-        // تحديد المبلغ الحالي ونوع الحركة للعرض في الاستمارة
-        $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
+        $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
 
-        return view('vendor_transactions.edit', compact('transaction', 'vendors', 'currentAmount', 'currentType'));
+        return view('vendor_transactions.edit', compact(
+            'transaction',
+            'vendors',
+            'existingTags',
+            'currentType',
+            'currentAmount'
+        ));
     }
 
     // 5. تحديث بيانات الحركة المالية
@@ -11358,7 +11429,8 @@ class VendorTransactionController extends Controller
 
                 foreach ($tagNames as $name) {
                     $trimmedName = trim($name);
-                    if (empty($trimmedName)) continue;
+                    if (empty($trimmedName))
+                        continue;
 
                     $tag = TransactionTag::firstOrCreate([
                         'company_id' => $companyId,
@@ -11408,6 +11480,20 @@ class VendorTransactionController extends Controller
 
         DB::table('vendors')->where('id', $vendorId)->update(['balance' => $calculatedBalance]);
     }
+
+
+    public function receipt($id)
+    {
+        $companyId = session('company_id');
+        $transaction = VendorTransaction::where('company_id', $companyId)
+            ->with(['vendor', 'tags'])
+            ->findOrFail($id);
+
+        return view('vendor_transactions.receipt', compact('transaction'));
+    }
+
+
+
 }
 
 --- FILE: app\Http\Controllers\VendorsController.php ---
@@ -11420,153 +11506,152 @@ use App\Vendor;
 use App\VendorTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\TransactionTag;
+
+use App\VendorTransaction;
 
 class VendorsController extends Controller
 {
-    // List vendors for the active company only
     public function index()
-    {
-        $companyId = session('company_id');
+{
+    $companyId = session('company_id');
 
-        $vendors = Vendor::where('company_id', $companyId)
-            ->with('tags')
-            ->get();
+    $vendors = Vendor::where('company_id', $companyId)
+        ->with('tags')
+        ->get();
 
-        return view('bsc.vendors.index', compact('vendors'));
-    }
+    return view('bsc.vendors.index', compact('vendors'));
+}
 
-    public function create()
-    {
-        return view('bsc.vendors.create');
-    }
+public function create()
+{
+    $companyId    = session('company_id');
+    $vendors      = Vendor::where('company_id', $companyId)->get();
+    $existingTags = TransactionTag::where('company_id', $companyId)->get(); // ← add this
 
-    // Store vendor and process tags on-the-fly
+    return view('bsc.vendors.create', compact('vendors', 'existingTags'));
+}
+
     public function store(Request $request)
     {
         $companyId = session('company_id');
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel' => 'nullable|string|max:50',
+            'tel'  => 'nullable|string|max:50',
         ]);
 
         $vendor = Vendor::create([
             'company_id' => $companyId,
-            'name' => $request->name,
-            'tel' => $request->tel,
-            'balance' => 0,
+            'name'       => $request->name,
+            'tel'        => $request->tel,
+            'balance'    => 0,
         ]);
 
-        // Process tags on the fly if provided (expects comma-separated string)
-        if ($request->filled('tags')) {
-            $tagNames = explode(',', $request->tags);
-            $tagIds = [];
+        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
-            foreach ($tagNames as $name) {
-                $trimmedName = trim($name);
-                if (empty($trimmedName)) continue;
-
-                // Find or create tag inside the active company scope
-                $tag = VendorTag::firstOrCreate([
-                    'company_id' => $companyId,
-                    'name' => $trimmedName
-                ]);
-
-                $tagIds[] = $tag->id;
-            }
-
-            $vendor->tags()->sync($tagIds);
-        }
-
-        return redirect()->route('vendors.index')->with('success', 'Vendor created successfully.');
+        return redirect()->route('vendors.index')->with('success', 'تم إضافة المورد بنجاح.');
     }
 
-
-// Show the form for editing the specified vendor
     public function edit($id)
     {
         $companyId = session('company_id');
-        $vendor = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
 
-        return view('bsc.vendors.edit', compact('vendor'));
+        $vendor       = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
+        $existingTags = VendorTag::where('company_id', $companyId)->get();
+
+        return view('bsc.vendors.edit', compact('vendor', 'existingTags'));
     }
 
-    // Update logic for vendor profiles and sync tags on the fly
     public function update(Request $request, $id)
     {
         $companyId = session('company_id');
-        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel' => 'nullable|string|max:50',
+            'tel'  => 'nullable|string|max:50',
         ]);
 
         $vendor->update([
             'name' => $request->name,
-            'tel' => $request->tel,
+            'tel'  => $request->tel,
         ]);
 
-        // Re-process multi-filter tags framework mapping matches
-        if ($request->has('tags')) {
-            $tagNames = explode(',', $request->tags);
-            $tagIds = [];
-
-            foreach ($tagNames as $name) {
-                $trimmedName = trim($name);
-                if (empty($trimmedName)) continue;
-
-                $tag = VendorTag::firstOrCreate([
-                    'company_id' => $companyId,
-                    'name' => $trimmedName
-                ]);
-
-                $tagIds[] = $tag->id;
-            }
-            $vendor->tags()->sync($tagIds);
-        } else {
-            $vendor->tags()->sync([]);
-        }
+        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
 
-    // Delete logic to drop vendor account record safely
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
-        
+        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+
         $vendor->delete();
 
         return redirect()->route('vendors.index')->with('success', 'تم حذف المورد بنجاح.');
     }
 
-
-
-    // Button action to manually recalculate all vendor balances for the active company
     public function recalculateBalances()
     {
         $companyId = session('company_id');
 
-        // Fetch all vendors belonging to this company
-        $vendors = Vendor::where('company_id', $companyId)->get();
-
-        foreach ($vendors as $vendor) {
-            // Calculate dynamic balance total: sum(debit) - sum(credit)
+        Vendor::where('company_id', $companyId)->each(function ($vendor) {
             $totals = DB::table('vendor_transactions')
                 ->where('vendor_id', $vendor->id)
                 ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
                 ->first();
 
-            $calculatedBalance = ($totals->total_debit ?? 0) - ($totals->total_credit ?? 0);
+            $vendor->update([
+                'balance' => ($totals->total_debit ?? 0) - ($totals->total_credit ?? 0),
+            ]);
+        });
 
-            // Sync the changes back to storage
-            $vendor->update(['balance' => $calculatedBalance]);
+        return redirect()->route('vendors.index')->with('success', 'تم إعادة احتساب الأرصدة بنجاح.');
+    }
+
+    /**
+     * Resolve tag IDs from the multi-select array input.
+     * Tags submitted as new names (prefixed with "new:") are created on the fly.
+     * Existing tag IDs are used directly.
+     */
+    private function resolveTagIds(Request $request, int $companyId): array
+{
+    $submitted = $request->input('tags') ?? []; // ← null-safe fallback
+
+    if (empty($submitted) || !is_array($submitted)) {
+        return [];
+    }
+
+    $tagIds = [];
+
+    foreach ($submitted as $value) {
+        $value = trim($value);
+        if (empty($value)) continue;
+
+        if (str_starts_with($value, 'new:')) {
+            $name = trim(substr($value, 4));
+            if (empty($name)) continue;
+
+            $tag = VendorTag::firstOrCreate([
+                'company_id' => $companyId,
+                'name'       => $name,
+            ]);
+        } else {
+            $tag = VendorTag::where('company_id', $companyId)
+                ->findOrFail((int) $value);
         }
 
-        return redirect()->route('vendors.index')->with('success', 'Balances recalculated successfully.');
+        $tagIds[] = $tag->id;
     }
+
+    return array_unique($tagIds);
+}
+
+
+
+
 }
 
 --- FILE: app\Http\Controllers\important.txt ---
@@ -36326,42 +36411,32 @@ class VendorReportController extends Controller
     public function index(Request $request)
     {
         $companyId = session('company_id');
-        
-        // باني استعلام تقرير الحركات الأساسي
+
         $query = VendorTransaction::where('company_id', $companyId)
             ->with(['vendor.tags', 'tags']);
 
-        // 1. الفلترة حسب المورد المختار
         if ($request->filled('vendor_id')) {
             $query->where('vendor_id', $request->vendor_id);
         }
-
-        // 2. الفلترة حسب النطاق الزمني للمستندات
         if ($request->filled('from_date')) {
             $query->where('date', '>=', $request->from_date);
         }
         if ($request->filled('to_date')) {
             $query->where('date', '<=', $request->to_date);
         }
-
-        // 3. الفلترة المتقدمة بحسب وسوم الموردين (Vendor Tags)
-        if ($request->filled('vendor_tag_id')) {
+        if ($request->filled('vendor_tag_ids')) {
             $query->whereHas('vendor.tags', function ($q) use ($request) {
-                $q->where('vendor_tags.id', $request->vendor_tag_id);
+                $q->whereIn('vendor_tags.id', $request->vendor_tag_ids);
             });
         }
-
-        // 4. الفلترة المتقدمة بحسب وسوم الحركات المباشرة (Transaction Tags)
-        if ($request->filled('transaction_tag_id')) {
+        if ($request->filled('transaction_tag_ids')) {
             $query->whereHas('tags', function ($q) use ($request) {
-                $q->where('transaction_tags.id', $request->transaction_tag_id);
+                $q->whereIn('transaction_tags.id', $request->transaction_tag_ids);
             });
         }
 
-        // جلب النتائج النهائية مصنفة حسب تاريخ القيد المالي
         $transactions = $query->orderBy('date', 'asc')->get();
 
-        // حساب الرصيد السابق التراكمي (الافتتاحي قبل تاريخ البداية من أجل صحة الحسابات)
         $previousBalance = 0;
         if ($request->filled('vendor_id') && $request->filled('from_date')) {
             $prevTotals = DB::table('vendor_transactions')
@@ -36369,16 +36444,13 @@ class VendorReportController extends Controller
                 ->where('date', '<', $request->from_date)
                 ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
                 ->first();
-
             $previousBalance = ($prevTotals->total_debit ?? 0) - ($prevTotals->total_credit ?? 0);
         }
 
-        // حساب مجاميع الحركات الحالية المعروضة بالفترة للتلخيص
         $totalDebit = $transactions->sum('debit');
         $totalCredit = $transactions->sum('credit');
         $finalBalance = $previousBalance + $totalDebit - $totalCredit;
 
-        // جلب جميع بيانات القوائم المنسدلة المربوطة بالشركة المحددة لعرض الفلاتر
         $vendors = Vendor::where('company_id', $companyId)->get();
         $vendorTags = VendorTag::where('company_id', $companyId)->get();
         $transactionTags = TransactionTag::where('company_id', $companyId)->get();
@@ -36392,6 +36464,84 @@ class VendorReportController extends Controller
             'totalDebit',
             'totalCredit',
             'finalBalance'
+        ));
+    }
+
+    public function print(Request $request)
+    {
+        $companyId = session('company_id');
+
+        $query = VendorTransaction::where('company_id', $companyId)
+            ->with(['vendor.tags', 'tags']);
+
+        if ($request->filled('vendor_id')) {
+            $query->where('vendor_id', $request->vendor_id);
+        }
+        if ($request->filled('from_date')) {
+            $query->where('date', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->where('date', '<=', $request->to_date);
+        }
+        if ($request->filled('vendor_tag_ids')) {
+            $query->whereHas('vendor.tags', function ($q) use ($request) {
+                $q->whereIn('vendor_tags.id', $request->vendor_tag_ids);
+            });
+        }
+        if ($request->filled('transaction_tag_ids')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('transaction_tags.id', $request->transaction_tag_ids);
+            });
+        }
+
+        $transactions = $query->orderBy('date', 'asc')->get();
+
+        $previousBalance = 0;
+        if ($request->filled('vendor_id') && $request->filled('from_date')) {
+            $prevTotals = DB::table('vendor_transactions')
+                ->where('vendor_id', $request->vendor_id)
+                ->where('date', '<', $request->from_date)
+                ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
+                ->first();
+            $previousBalance = ($prevTotals->total_debit ?? 0) - ($prevTotals->total_credit ?? 0);
+        }
+
+        $totalDebit = $transactions->sum('debit');
+        $totalCredit = $transactions->sum('credit');
+        $finalBalance = $previousBalance + $totalDebit - $totalCredit;
+
+        $filterVendor = null;
+        if ($request->filled('vendor_id')) {
+            $v = Vendor::find($request->vendor_id);
+            $filterVendor = $v ? $v->name : null;  // ← PHP 7 compatible
+        }
+
+        $filterVendorTags = null;
+        if ($request->filled('vendor_tag_ids')) {
+            $filterVendorTags = VendorTag::whereIn('id', $request->vendor_tag_ids)
+                ->pluck('name')->implode('، ');
+        }
+
+        $filterTransactionTags = null;
+        if ($request->filled('transaction_tag_ids')) {
+            $filterTransactionTags = TransactionTag::whereIn('id', $request->transaction_tag_ids)
+                ->pluck('name')->implode('، ');
+        }
+
+        $filterFromDate = $request->from_date;
+        $filterToDate = $request->to_date;
+
+        return view('rep.vendor_report_print', compact(
+            'transactions',
+            'previousBalance',
+            'totalDebit',
+            'totalCredit',
+            'finalBalance',
+            'filterVendor',
+            'filterFromDate',
+            'filterToDate',
+            'filterVendorTags',
+            'filterTransactionTags'
         ));
     }
 }
@@ -36555,7 +36705,8 @@ class VendorTransactionController extends Controller
 
                 foreach ($tagNames as $name) {
                     $trimmedName = trim($name);
-                    if (empty($trimmedName)) continue;
+                    if (empty($trimmedName))
+                        continue;
 
                     $tag = TransactionTag::firstOrCreate([
                         'company_id' => $companyId,
@@ -36574,18 +36725,23 @@ class VendorTransactionController extends Controller
         return redirect()->route('transactions.index')->with('success', 'تم تسجيل الحركة المالية وتحديث الرصيد بنجاح.');
     }
 
-    // 4. نموذج تعديل الحركة المالية
     public function edit($id)
     {
         $companyId = session('company_id');
         $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
         $vendors = Vendor::where('company_id', $companyId)->get();
+        $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
-        // تحديد المبلغ الحالي ونوع الحركة للعرض في الاستمارة
-        $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
+        $currentAmount = $transaction->debit > 0 ? $transaction->debit : $transaction->credit;
 
-        return view('vendor_transactions.edit', compact('transaction', 'vendors', 'currentAmount', 'currentType'));
+        return view('vendor_transactions.edit', compact(
+            'transaction',
+            'vendors',
+            'existingTags',
+            'currentType',
+            'currentAmount'
+        ));
     }
 
     // 5. تحديث بيانات الحركة المالية
@@ -36623,7 +36779,8 @@ class VendorTransactionController extends Controller
 
                 foreach ($tagNames as $name) {
                     $trimmedName = trim($name);
-                    if (empty($trimmedName)) continue;
+                    if (empty($trimmedName))
+                        continue;
 
                     $tag = TransactionTag::firstOrCreate([
                         'company_id' => $companyId,
@@ -36673,6 +36830,20 @@ class VendorTransactionController extends Controller
 
         DB::table('vendors')->where('id', $vendorId)->update(['balance' => $calculatedBalance]);
     }
+
+
+    public function receipt($id)
+    {
+        $companyId = session('company_id');
+        $transaction = VendorTransaction::where('company_id', $companyId)
+            ->with(['vendor', 'tags'])
+            ->findOrFail($id);
+
+        return view('vendor_transactions.receipt', compact('transaction'));
+    }
+
+
+
 }
 
 --- FILE: app\Http\Controllers\VendorsController.php ---
@@ -36685,153 +36856,152 @@ use App\Vendor;
 use App\VendorTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\TransactionTag;
+
+use App\VendorTransaction;
 
 class VendorsController extends Controller
 {
-    // List vendors for the active company only
     public function index()
-    {
-        $companyId = session('company_id');
+{
+    $companyId = session('company_id');
 
-        $vendors = Vendor::where('company_id', $companyId)
-            ->with('tags')
-            ->get();
+    $vendors = Vendor::where('company_id', $companyId)
+        ->with('tags')
+        ->get();
 
-        return view('bsc.vendors.index', compact('vendors'));
-    }
+    return view('bsc.vendors.index', compact('vendors'));
+}
 
-    public function create()
-    {
-        return view('bsc.vendors.create');
-    }
+public function create()
+{
+    $companyId    = session('company_id');
+    $vendors      = Vendor::where('company_id', $companyId)->get();
+    $existingTags = TransactionTag::where('company_id', $companyId)->get(); // ← add this
 
-    // Store vendor and process tags on-the-fly
+    return view('bsc.vendors.create', compact('vendors', 'existingTags'));
+}
+
     public function store(Request $request)
     {
         $companyId = session('company_id');
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel' => 'nullable|string|max:50',
+            'tel'  => 'nullable|string|max:50',
         ]);
 
         $vendor = Vendor::create([
             'company_id' => $companyId,
-            'name' => $request->name,
-            'tel' => $request->tel,
-            'balance' => 0,
+            'name'       => $request->name,
+            'tel'        => $request->tel,
+            'balance'    => 0,
         ]);
 
-        // Process tags on the fly if provided (expects comma-separated string)
-        if ($request->filled('tags')) {
-            $tagNames = explode(',', $request->tags);
-            $tagIds = [];
+        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
-            foreach ($tagNames as $name) {
-                $trimmedName = trim($name);
-                if (empty($trimmedName)) continue;
-
-                // Find or create tag inside the active company scope
-                $tag = VendorTag::firstOrCreate([
-                    'company_id' => $companyId,
-                    'name' => $trimmedName
-                ]);
-
-                $tagIds[] = $tag->id;
-            }
-
-            $vendor->tags()->sync($tagIds);
-        }
-
-        return redirect()->route('vendors.index')->with('success', 'Vendor created successfully.');
+        return redirect()->route('vendors.index')->with('success', 'تم إضافة المورد بنجاح.');
     }
 
-
-// Show the form for editing the specified vendor
     public function edit($id)
     {
         $companyId = session('company_id');
-        $vendor = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
 
-        return view('bsc.vendors.edit', compact('vendor'));
+        $vendor       = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
+        $existingTags = VendorTag::where('company_id', $companyId)->get();
+
+        return view('bsc.vendors.edit', compact('vendor', 'existingTags'));
     }
 
-    // Update logic for vendor profiles and sync tags on the fly
     public function update(Request $request, $id)
     {
         $companyId = session('company_id');
-        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel' => 'nullable|string|max:50',
+            'tel'  => 'nullable|string|max:50',
         ]);
 
         $vendor->update([
             'name' => $request->name,
-            'tel' => $request->tel,
+            'tel'  => $request->tel,
         ]);
 
-        // Re-process multi-filter tags framework mapping matches
-        if ($request->has('tags')) {
-            $tagNames = explode(',', $request->tags);
-            $tagIds = [];
-
-            foreach ($tagNames as $name) {
-                $trimmedName = trim($name);
-                if (empty($trimmedName)) continue;
-
-                $tag = VendorTag::firstOrCreate([
-                    'company_id' => $companyId,
-                    'name' => $trimmedName
-                ]);
-
-                $tagIds[] = $tag->id;
-            }
-            $vendor->tags()->sync($tagIds);
-        } else {
-            $vendor->tags()->sync([]);
-        }
+        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
 
-    // Delete logic to drop vendor account record safely
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
-        
+        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+
         $vendor->delete();
 
         return redirect()->route('vendors.index')->with('success', 'تم حذف المورد بنجاح.');
     }
 
-
-
-    // Button action to manually recalculate all vendor balances for the active company
     public function recalculateBalances()
     {
         $companyId = session('company_id');
 
-        // Fetch all vendors belonging to this company
-        $vendors = Vendor::where('company_id', $companyId)->get();
-
-        foreach ($vendors as $vendor) {
-            // Calculate dynamic balance total: sum(debit) - sum(credit)
+        Vendor::where('company_id', $companyId)->each(function ($vendor) {
             $totals = DB::table('vendor_transactions')
                 ->where('vendor_id', $vendor->id)
                 ->selectRaw('SUM(debit) as total_debit, SUM(credit) as total_credit')
                 ->first();
 
-            $calculatedBalance = ($totals->total_debit ?? 0) - ($totals->total_credit ?? 0);
+            $vendor->update([
+                'balance' => ($totals->total_debit ?? 0) - ($totals->total_credit ?? 0),
+            ]);
+        });
 
-            // Sync the changes back to storage
-            $vendor->update(['balance' => $calculatedBalance]);
+        return redirect()->route('vendors.index')->with('success', 'تم إعادة احتساب الأرصدة بنجاح.');
+    }
+
+    /**
+     * Resolve tag IDs from the multi-select array input.
+     * Tags submitted as new names (prefixed with "new:") are created on the fly.
+     * Existing tag IDs are used directly.
+     */
+    private function resolveTagIds(Request $request, int $companyId): array
+{
+    $submitted = $request->input('tags') ?? []; // ← null-safe fallback
+
+    if (empty($submitted) || !is_array($submitted)) {
+        return [];
+    }
+
+    $tagIds = [];
+
+    foreach ($submitted as $value) {
+        $value = trim($value);
+        if (empty($value)) continue;
+
+        if (str_starts_with($value, 'new:')) {
+            $name = trim(substr($value, 4));
+            if (empty($name)) continue;
+
+            $tag = VendorTag::firstOrCreate([
+                'company_id' => $companyId,
+                'name'       => $name,
+            ]);
+        } else {
+            $tag = VendorTag::where('company_id', $companyId)
+                ->findOrFail((int) $value);
         }
 
-        return redirect()->route('vendors.index')->with('success', 'Balances recalculated successfully.');
+        $tagIds[] = $tag->id;
     }
+
+    return array_unique($tagIds);
+}
+
+
+
+
 }
 
 --- FILE: app\Http\Controllers\important.txt ---
@@ -51914,21 +52084,21 @@ $cyan: #6cb2eb;
                             <div class="form-group row mb-3">
                                 <label for="name" class="col-sm-3 col-form-label font-weight-bold">إسم المورد <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="name" name="name" required placeholder="مثال: شركة الأنوار للإلكترونيات">
+                                    <input type="text" class="form-control" id="name" name="name" required >
                                 </div>
                             </div>
 
                             <div class="form-group row mb-3">
                                 <label for="tel" class="col-sm-3 col-form-label font-weight-bold">رقم الهاتف</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control text-left" id="tel" name="tel" placeholder="مثال: 091XXXXXXX" dir="ltr">
+                                    <input type="text" class="form-control text-left" id="tel" name="tel" >
                                 </div>
                             </div>
 
                             <div class="form-group row mb-3">
                                 <label for="tags" class="col-sm-3 col-form-label font-weight-bold">الوسوم / التصنيفات</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="tags" name="tags" placeholder="VIP, محلي, جملة">
+                                    <input type="text" class="form-control" id="tags" name="tags" >
                                     <small class="form-text text-muted mt-1">اكتب الأسماء مفصولة بفاصلة عادية ( , ).</small>
                                 </div>
                             </div>
@@ -54820,7 +54990,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                 {{-- Menu --}}
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <li class="nav-item">
+                <!-- <li class="nav-item">
     <a href="{{ route('vendors.index') }}" class="nav-link">
         <i class="nav-icon fas fa-boxes"></i>
         <p>الموردين</p>
@@ -54837,7 +55007,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 <li class="nav-item">
     <a href="{{ route('reports.vendor_report') }}" class="nav-link">
         <i class="nav-icon fas fa-chart-line"></i>
-        <p>تقرير الموردين</p>
+        <p>تقرير الموردين</p> -->
     </a>
 </li>
 
@@ -54884,6 +55054,31 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                                     </li>
                                     <li><a class="dropdown-item" href="/estimated_expense?transaction_type_id=1">المصروفات
                                             الإدارية التقديرية</a></li>
+                                </ul>
+                            </li>
+
+                            {{-- الحركة --}}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    حركة الموردين
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/transactions">حركة الموردين</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                    </li>
                                 </ul>
                             </li>
 
@@ -59447,189 +59642,762 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 @extends('layout.master')
 
 @section('content')
-<div class="content-header text-right">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark">كشف الحساب المتقدم للموردين</h1>
+
+    {{-- Select2 --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* ── Select2 pill styling ── */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            min-height: 38px;
+            padding: 3px 6px;
+            background-color: #fff;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 2px 3px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #555;
+            margin-left: 6px;
+            font-weight: bold;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #c00;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        /* ── Summary cards ── */
+        .summary-card {
+            border-radius: 8px;
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+        }
+
+        .summary-card .s-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c757d;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .s-value {
+            font-size: 20px;
+            font-weight: 800;
+            display: block;
+        }
+
+        /* ── Print ── */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+
+    {{-- ═══════════════════════════════════════════
+    PAGE HEADER
+    ════════════════════════════════════════════ --}}
+    <div class="content-header text-right no-print">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-12">
+                    <h1 class="m-0 text-dark">
+                        <i class="fas fa-file-invoice-dollar ml-2 text-primary"></i>
+                        كشف الحساب المتقدم للموردين
+                    </h1>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="content text-right" dir="rtl">
-    <div class="container-fluid">
-        
-        <div class="card card-primary card-outline shadow-sm mb-4">
-            <div class="card-header">
-                <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
-                    <i class="fas fa-filter ml-2 text-primary"></i> خيارات البحث والفلترة التفصيلية
-                </h3>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('reports.vendor_report') }}" method="GET">
-                    <div class="row">
-                        <div class="col-md-4 form-group mb-3">
-                            <label class="font-weight-bold">المورد المالي</label>
-                            <select class="form-control" name="vendor_id">
-                                <option value="">-- كل الموردين المسجلين --</option>
-                                @foreach($vendors as $vendor)
-                                    <option value="{{ $vendor->id }}" {{ request('vendor_id') == $vendor->id ? 'selected' : '' }}>
-                                        {{ $vendor->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+    <div class="content text-right" dir="rtl">
+        <div class="container-fluid">
 
-                        <div class="col-md-4 form-group mb-3">
-                            <label class="font-weight-bold">من تاريخ</label>
-                            <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
-                        </div>
-
-                        <div class="col-md-4 form-group mb-3">
-                            <label class="font-weight-bold">إلى تاريخ</label>
-                            <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
-                        </div>
-
-                        <div class="col-md-4 form-group mb-3">
-                            <label class="font-weight-bold">تصنيف الموردين (وسوم المورد)</label>
-                            <select class="form-control" name="vendor_tag_id">
-                                <option value="">-- كل التصنيفات --</option>
-                                @foreach($vendorTags as $vTag)
-                                    <option value="{{ $vTag->id }}" {{ request('vendor_tag_id') == $vTag->id ? 'selected' : '' }}>
-                                        {{ $vTag->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 form-group mb-3">
-                            <label class="font-weight-bold">نوع المعاملة المالية (وسوم الحركة)</label>
-                            <select class="form-control" name="transaction_tag_id">
-                                <option value="">-- كل الحركات المادية --</option>
-                                @foreach($transactionTags as $tTag)
-                                    <option value="{{ $tTag->id }}" {{ request('transaction_tag_id') == $tTag->id ? 'selected' : '' }}>
-                                        {{ $tTag->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-md-4 form-group mb-3 d-flex align-items-end" style="gap: 10px;">
-                            <button type="submit" class="btn btn-primary font-weight-bold flex-grow-1 shadow-sm">
-                                <i class="fas fa-calculator ml-1"></i> استخراج التقرير
-                            </button>
-                            <a href="{{ route('reports.vendor_report') }}" class="btn btn-default border">تصفية الكل</a>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="info-box bg-light shadow-sm border text-center d-block py-2">
-                    <span class="info-box-text text-muted font-weight-bold">الرصيد الافتتاحي المنقول</span>
-                    <h4 class="info-box-number mt-1 font-weight-bold {{ $previousBalance < 0 ? 'text-danger' : 'text-success' }}">
-                        {{ number_format($previousBalance, 2) }}
-                    </h4>
+            {{-- ═══════════════════════════════════════════
+            FILTER CARD
+            ════════════════════════════════════════════ --}}
+            <div class="card card-primary card-outline shadow-sm mb-4 no-print">
+                <div class="card-header">
+                    <h3 class="card-title font-weight-bold w-100 text-right" style="float:right;">
+                        <i class="fas fa-sliders-h ml-2 text-primary"></i> خيارات البحث والفلترة
+                    </h3>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="info-box bg-light shadow-sm border text-center d-block py-2">
-                    <span class="info-box-text text-muted font-weight-bold">إجمالي مدين (+) له</span>
-                    <h4 class="info-box-number mt-1 text-success font-weight-bold">{{ number_format($totalDebit, 2) }}</h4>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="info-box bg-light shadow-sm border text-center d-block py-2">
-                    <span class="info-box-text text-muted font-weight-bold">إجمالي دائن (-) عليه</span>
-                    <h4 class="info-box-number mt-1 text-danger font-weight-bold">{{ number_format($totalCredit, 2) }}</h4>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="info-box bg-dark shadow-sm text-center d-block py-2">
-                    <span class="info-box-text font-weight-bold text-white">صافي رصيد الحساب الختامي</span>
-                    <h4 class="info-box-number mt-1 text-warning font-weight-bold">{{ number_format($finalBalance, 2) }}</h4>
-                </div>
-            </div>
-        </div>
+                <div class="card-body">
+                    <form action="{{ route('reports.vendor_report') }}" method="GET" id="filterForm">
+                        <div class="row align-items-end">
 
-        <div class="card card-outline card-secondary shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title font-weight-bold text-dark m-0" style="flex: 1;">
-                    <i class="fas fa-file-alt ml-2 text-secondary"></i> السجلات والقيود الناتجة عن البحث المتقدم
-                </h3>
-                <div class="card-tools">
-                    <button onclick="window.print();" class="btn btn-sm btn-default border font-weight-bold">
-                        <i class="fas fa-print ml-1"></i> طباعة النسخة الورقية
-                    </button>
-                </div>
-            </div>
-            
-            <div class="card-body table-responsive p-0">
-                <table class="table table-bordered table-striped text-center mb-0">
-                    <thead class="bg-secondary text-white">
-                        <tr>
-                            <th style="width: 60px;">#</th>
-                            <th style="width: 110px;">التاريخ</th>
-                            <th>المورد</th>
-                            <th>البيان والتفاصيل</th>
-                            <th>الوسوم</th>
-                            <th style="width: 120px;">مدين (+)</th>
-                            <th style="width: 120px;">دائن (-)</th>
-                            <th style="width: 140px;">الرصيد التراكمي</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(request('from_date'))
-                            <tr class="bg-light text-muted font-weight-bold">
-                                <td>-</td>
-                                <td>{{ request('from_date') }}</td>
-                                <td>{{ request('vendor_id') ? $vendors->firstWhere('id', request('vendor_id'))->name : 'كل الموردين' }}</td>
-                                <td class="text-right px-3">رصيد حساب مرحل سابق لتاريخ النطاق الحالي...</td>
-                                <td><span class="badge badge-secondary">افتتاحي</span></td>
-                                <td>---</td>
-                                <td>---</td>
-                                <td class="{{ $previousBalance < 0 ? 'text-danger' : 'text-success' }}">{{ number_format($previousBalance, 2) }}</td>
-                            </tr>
-                        @endif
-
-                        @php $currentTrackBalance = $previousBalance; @endphp
-                        @forelse($transactions as $transaction)
-                            @php 
-                                $currentTrackBalance += $transaction->debit - $transaction->credit; 
-                            @endphp
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ \Carbon\Carbon::parse($transaction->date)->format('Y-m-d') }}</td>
-                                <td class="font-weight-bold text-primary">{{ $transaction->vendor->name ?? '---' }}</td>
-                                <td class="text-right px-3 text-muted small">{{ $transaction->description ?? '---' }}</td>
-                                <td>
-                                    @foreach($transaction->tags as $tag)
-                                        <span class="badge badge-warning px-1 text-dark">{{ $tag->name }}</span>
+                            {{-- Vendor --}}
+                            <div class="col-md-4 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">المورد المالي</label>
+                                <select class="form-control" name="vendor_id">
+                                    <option value="">-- كل الموردين --</option>
+                                    @foreach($vendors as $vendor)
+                                        <option value="{{ $vendor->id }}" {{ request('vendor_id') == $vendor->id ? 'selected' : '' }}>
+                                            {{ $vendor->name }}
+                                        </option>
                                     @endforeach
-                                </td>
-                                <td class="text-success font-weight-bold">{{ $transaction->debit > 0 ? number_format($transaction->debit, 2) : '---' }}</td>
-                                <td class="text-danger font-weight-bold">{{ $transaction->credit > 0 ? number_format($transaction->credit, 2) : '---' }}</td>
-                                <td class="font-weight-bold {{ $currentTrackBalance < 0 ? 'text-danger' : 'text-success' }}">{{ number_format($currentTrackBalance, 2) }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
-                                    <i class="fas fa-exclamation-circle d-block mb-2 text-warning fa-lg"></i>
-                                    لا توجد سجلات مالية متوافقة مع معايير الفلترة والبحث الحالية.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                </select>
+                            </div>
 
+                            {{-- From Date — default: first day of current month --}}
+                            <div class="col-md-2 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">من تاريخ</label>
+                                <input type="date" class="form-control" name="from_date"
+                                    value="{{ request('from_date', now()->startOfMonth()->toDateString()) }}">
+                            </div>
+
+                            {{-- To Date — default: today --}}
+                            <div class="col-md-2 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">إلى تاريخ</label>
+                                <input type="date" class="form-control" name="to_date"
+                                    value="{{ request('to_date', now()->toDateString()) }}">
+                            </div>
+
+                            {{-- Vendor Tags (multi) --}}
+                            <div class="col-md-4 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">وسوم المورد</label>
+                                <select class="select2-tags" name="vendor_tag_ids[]" multiple>
+                                    @foreach($vendorTags as $vTag)
+                                        <option value="{{ $vTag->id }}" {{ in_array($vTag->id, request('vendor_tag_ids', [])) ? 'selected' : '' }}>
+                                            {{ $vTag->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Transaction Tags (multi) --}}
+                            <div class="col-md-4 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">وسوم الحركة</label>
+                                <select class="select2-tags" name="transaction_tag_ids[]" multiple>
+                                    @foreach($transactionTags as $tTag)
+                                        <option value="{{ $tTag->id }}" {{ in_array($tTag->id, request('transaction_tag_ids', [])) ? 'selected' : '' }}>
+                                            {{ $tTag->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Actions --}}
+                            <div class="col-md-4 form-group mb-3 d-flex" style="gap:8px;">
+                                <button type="submit" class="btn btn-primary font-weight-bold flex-grow-1">
+                                    <i class="fas fa-search ml-1"></i> استخراج التقرير
+                                </button>
+                                <a href="{{ route('reports.vendor_report') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo ml-1"></i> إعادة تعيين
+                                </a>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- ═══════════════════════════════════════════
+            SUMMARY CARDS
+            ════════════════════════════════════════════ --}}
+            <div class="row mb-4">
+                <div class="col-6 col-md-3 mb-2">
+                    <div class="summary-card bg-white border">
+                        <span class="s-label">الرصيد الافتتاحي المنقول</span>
+                        <span class="s-value {{ $previousBalance < 0 ? 'text-danger' : 'text-secondary' }}">
+                            {{ number_format($previousBalance, 2) }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 mb-2">
+                    <div class="summary-card bg-white border">
+                        <span class="s-label">إجمالي المدين (+)</span>
+                        <span class="s-value text-success">{{ number_format($totalDebit, 2) }}</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 mb-2">
+                    <div class="summary-card bg-white border">
+                        <span class="s-label">إجمالي الدائن (−)</span>
+                        <span class="s-value text-danger">{{ number_format($totalCredit, 2) }}</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 mb-2">
+                    <div class="summary-card bg-dark">
+                        <span class="s-label text-white-50">صافي الرصيد الختامي</span>
+                        <span class="s-value text-warning">{{ number_format($finalBalance, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ═══════════════════════════════════════════
+            RESULTS TABLE
+            ════════════════════════════════════════════ --}}
+            <div class="card card-outline card-secondary shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title font-weight-bold text-dark m-0">
+                        <i class="fas fa-table ml-2 text-secondary"></i>
+                        سجلات الحركات المالية
+                        <small class="text-muted font-weight-normal mr-2">
+                            ({{ $transactions->count() }} حركة)
+                        </small>
+                    </h3>
+                    <div class="no-print">
+                        <a href="{{ route('reports.vendor_report_print') . '?' . http_build_query(request()->all()) }}"
+                            target="_blank" class="btn btn-sm btn-outline-secondary font-weight-bold no-print">
+                            <i class="fas fa-print ml-1"></i> طباعة
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm text-center mb-0" style="font-size:13px;">
+                            <thead class="bg-secondary text-white">
+                                <tr>
+                                    <th style="width:45px;">#</th>
+                                    <th style="width:100px;">التاريخ</th>
+                                    <th>المورد</th>
+                                    <th>البيان</th>
+                                    <th style="width:130px;">الوسوم</th>
+                                    <th style="width:110px;">مدين (+)</th>
+                                    <th style="width:110px;">دائن (−)</th>
+                                    <th style="width:130px;">الرصيد التراكمي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                {{-- Opening balance row --}}
+                                @if(request('from_date'))
+                                                        <tr class="table-light text-muted" style="font-size:12px;">
+                                                            <td>—</td>
+                                                            <td>{{ request('from_date') }}</td>
+                                                            <td class="font-weight-bold">
+                                                                {{ request('vendor_id')
+                                    ? ($vendors->firstWhere('id', request('vendor_id'))->name ?? '—')
+                                    : 'كل الموردين' }}
+                                                            </td>
+                                                            <td class="text-right px-2">رصيد مرحّل سابق</td>
+                                                            <td>
+                                                                <span class="badge badge-secondary" style="border-radius:20px;">افتتاحي</span>
+                                                            </td>
+                                                            <td class="text-muted">—</td>
+                                                            <td class="text-muted">—</td>
+                                                            <td
+                                                                class="font-weight-bold {{ $previousBalance < 0 ? 'text-danger' : 'text-success' }}">
+                                                                {{ number_format($previousBalance, 2) }}
+                                                            </td>
+                                                        </tr>
+                                @endif
+
+                                {{-- Transaction rows --}}
+                                @php $runningBalance = $previousBalance; @endphp
+
+                                @forelse($transactions as $t)
+                                    @php $runningBalance += $t->debit - $t->credit; @endphp
+                                    <tr>
+                                        <td class="text-muted">{{ $loop->iteration }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($t->date)->format('Y-m-d') }}</td>
+                                        <td class="font-weight-bold text-primary">{{ $t->vendor->name ?? '—' }}</td>
+                                        <td class="text-right px-2 text-muted small">{{ $t->description ?? '—' }}</td>
+                                        <td>
+                                            @forelse($t->tags as $tag)
+                                                <span class="badge badge-warning text-dark px-2"
+                                                    style="border-radius:20px; font-size:11px; margin:1px;">
+                                                    {{ $tag->name }}
+                                                </span>
+                                            @empty
+                                                <span class="text-muted">—</span>
+                                            @endforelse
+                                        </td>
+                                        <td class="font-weight-bold text-success">
+                                            {{ $t->debit > 0 ? number_format($t->debit, 2) : '—' }}
+                                        </td>
+                                        <td class="font-weight-bold text-danger">
+                                            {{ $t->credit > 0 ? number_format($t->credit, 2) : '—' }}
+                                        </td>
+                                        <td class="font-weight-bold {{ $runningBalance < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ number_format($runningBalance, 2) }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5 text-muted">
+                                            <i class="fas fa-inbox fa-2x d-block mb-2 text-secondary"></i>
+                                            لا توجد حركات مالية مطابقة لمعايير البحث الحالية.
+                                        </td>
+                                    </tr>
+                                @endforelse
+
+                            </tbody>
+
+                            {{-- Footer totals (only when there are rows) --}}
+                            @if($transactions->count() > 0)
+                                <tfoot class="bg-light font-weight-bold" style="font-size:13px;">
+                                    <tr>
+                                        <td colspan="5" class="text-right px-3">المجموع الكلي للفترة</td>
+                                        <td class="text-success">{{ number_format($totalDebit, 2) }}</td>
+                                        <td class="text-danger">{{ number_format($totalCredit, 2) }}</td>
+                                        <td class="{{ $finalBalance < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ number_format($finalBalance, 2) }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            @endif
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
+
+    {{-- Select2 JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.select2-tags').select2({
+                dir: 'rtl',
+                placeholder: '-- اختر وسوماً --',
+                allowClear: true,
+            });
+        });
+    </script>
+
 @endsection
+
+--- FILE: resources\views\rep\vendor_report_print.blade.php ---
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير الموردين</title>
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    @page {
+        size: A4 landscape;
+        margin: 12mm 10mm;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+        font-size: 13px;
+        color: #1a1a1a;
+        background: #fff;
+        direction: rtl;
+    }
+
+    .page {
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    /* ── Header ── */
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 3px solid #2c3e50;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+    }
+    .company-block .company-name {
+        font-size: 22px;
+        font-weight: 800;
+        color: #2c3e50;
+    }
+    .company-block .report-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        margin-top: 4px;
+    }
+    .meta-block {
+        text-align: left;
+        font-size: 12px;
+        color: #555;
+        line-height: 1.9;
+    }
+    .meta-block strong { color: #2c3e50; }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+        background: #f4f6f8;
+        border: 1px solid #dde1e6;
+        border-radius: 5px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 22px;
+        font-size: 12px;
+        color: #444;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .filter-bar .filter-label { font-weight: 700; color: #2c3e50; margin-left: 4px; }
+
+    /* ── Summary cards ── */
+    .summary-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+    .summary-card {
+        border: 1px solid #dde1e6;
+        border-radius: 6px;
+        padding: 8px 10px;
+        text-align: center;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .summary-card .s-label {
+        font-size: 11px;
+        color: #777;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .summary-card .s-value {
+        font-size: 18px;
+        font-weight: 800;
+        display: block;
+    }
+    .summary-card.dark {
+        background: #2c3e50;
+        border-color: #2c3e50;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .summary-card.dark .s-label { color: #99aabb; }
+    .summary-card.dark .s-value { color: #f1c40f; }
+    .text-success { color: #27ae60; }
+    .text-danger  { color: #c0392b; }
+    .text-muted   { color: #999; }
+
+    /* ── Table ── */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin-bottom: 14px;
+        table-layout: auto;   /* let browser size columns by content */
+    }
+    thead tr {
+        background: #2c3e50;
+        color: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    thead th {
+        padding: 9px 10px;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid #1a252f;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #e8eaed; }
+    tbody tr:nth-child(even) {
+        background: #f9fafb;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    tbody tr.opening-row {
+        background: #eef2f7;
+        font-style: italic;
+        color: #555;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    tbody tr.total-row {
+        background: #edf2f7;
+        font-weight: 800;
+        border-top: 2px solid #2c3e50;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    tbody td {
+        padding: 7px 10px;
+        text-align: center;
+        border: 1px solid #e0e3e8;
+        vertical-align: middle;
+    }
+
+    /* # column — tiny */
+    .col-num { width: 30px; white-space: nowrap; }
+
+    /* Date — fixed narrow */
+    .col-date { width: 88px; white-space: nowrap; }
+
+    /* Vendor — fixed medium */
+    .col-vendor { width: 120px; white-space: nowrap; font-weight: 700; color: #2980b9; }
+
+    /* البيان — gets all remaining space, wraps freely */
+    .col-desc {
+        text-align: right;
+        padding-right: 12px;
+        line-height: 1.6;
+        color: #333;
+        min-width: 200px;   /* never collapses below this */
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* Amount columns — wide enough for 000,000.00 */
+    .col-debit, .col-credit {
+        width: 110px;
+        white-space: nowrap;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Balance — slightly wider for running total */
+    .col-balance {
+        width: 120px;
+        white-space: nowrap;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Footer ── */
+    .report-footer {
+        border-top: 2px solid #2c3e50;
+        padding-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #888;
+        margin-top: 10px;
+    }
+
+    /* ── Screen toolbar ── */
+    .print-toolbar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        background: #2c3e50;
+        color: #fff;
+        padding: 9px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 999;
+        font-size: 13px;
+    }
+    .print-toolbar .btn-print {
+        background: #27ae60;
+        color: #fff;
+        border: none;
+        padding: 7px 22px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .print-toolbar .btn-print:hover { background: #219a52; }
+    .print-toolbar .btn-back {
+        background: #c0392b;
+        color: #fff;
+        border: none;
+        padding: 7px 18px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-right: auto;
+    }
+    .print-toolbar .btn-back:hover { background: #a93226; }
+
+    @media print {
+        body { background: #fff; padding-top: 0 !important; }
+        .no-print { display: none !important; }
+        .page { padding: 0; }
+        table { page-break-inside: auto; }
+        tr { page-break-inside: avoid; }
+        thead { display: table-header-group; }
+    }
+
+    body { padding-top: 48px; }
+</style>
+</head>
+<body>
+
+{{-- Screen toolbar --}}
+<div class="print-toolbar no-print">
+    <button class="btn-print" onclick="window.print()">🖨 طباعة التقرير</button>
+    <span>معاينة التقرير قبل الطباعة</span>
+    <button class="btn-back" onclick="window.history.back()">✕ رجوع</button>
+</div>
+
+<div class="page">
+
+    {{-- ══ HEADER ══ --}}
+    <div class="report-header">
+        <div class="company-block">
+            <div class="company-name">{{ session('company_name', 'الشركة') }}</div>
+            <div class="report-title">كشف الحساب المتقدم للموردين</div>
+        </div>
+        <div class="meta-block">
+            <div><strong>تاريخ الطباعة:</strong> {{ now()->format('Y-m-d') }}</div>
+            <div><strong>وقت الطباعة:</strong> {{ now()->format('H:i') }}</div>
+            <div><strong>عدد الحركات:</strong> {{ $transactions->count() }}</div>
+        </div>
+    </div>
+
+    {{-- ══ FILTER BAR ══ --}}
+    <div class="filter-bar">
+        <div>
+            <span class="filter-label">المورد:</span>
+            <span>{{ $filterVendor ?? 'كل الموردين' }}</span>
+        </div>
+        <div>
+            <span class="filter-label">من:</span>
+            <span>{{ $filterFromDate ?? '—' }}</span>
+        </div>
+        <div>
+            <span class="filter-label">إلى:</span>
+            <span>{{ $filterToDate ?? '—' }}</span>
+        </div>
+        @if(!empty($filterVendorTags))
+        <div>
+            <span class="filter-label">وسوم المورد:</span>
+            <span>{{ $filterVendorTags }}</span>
+        </div>
+        @endif
+        @if(!empty($filterTransactionTags))
+        <div>
+            <span class="filter-label">وسوم الحركة:</span>
+            <span>{{ $filterTransactionTags }}</span>
+        </div>
+        @endif
+    </div>
+
+    {{-- ══ SUMMARY CARDS ══ --}}
+    <div class="summary-row">
+        <div class="summary-card">
+            <span class="s-label">الرصيد الافتتاحي</span>
+            <span class="s-value {{ $previousBalance < 0 ? 'text-danger' : 'text-muted' }}">
+                {{ number_format($previousBalance, 2) }}
+            </span>
+        </div>
+        <div class="summary-card">
+            <span class="s-label">إجمالي المدين (+)</span>
+            <span class="s-value text-success">{{ number_format($totalDebit, 2) }}</span>
+        </div>
+        <div class="summary-card">
+            <span class="s-label">إجمالي الدائن (−)</span>
+            <span class="s-value text-danger">{{ number_format($totalCredit, 2) }}</span>
+        </div>
+        <div class="summary-card dark">
+            <span class="s-label">صافي الرصيد الختامي</span>
+            <span class="s-value">{{ number_format($finalBalance, 2) }}</span>
+        </div>
+    </div>
+
+    {{-- ══ TABLE ══ --}}
+    <table>
+        <thead>
+            <tr>
+                <th class="col-num">#</th>
+                <th class="col-date">التاريخ</th>
+                <th class="col-vendor">المورد</th>
+                <th class="col-desc">البيان والتفاصيل</th>
+                <th class="col-debit">مدين (+)</th>
+                <th class="col-credit">دائن (−)</th>
+                <th class="col-balance">الرصيد التراكمي</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {{-- Opening balance row --}}
+            @if($filterFromDate)
+            <tr class="opening-row">
+                <td>—</td>
+                <td>{{ $filterFromDate }}</td>
+                <td>{{ $filterVendor ?? 'كل الموردين' }}</td>
+                <td class="desc-cell">رصيد مرحّل سابق لتاريخ بداية الفترة</td>
+                <td class="amount-cell text-muted">—</td>
+                <td class="amount-cell text-muted">—</td>
+                <td class="balance-cell {{ $previousBalance < 0 ? 'text-danger' : 'text-success' }}">
+                    {{ number_format($previousBalance, 2) }}
+                </td>
+            </tr>
+            @endif
+
+            {{-- Rows --}}
+            @php $running = $previousBalance; @endphp
+            @forelse($transactions as $t)
+                @php $running += $t->debit - $t->credit; @endphp
+                <tr>
+                    <td class="text-muted">{{ $loop->iteration }}</td>
+                    <td>{{ \Carbon\Carbon::parse($t->date)->format('Y-m-d') }}</td>
+                    <td style="font-weight:700; color:#2980b9;">{{ $t->vendor->name ?? '—' }}</td>
+                    <td class="desc-cell">{{ $t->description ?? '—' }}</td>
+                    <td class="amount-cell text-success">
+                        {{ $t->debit > 0 ? number_format($t->debit, 2) : '—' }}
+                    </td>
+                    <td class="amount-cell text-danger">
+                        {{ $t->credit > 0 ? number_format($t->credit, 2) : '—' }}
+                    </td>
+                    <td class="balance-cell {{ $running < 0 ? 'text-danger' : 'text-success' }}">
+                        {{ number_format($running, 2) }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:24px; color:#999;">
+                        لا توجد حركات مالية مطابقة لمعايير البحث.
+                    </td>
+                </tr>
+            @endforelse
+
+            {{-- Totals row --}}
+            @if($transactions->count() > 0)
+            <tr class="total-row">
+                <td colspan="4" style="text-align:right; padding-right:14px; font-size:14px;">
+                    المجموع الكلي للفترة
+                </td>
+                <td class="amount-cell text-success">{{ number_format($totalDebit, 2) }}</td>
+                <td class="amount-cell text-danger">{{ number_format($totalCredit, 2) }}</td>
+                <td class="balance-cell {{ $finalBalance < 0 ? 'text-danger' : 'text-success' }}">
+                    {{ number_format($finalBalance, 2) }}
+                </td>
+            </tr>
+            @endif
+
+        </tbody>
+    </table>
+
+    {{-- ══ FOOTER ══ --}}
+    <div class="report-footer">
+        <span>{{ session('company_name', '') }} &mdash; كشف حساب الموردين</span>
+        <span>تم الإنشاء بتاريخ {{ now()->format('Y-m-d H:i') }}</span>
+    </div>
+
+</div>
+</body>
+</html>
 
 --- FILE: resources\views\sys\about.blade.php ---
 
@@ -61897,6 +62665,45 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 @extends('layout.master')
 
 @section('content')
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        min-height: 38px;
+        padding: 3px 6px;
+        background-color: #fff;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        border: none;
+        border-radius: 20px;
+        padding: 2px 12px;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 2px 3px;
+        color: #fff;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: rgba(255,255,255,.7);
+        margin-left: 6px;
+        font-weight: bold;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #fff;
+    }
+    .select2-container { width: 100% !important; }
+
+    .select2-selection__choice:nth-child(8n+1) { background-color: #3498db; }
+    .select2-selection__choice:nth-child(8n+2) { background-color: #2ecc71; }
+    .select2-selection__choice:nth-child(8n+3) { background-color: #e67e22; }
+    .select2-selection__choice:nth-child(8n+4) { background-color: #9b59b6; }
+    .select2-selection__choice:nth-child(8n+5) { background-color: #e74c3c; }
+    .select2-selection__choice:nth-child(8n+6) { background-color: #1abc9c; }
+    .select2-selection__choice:nth-child(8n+7) { background-color: #e91e8c; }
+    .select2-selection__choice:nth-child(8n+8) { background-color: #f39c12; }
+</style>
+
 <div class="content-header text-right">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -61911,7 +62718,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                
+
                 <div class="card card-success card-outline shadow-sm">
                     <div class="card-header">
                         <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
@@ -61922,59 +62729,93 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                     <form action="{{ route('transactions.store') }}" method="POST">
                         @csrf
                         <div class="card-body">
-                            
+
+                            {{-- Vendor --}}
                             <div class="form-group row mb-3">
-                                <label for="vendor_id" class="col-sm-3 col-form-label font-weight-bold">المورد المستهدف <span class="text-danger">*</span></label>
+                                <label for="vendor_id" class="col-sm-3 col-form-label font-weight-bold">
+                                    المورد المستهدف <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9">
                                     <select class="form-control" id="vendor_id" name="vendor_id" required>
                                         <option value="">-- اختر المورد من القائمة --</option>
                                         @foreach($vendors as $vendor)
-                                            <option value="{{ $vendor->id }}">{{ $vendor->name }} (الرصيد الحالي: {{ number_format($vendor->balance, 2) }})</option>
+                                            <option value="{{ $vendor->id }}">
+                                                {{ $vendor->name }} (الرصيد الحالي: {{ number_format($vendor->balance, 2) }})
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
 
+                            {{-- Date --}}
                             <div class="form-group row mb-3">
-                                <label for="date" class="col-sm-3 col-form-label font-weight-bold">تاريخ القيد <span class="text-danger">*</span></label>
+                                <label for="date" class="col-sm-3 col-form-label font-weight-bold">
+                                    تاريخ القيد <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9">
-                                    <input type="date" class="form-control text-right" id="date" name="date" value="{{ date('Y-m-d') }}" required>
+                                    <input type="date" class="form-control text-right" id="date" name="date"
+                                        value="{{ date('Y-m-d') }}" required>
                                 </div>
                             </div>
 
+                            {{-- Type --}}
                             <div class="form-group row mb-3">
-                                <label class="col-sm-3 col-form-label font-weight-bold">نوع الحركة المادية <span class="text-danger">*</span></label>
+                                <label class="col-sm-3 col-form-label font-weight-bold">
+                                    نوع الحركة المادية <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9 d-flex align-items-center" style="gap: 20px;">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="type" id="type_debit" value="debit" checked required>
-                                        <label class="form-check-label mr-4 text-success font-weight-bold" for="type_debit">مدين (+) (له / فاتورة شراء أو إستحقاق)</label>
+                                        <input class="form-check-input" type="radio" name="type"
+                                            id="type_debit" value="debit" checked required>
+                                        <label class="form-check-label mr-4 text-success font-weight-bold" for="type_debit">
+                                            مدين (+) &mdash; له / فاتورة شراء أو استحقاق
+                                        </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="type" id="type_credit" value="credit" required>
-                                        <label class="form-check-label mr-4 text-danger font-weight-bold" for="type_credit">دائن (-) (عليه / سداد نقدي أو دفعة مادية)</label>
+                                        <input class="form-check-input" type="radio" name="type"
+                                            id="type_credit" value="credit" required>
+                                        <label class="form-check-label mr-4 text-danger font-weight-bold" for="type_credit">
+                                            دائن (-) &mdash; عليه / سداد نقدي أو دفعة مادية
+                                        </label>
                                     </div>
                                 </div>
                             </div>
 
+                            {{-- Amount --}}
                             <div class="form-group row mb-3">
-                                <label for="amount" class="col-sm-3 col-form-label font-weight-bold">المبلغ المالي <span class="text-danger">*</span></label>
+                                <label for="amount" class="col-sm-3 col-form-label font-weight-bold">
+                                    المبلغ المالي <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9">
-                                    <input type="number" step="0.01" min="0.01" class="form-control text-left" id="amount" name="amount" placeholder="0.00" required dir="ltr">
+                                    <input type="number" step="0.01" min="0.01" class="form-control text-left"
+                                        id="amount" name="amount" required dir="ltr">
                                 </div>
                             </div>
 
+                            {{-- Description --}}
                             <div class="form-group row mb-3">
-                                <label for="description" class="col-sm-3 col-form-label font-weight-bold">البيان / الشرح</label>
+                                <label for="description" class="col-sm-3 col-form-label font-weight-bold">
+                                    البيان / الشرح
+                                </label>
                                 <div class="col-sm-9">
-                                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="اكتب تفاصيل أو سبب الحركة المالية بالتفصيل..."></textarea>
+                                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                                 </div>
                             </div>
 
+                            {{-- Transaction Tags --}}
                             <div class="form-group row mb-3">
-                                <label for="tags" class="col-sm-3 col-form-label font-weight-bold">وسوم الحركة</label>
+                                <label class="col-sm-3 col-form-label font-weight-bold">وسوم الحركة</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="tags" name="tags" placeholder="مثال: نقدي, شيك, توريد_مواد">
-                                    <small class="form-text text-muted mt-1">افصل بين الوسوم بفاصلة ( , ).</small>
+                                    <select class="select2-transaction-tags" name="tags[]" multiple>
+                                        @isset($existingTags)
+                                            @foreach($existingTags as $tag)
+                                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                            @endforeach
+                                        @endisset
+                                    </select>
+                                    <small class="form-text text-muted mt-1">
+                                        اختر وسوماً من القائمة أو اكتب اسم وسم جديد.
+                                    </small>
                                 </div>
                             </div>
 
@@ -61982,7 +62823,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 
                         <div class="card-footer d-flex justify-content-start">
                             <button type="submit" class="btn btn-success font-weight-bold ml-2">
-                                <i class="fas fa-save ml-1"></i> حفظ القيد المالي
+                                <i class="fas fa-save ml-1"></i> حفظ السجل المالي
                             </button>
                             <a href="{{ route('transactions.index') }}" class="btn btn-default">إلغاء الأمر</a>
                         </div>
@@ -61993,6 +62834,24 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.select2-transaction-tags').select2({
+            dir: 'rtl',
+            placeholder: '-- اختر أو أنشئ وسماً --',
+            allowClear: true,
+            tags: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (!term) return null;
+                return { id: 'new:' + term, text: term + ' ✦ جديد' };
+            },
+        });
+    });
+</script>
+
 @endsection
 
 --- FILE: resources\views\vendor_transactions\edit.blade.php ---
@@ -62000,6 +62859,45 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 @extends('layout.master')
 
 @section('content')
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        min-height: 38px;
+        padding: 3px 6px;
+        background-color: #fff;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        border: none;
+        border-radius: 20px;
+        padding: 2px 12px;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 2px 3px;
+        color: #fff;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: rgba(255,255,255,.7);
+        margin-left: 6px;
+        font-weight: bold;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #fff;
+    }
+    .select2-container { width: 100% !important; }
+
+    .select2-selection__choice:nth-child(8n+1) { background-color: #3498db; }
+    .select2-selection__choice:nth-child(8n+2) { background-color: #2ecc71; }
+    .select2-selection__choice:nth-child(8n+3) { background-color: #e67e22; }
+    .select2-selection__choice:nth-child(8n+4) { background-color: #9b59b6; }
+    .select2-selection__choice:nth-child(8n+5) { background-color: #e74c3c; }
+    .select2-selection__choice:nth-child(8n+6) { background-color: #1abc9c; }
+    .select2-selection__choice:nth-child(8n+7) { background-color: #e91e8c; }
+    .select2-selection__choice:nth-child(8n+8) { background-color: #f39c12; }
+</style>
+
 <div class="content-header text-right">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -62014,11 +62912,12 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                
+
                 <div class="card card-warning card-outline shadow-sm">
                     <div class="card-header">
                         <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
-                            <i class="fas fa-edit ml-2 text-warning"></i> مراجعة وتعديل بيانات القيد المالي رقم #{{ $transaction->id }}
+                            <i class="fas fa-edit ml-2 text-warning"></i>
+                            مراجعة وتعديل بيانات القيد المالي رقم #{{ $transaction->id }}
                         </h3>
                     </div>
 
@@ -62026,13 +62925,17 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                         @csrf
                         @method('PUT')
                         <div class="card-body">
-                            
+
+                            {{-- Vendor --}}
                             <div class="form-group row mb-3">
-                                <label for="vendor_id" class="col-sm-3 col-form-label font-weight-bold">اسم المورد <span class="text-danger">*</span></label>
+                                <label for="vendor_id" class="col-sm-3 col-form-label font-weight-bold">
+                                    اسم المورد <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9">
                                     <select class="form-control" id="vendor_id" name="vendor_id" required>
                                         @foreach($vendors as $vendor)
-                                            <option value="{{ $vendor->id }}" {{ $transaction->vendor_id == $vendor->id ? 'selected' : '' }}>
+                                            <option value="{{ $vendor->id }}"
+                                                {{ $transaction->vendor_id == $vendor->id ? 'selected' : '' }}>
                                                 {{ $vendor->name }}
                                             </option>
                                         @endforeach
@@ -62040,46 +62943,82 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                                 </div>
                             </div>
 
+                            {{-- Date --}}
                             <div class="form-group row mb-3">
-                                <label for="date" class="col-sm-3 col-form-label font-weight-bold">تاريخ القيد <span class="text-danger">*</span></label>
+                                <label for="date" class="col-sm-3 col-form-label font-weight-bold">
+                                    تاريخ القيد <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9">
-                                    <input type="date" class="form-control text-right" id="date" name="date" value="{{ old('date', $transaction->date) }}" required>
+                                    <input type="date" class="form-control text-right" id="date" name="date"
+                                        value="{{ old('date', $transaction->date) }}" required>
                                 </div>
                             </div>
 
+                            {{-- Type --}}
                             <div class="form-group row mb-3">
-                                <label class="col-sm-3 col-form-label font-weight-bold">نوع القيد المالي <span class="text-danger">*</span></label>
+                                <label class="col-sm-3 col-form-label font-weight-bold">
+                                    نوع القيد المالي <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9 d-flex align-items-center" style="gap: 20px;">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="type" id="type_debit" value="debit" {{ $currentType === 'debit' ? 'checked' : '' }} required>
-                                        <label class="form-check-label mr-4 text-success font-weight-bold" for="type_debit">مدين (+) (له / شراء أو إستحقاق)</label>
+                                        <input class="form-check-input" type="radio" name="type"
+                                            id="type_debit" value="debit"
+                                            {{ $currentType === 'debit' ? 'checked' : '' }} required>
+                                        <label class="form-check-label mr-4 text-success font-weight-bold" for="type_debit">
+                                            مدين (+) &mdash; له / شراء أو استحقاق
+                                        </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="type" id="type_credit" value="credit" {{ $currentType === 'credit' ? 'checked' : '' }} required>
-                                        <label class="form-check-label mr-4 text-danger font-weight-bold" for="type_credit">دائن (-) (عليه / سداد مالي أو دفعة)</label>
+                                        <input class="form-check-input" type="radio" name="type"
+                                            id="type_credit" value="credit"
+                                            {{ $currentType === 'credit' ? 'checked' : '' }} required>
+                                        <label class="form-check-label mr-4 text-danger font-weight-bold" for="type_credit">
+                                            دائن (-) &mdash; عليه / سداد مالي أو دفعة
+                                        </label>
                                     </div>
                                 </div>
                             </div>
 
+                            {{-- Amount --}}
                             <div class="form-group row mb-3">
-                                <label for="amount" class="col-sm-3 col-form-label font-weight-bold">المبلغ المالي <span class="text-danger">*</span></label>
+                                <label for="amount" class="col-sm-3 col-form-label font-weight-bold">
+                                    المبلغ المالي <span class="text-danger">*</span>
+                                </label>
                                 <div class="col-sm-9">
-                                    <input type="number" step="0.01" min="0.01" class="form-control text-left" id="amount" name="amount" value="{{ old('amount', $currentAmount) }}" required dir="ltr">
+                                    <input type="number" step="0.01" min="0.01" class="form-control text-left"
+                                        id="amount" name="amount"
+                                        value="{{ old('amount', $currentAmount) }}" required dir="ltr">
                                 </div>
                             </div>
 
+                            {{-- Description --}}
                             <div class="form-group row mb-3">
-                                <label for="description" class="col-sm-3 col-form-label font-weight-bold">البيان / الشرح</label>
+                                <label for="description" class="col-sm-3 col-form-label font-weight-bold">
+                                    البيان / الشرح
+                                </label>
                                 <div class="col-sm-9">
-                                    <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $transaction->description) }}</textarea>
+                                    <textarea class="form-control" id="description" name="description"
+                                        rows="3">{{ old('description', $transaction->description) }}</textarea>
                                 </div>
                             </div>
 
+                            {{-- Transaction Tags --}}
                             <div class="form-group row mb-3">
-                                <label for="tags" class="col-sm-3 col-form-label font-weight-bold">وسوم الحركة</label>
+                                <label class="col-sm-3 col-form-label font-weight-bold">وسوم الحركة</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="tags" name="tags" value="{{ old('tags', $transaction->tags->pluck('name')->implode(', ')) }}">
-                                    <small class="form-text text-muted mt-1">افصل بين الوسوم بفاصلة ( , ).</small>
+                                    <select class="select2-transaction-tags" name="tags[]" multiple>
+                                        @isset($existingTags)
+                                            @foreach($existingTags as $tag)
+                                                <option value="{{ $tag->id }}"
+                                                    {{ $transaction->tags->contains('id', $tag->id) ? 'selected' : '' }}>
+                                                    {{ $tag->name }}
+                                                </option>
+                                            @endforeach
+                                        @endisset
+                                    </select>
+                                    <small class="form-text text-muted mt-1">
+                                        اختر وسوماً من القائمة أو اكتب اسم وسم جديد.
+                                    </small>
                                 </div>
                             </div>
 
@@ -62098,6 +63037,24 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.select2-transaction-tags').select2({
+            dir: 'rtl',
+            placeholder: '-- اختر أو أنشئ وسماً --',
+            allowClear: true,
+            tags: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (!term) return null;
+                return { id: 'new:' + term, text: term + ' ✦ جديد' };
+            },
+        });
+    });
+</script>
+
 @endsection
 
 --- FILE: resources\views\vendor_transactions\index.blade.php ---
@@ -62105,105 +63062,599 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 @extends('layout.master')
 
 @section('content')
-<div class="content-header text-right">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark">كشف حركات الموردين المالية</h1>
+
+    <div class="content-header text-right">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">كشف حركات الموردين المالية</h1>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="content text-right" dir="rtl">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                
-                @if(session()->has('success'))
-                    <div class="alert alert-success alert-dismissible fade show text-right" role="alert">
-                        {{ session()->get('success') }}
-                        <button type="button" class="close float-left" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                @endif
+    <div class="content text-right" dir="rtl">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
 
-                <div class="card card-primary card-outline shadow-sm">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <h3 class="card-title text-right font-weight-bold m-0" style="flex: 1;">
-                            <i class="fas fa-exchange-alt ml-2 text-primary"></i> السجل العام للعمليات المالية
-                        </h3>
-                        <div class="card-tools">
-                            <a href="{{ route('transactions.create') }}" class="btn btn-success font-weight-bold shadow-sm">
-                                <i class="fas fa-plus ml-1"></i> تسجيل حركة مالية جديدة
-                            </a>
+                    @if(session()->has('success'))
+                        <div class="alert alert-success alert-dismissible fade show text-right" role="alert">
+                            {{ session()->get('success') }}
+                            <button type="button" class="close float-left" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    <div class="card card-primary card-outline shadow-sm">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h3 class="card-title text-right font-weight-bold m-0" style="flex: 1;">
+                                <i class="fas fa-exchange-alt ml-2 text-primary"></i> السجل العام للعمليات المالية
+                            </h3>
+                            <div class="card-tools">
+                                <a href="{{ route('transactions.create') }}"
+                                    class="btn btn-success font-weight-bold shadow-sm">
+                                    <i class="fas fa-plus ml-1"></i> تسجيل حركة مالية جديدة
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover table-striped text-center mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th style="width: 55px;">#</th>
+                                        <th style="width: 100px;">التاريخ</th>
+                                        <th>اسم المورد</th>
+                                        <th style="width: 110px;">مدين (+)</th>
+                                        <th style="width: 110px;">دائن (−)</th>
+                                        <th>البيان / الوصف</th>
+                                        <th style="width: 130px;">الوسوم</th>
+                                        <th style="width: 210px;">العمليات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($transactions as $transaction)
+                                        <tr>
+                                            <td class="text-muted">{{ $loop->iteration }}</td>
+
+                                            <td>{{ \Carbon\Carbon::parse($transaction->date)->format('Y-m-d') }}</td>
+
+                                            <td class="font-weight-bold text-primary">
+                                                {{ $transaction->vendor->name ?? 'مورد محذوف' }}
+                                            </td>
+
+                                            <td class="text-success font-weight-bold">
+                                                {{ $transaction->debit > 0 ? number_format($transaction->debit, 2) : '—' }}
+                                            </td>
+
+                                            <td class="text-danger font-weight-bold">
+                                                {{ $transaction->credit > 0 ? number_format($transaction->credit, 2) : '—' }}
+                                            </td>
+
+                                            <td class="text-muted text-right px-3">
+                                                {{ $transaction->description ? strip_tags($transaction->description) : '—' }}
+                                            </td>
+
+                                            <td>
+                                                @forelse($transaction->tags as $tag)
+                                                    <span class="badge badge-warning px-2 py-1 ml-1 text-dark font-weight-bold">
+                                                        {{ $tag->name }}
+                                                    </span>
+                                                @empty
+                                                    <span class="text-muted small">—</span>
+                                                @endforelse
+                                            </td>
+
+                                            <td>
+                                                {{-- Receipt --}}
+                                                <a href="{{ route('transactions.receipt', $transaction->id) }}" target="_blank"
+                                                    class="btn btn-sm btn-info ml-1" title="طباعة السند">
+                                                    <i class="fas fa-receipt ml-1"></i> سند
+                                                </a>
+
+                                                {{-- Edit --}}
+                                                <a href="{{ route('transactions.edit', $transaction->id) }}"
+                                                    class="btn btn-sm btn-warning ml-1" title="تعديل">
+                                                    <i class="fas fa-edit ml-1"></i> تعديل
+                                                </a>
+
+                                                {{-- Delete --}}
+                                                <form action="{{ route('transactions.destroy', $transaction->id) }}"
+                                                    method="POST" class="d-inline-block"
+                                                    onsubmit="return confirm('هل أنت متأكد من حذف هذه الحركة المالية نهائياً؟');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="حذف">
+                                                        <i class="fas fa-trash"></i> حذف
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center py-5 text-muted">
+                                                <i class="fas fa-folder-open d-block mb-2 fa-2x text-secondary"></i>
+                                                لا توجد أي حركات مالية مسجلة حالياً.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover table-striped text-center mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th style="width: 70px;">#</th>
-                                    <th>التاريخ</th>
-                                    <th>اسم المورد</th>
-                                    <th>مدين (+)</th>
-                                    <th>دائن (-)</th>
-                                    <th>البيان / الوصف</th>
-                                    <th>الوسوم</th>
-                                    <th style="width: 180px;">العمليات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($transactions as $transaction)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($transaction->date)->format('Y-m-d') }}</td>
-                                        <td class="font-weight-bold text-primary">{{ $transaction->vendor->name ?? 'مورد محذوف' }}</td>
-                                        <td class="text-success font-weight-bold">{{ $transaction->debit > 0 ? number_format($transaction->debit, 2) : '---' }}</td>
-                                        <td class="text-danger font-weight-bold">{{ $transaction->credit > 0 ? number_format($transaction->credit, 2) : '---' }}</td>
-                                        <td class="text-muted text-right px-3">{{ $transaction->description ?? '---' }}</td>
-                                        <td>
-                                            @forelse($transaction->tags as $tag)
-                                                <span class="badge badge-warning px-2 py-1 ml-1 text-dark font-weight-bold">
-                                                    {{ $tag->name }}
-                                                </span>
-                                            @empty
-                                                <span class="text-muted small">---</span>
-                                            @endforelse
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('transactions.edit', $transaction->id) }}" class="btn btn-sm btn-warning ml-1" title="تعديل">
-                                                <i class="fas fa-edit ml-1"></i> تعديل
-                                            </a>
-                                            <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('هل أنت متأكد من حذف هذه الحركة المالية نهائياً؟ سيتم تعديل رصيد المورد تلقائياً.');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="حذف">
-                                                    <i class="fas fa-trash ml-1"></i> حذف
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="text-center py-4 text-muted">
-                                            <i class="fas fa-folder-open d-block mb-2 fa-2x text-secondary"></i>
-                                            لا توجد أي حركات مالية مسجلة حالياً.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
-
             </div>
         </div>
     </div>
-</div>
+
 @endsection
+
+--- FILE: resources\views\vendor_transactions\receipt.blade.php ---
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>سند {{ $transaction->debit > 0 ? 'قبض' : 'صرف' }} #{{ $transaction->id }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 15mm 15mm;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 14px;
+            color: #1a1a1a;
+            background: #fff;
+            direction: rtl;
+            padding-top: 52px;
+            /* toolbar offset on screen */
+        }
+
+        /* ── Screen toolbar ── */
+        .print-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #2c3e50;
+            color: #fff;
+            padding: 9px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 999;
+            font-size: 13px;
+        }
+
+        .btn-print {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 7px 22px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-print:hover {
+            background: #219a52;
+        }
+
+        .btn-back {
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            padding: 7px 18px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: auto;
+        }
+
+        .btn-back:hover {
+            background: #a93226;
+        }
+
+        /* ── Receipt wrapper ── */
+        .receipt {
+            width: 100%;
+            max-width: 180mm;
+            margin: 0 auto;
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* ── Type banner ── */
+        .receipt-banner {
+            padding: 14px 20px;
+            text-align: center;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .receipt-banner.debit {
+            background: #1a7a4a;
+        }
+
+        .receipt-banner.credit {
+            background: #922b21;
+        }
+
+        .receipt-banner .type-label {
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 1px;
+            display: block;
+        }
+
+        .receipt-banner .type-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, .75);
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* ── Header info row ── */
+        .receipt-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 14px 20px 10px;
+            border-bottom: 1px solid #e0e3e8;
+            background: #f8f9fa;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .company-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: #2c3e50;
+        }
+
+        .company-sub {
+            font-size: 12px;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        .receipt-meta {
+            text-align: left;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.9;
+        }
+
+        .receipt-meta strong {
+            color: #2c3e50;
+        }
+
+        /* ── Body fields ── */
+        .receipt-body {
+            padding: 18px 20px;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 14px;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 10px;
+            gap: 10px;
+        }
+
+        .field-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .field-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #555;
+            white-space: nowrap;
+            min-width: 110px;
+        }
+
+        .field-value {
+            font-size: 14px;
+            color: #1a1a1a;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        /* ── Amount highlight ── */
+        .amount-box {
+            border: 2px solid;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .amount-box.debit {
+            border-color: #1a7a4a;
+            background: #f0fff6;
+        }
+
+        .amount-box.credit {
+            border-color: #922b21;
+            background: #fff5f5;
+        }
+
+        .amount-label {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .amount-box.debit .amount-label {
+            color: #1a7a4a;
+        }
+
+        .amount-box.credit .amount-label {
+            color: #922b21;
+        }
+
+        .amount-value {
+            font-size: 26px;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+        }
+
+        .amount-box.debit .amount-value {
+            color: #1a7a4a;
+        }
+
+        .amount-box.credit .amount-value {
+            color: #922b21;
+        }
+
+        /* ── Tags ── */
+        .tags-row {
+            padding: 0 20px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tag-pill {
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .tag-pill:nth-child(8n+1) {
+            background: #3498db;
+        }
+
+        .tag-pill:nth-child(8n+2) {
+            background: #2ecc71;
+        }
+
+        .tag-pill:nth-child(8n+3) {
+            background: #e67e22;
+        }
+
+        .tag-pill:nth-child(8n+4) {
+            background: #9b59b6;
+        }
+
+        .tag-pill:nth-child(8n+5) {
+            background: #e74c3c;
+        }
+
+        .tag-pill:nth-child(8n+6) {
+            background: #1abc9c;
+        }
+
+        .tag-pill:nth-child(8n+7) {
+            background: #e91e8c;
+        }
+
+        .tag-pill:nth-child(8n+8) {
+            background: #f39c12;
+        }
+
+        /* ── Signatures ── */
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 18px 20px 16px;
+            border-top: 1px solid #e0e3e8;
+            margin-top: 4px;
+        }
+
+        .sig-block {
+            text-align: center;
+        }
+
+        .sig-line {
+            border-top: 1px solid #555;
+            margin: 28px 10px 6px;
+        }
+
+        .sig-label {
+            font-size: 11px;
+            color: #777;
+            font-weight: 600;
+        }
+
+        /* ── Footer ── */
+        .receipt-footer {
+            background: #f8f9fa;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            border-top: 1px solid #e0e3e8;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                padding-top: 0 !important;
+            }
+
+            .print-toolbar {
+                display: none !important;
+            }
+
+            .receipt {
+                border: 2px solid #2c3e50;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {{-- Screen toolbar --}}
+    <div class="print-toolbar">
+        <button class="btn-print" onclick="window.print()">🖨 طباعة السند</button>
+        <span>
+            سند {{ $transaction->debit > 0 ? 'قبض' : 'صرف' }}
+            رقم #{{ $transaction->id }}
+        </span>
+        <button class="btn-back" onclick="window.history.back()">✕ رجوع</button>
+    </div>
+
+    @php
+        $isDebit = $transaction->debit > 0;
+        $type = $isDebit ? 'debit' : 'credit';
+        $amount = $isDebit ? $transaction->debit : $transaction->credit;
+    @endphp
+
+    <div class="receipt">
+
+        {{-- ── Banner ── --}}
+        <div class="receipt-banner {{ $type }}">
+            <span class="type-label">
+                {{ $isDebit ? 'سـنـد قـبـض' : 'سـنـد صـرف' }}
+            </span>
+            <span class="type-sub">
+                {{ $isDebit
+    ? 'إثبات استلام مبلغ مالي من المورد'
+    : 'إثبات صرف مبلغ مالي للمورد' }}
+            </span>
+        </div>
+
+        {{-- ── Header ── --}}
+        <div class="receipt-head">
+            <div>
+                <div class="company-name">{{ session('company_name', 'الشركة') }}</div>
+                <div class="company-sub">سجل الموردين والمعاملات المالية</div>
+            </div>
+            <div class="receipt-meta">
+                <div><strong>رقم السند:</strong> #{{ $transaction->id }}</div>
+                <div><strong>التاريخ:</strong> {{ \Carbon\Carbon::parse($transaction->date)->format('Y-m-d') }}</div>
+                <div><strong>وقت الطباعة:</strong> {{ now()->format('H:i') }}</div>
+            </div>
+        </div>
+
+        {{-- ── Amount ── --}}
+        <div class="amount-box {{ $type }}">
+            <span class="amount-label">
+                {{ $isDebit ? 'المبلغ المستلم' : 'المبلغ المصروف' }}
+            </span>
+            <span class="amount-value">{{ number_format($amount, 2) }}</span>
+        </div>
+
+        {{-- ── Fields ── --}}
+        <div class="receipt-body">
+
+            <div class="field-row">
+                <span class="field-label">اسم المورد</span>
+                <span class="field-value">{{ $transaction->vendor->name ?? '—' }}</span>
+            </div>
+
+            <div class="field-row">
+                <span class="field-label">نوع العملية</span>
+                <span class="field-value" style="font-weight:700; color: {{ $isDebit ? '#1a7a4a' : '#922b21' }};">
+                    {{ $isDebit ? 'مدين (+) — مبلغ مستحق للمورد / فاتورة شراء' : 'دائن (−) — سداد نقدي أو دفعة للمورد' }}
+                </span>
+            </div>
+
+            <div class="field-row">
+                <span class="field-label">البيان / الشرح</span>
+                <span class="field-value" style="color:#555;">
+                    {{ $transaction->description ? strip_tags($transaction->description) : '—' }}
+                </span>
+            </div>
+
+            <div class="field-row">
+                <span class="field-label">تاريخ القيد</span>
+                <span class="field-value">
+                    {{ \Carbon\Carbon::parse($transaction->date)->format('Y-m-d') }}
+                </span>
+            </div>
+
+        </div>
+
+        {{-- ── Tags ── --}}
+        @if($transaction->tags->count() > 0)
+            <div class="tags-row">
+                <span style="font-size:12px; font-weight:700; color:#555; margin-left:6px;">الوسوم:</span>
+                @foreach($transaction->tags as $tag)
+                    <span class="tag-pill">{{ $tag->name }}</span>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- ── Signatures ── --}}
+        <div class="signatures">
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">المستلم / المحاسب</div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">المراجع</div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">المدير المالي</div>
+            </div>
+        </div>
+
+        {{-- ── Footer ── --}}
+        <div class="receipt-footer">
+            تم إصدار هذا السند بتاريخ {{ now()->format('Y-m-d') }} الساعة {{ now()->format('H:i') }}
+            &mdash; {{ session('company_name', '') }}
+        </div>
+
+    </div>
+
+</body>
+
+</html>
 
 --- FILE: routes\api.php ---
 
@@ -62411,6 +63862,9 @@ Route::delete('transactions/{id}/delete', 'VendorTransactionController@destroy')
 
 // Multi-Filter Report Matrix Pathway
 Route::get('reports/vendor-report', 'VendorReportController@index')->name('reports.vendor_report');
+Route::get('reports/vendor-report/print', 'VendorReportController@print')->name('reports.vendor_report_print');
+Route::get('transactions/{id}/receipt', 'VendorTransactionController@receipt')
+    ->name('transactions.receipt');
 
 
 --- FILE: server.php ---

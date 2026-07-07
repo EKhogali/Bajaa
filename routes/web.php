@@ -137,3 +137,8 @@ Route::get('reports/vendor-report', 'VendorReportController@index')->name('repor
 Route::get('reports/vendor-report/print', 'VendorReportController@print')->name('reports.vendor_report_print');
 Route::get('transactions/{id}/receipt', 'VendorTransactionController@receipt')
     ->name('transactions.receipt');
+
+Route::resource('/vendor_groups', 'VendorGroupController');
+
+Route::get('reports/debt-statement', 'DebtStatementReportController@index')->name('reports.debt_statement');
+Route::get('reports/debt-statement/print', 'DebtStatementReportController@print')->name('reports.debt_statement_print');

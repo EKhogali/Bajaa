@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Vendor;
 use App\VendorTag;
+use App\VendorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\TransactionTag;
@@ -12,25 +13,34 @@ use App\VendorTransaction;
 
 class VendorsController extends Controller
 {
-    public function index()
-{
-    $companyId = session('company_id');
+    public function index(Request $request)
+    {
+        $companyId = session('company_id');
 
-    $vendors = Vendor::where('company_id', $companyId)
-        ->with('tags')
-        ->get();
+        $vendors = Vendor::where('company_id', $companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->with('tags', 'group')
+            ->get();
 
-    return view('bsc.vendors.index', compact('vendors'));
-}
+        $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $activeGroup = $request->filled('vendor_group_id')
+            ? $groups->firstWhere('id', $request->vendor_group_id)
+            : null;
 
-public function create()
-{
-    $companyId    = session('company_id');
-    $vendors      = Vendor::where('company_id', $companyId)->get();
-    $existingTags = TransactionTag::where('company_id', $companyId)->get(); // ← add this
+        return view('bsc.vendors.index', compact('vendors', 'groups', 'activeGroup'));
+    }
 
-    return view('bsc.vendors.create', compact('vendors', 'existingTags'));
-}
+    public function create()
+    {
+        $companyId    = session('company_id');
+        $vendors      = Vendor::where('company_id', $companyId)->get();
+        $existingTags = TransactionTag::where('company_id', $companyId)->get();
+        $groups       = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+
+        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups'));
+    }
 
     public function store(Request $request)
     {
@@ -39,6 +49,7 @@ public function create()
         $request->validate([
             'name' => 'required|string|max:255',
             'tel'  => 'nullable|string|max:50',
+            'vendor_group_id' => 'nullable|exists:vendor_groups,id',
         ]);
 
         $vendor = Vendor::create([
@@ -46,6 +57,7 @@ public function create()
             'name'       => $request->name,
             'tel'        => $request->tel,
             'balance'    => 0,
+            'vendor_group_id' => $request->vendor_group_id,
         ]);
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
@@ -59,8 +71,9 @@ public function create()
 
         $vendor       = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
         $existingTags = VendorTag::where('company_id', $companyId)->get();
+        $groups       = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
 
-        return view('bsc.vendors.edit', compact('vendor', 'existingTags'));
+        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups'));
     }
 
     public function update(Request $request, $id)
@@ -71,11 +84,13 @@ public function create()
         $request->validate([
             'name' => 'required|string|max:255',
             'tel'  => 'nullable|string|max:50',
+            'vendor_group_id' => 'nullable|exists:vendor_groups,id',
         ]);
 
         $vendor->update([
             'name' => $request->name,
             'tel'  => $request->tel,
+            'vendor_group_id' => $request->vendor_group_id,
         ]);
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
@@ -117,39 +132,35 @@ public function create()
      * Existing tag IDs are used directly.
      */
     private function resolveTagIds(Request $request, int $companyId): array
-{
-    $submitted = $request->input('tags') ?? []; // ← null-safe fallback
+    {
+        $submitted = $request->input('tags') ?? [];
 
-    if (empty($submitted) || !is_array($submitted)) {
-        return [];
-    }
-
-    $tagIds = [];
-
-    foreach ($submitted as $value) {
-        $value = trim($value);
-        if (empty($value)) continue;
-
-        if (str_starts_with($value, 'new:')) {
-            $name = trim(substr($value, 4));
-            if (empty($name)) continue;
-
-            $tag = VendorTag::firstOrCreate([
-                'company_id' => $companyId,
-                'name'       => $name,
-            ]);
-        } else {
-            $tag = VendorTag::where('company_id', $companyId)
-                ->findOrFail((int) $value);
+        if (empty($submitted) || !is_array($submitted)) {
+            return [];
         }
 
-        $tagIds[] = $tag->id;
+        $tagIds = [];
+
+        foreach ($submitted as $value) {
+            $value = trim($value);
+            if (empty($value)) continue;
+
+            if (str_starts_with($value, 'new:')) {
+                $name = trim(substr($value, 4));
+                if (empty($name)) continue;
+
+                $tag = VendorTag::firstOrCreate([
+                    'company_id' => $companyId,
+                    'name'       => $name,
+                ]);
+            } else {
+                $tag = VendorTag::where('company_id', $companyId)
+                    ->findOrFail((int) $value);
+            }
+
+            $tagIds[] = $tag->id;
+        }
+
+        return array_unique($tagIds);
     }
-
-    return array_unique($tagIds);
-}
-
-
-
-
 }

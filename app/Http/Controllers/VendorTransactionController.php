@@ -11,16 +11,34 @@ use Illuminate\Support\Facades\DB;
 class VendorTransactionController extends Controller
 {
     // 1. عرض جدول الحركات
-    public function index()
+    public function index(Request $request)
     {
         $companyId = session('company_id');
 
         $transactions = VendorTransaction::where('company_id', $companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->whereHas('vendor', function ($v) use ($request) {
+                    $v->where('vendor_group_id', $request->vendor_group_id);
+                });
+            })
+            ->when($request->filled('vendor_id'), function ($q) use ($request) {
+                $q->where('vendor_id', $request->vendor_id);
+            })
             ->with(['vendor', 'tags'])
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('vendor_transactions.index', compact('transactions'));
+        $groups = \App\VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+
+        // Vendor dropdown is scoped to the selected classification, if any
+        $vendors = Vendor::where('company_id', $companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('vendor_transactions.index', compact('transactions', 'groups', 'vendors'));
     }
 
     // 2. نموذج إضافة حركة جديدة

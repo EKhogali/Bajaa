@@ -40,6 +40,32 @@
                         </div>
 
                         <div class="card-body table-responsive p-0">
+
+                            <div class="p-3 border-bottom">
+                                <form method="GET" class="d-flex align-items-center flex-wrap" style="gap:10px;">
+                                    <div>
+                                        <label class="font-weight-bold mb-1 d-block">التصنيف</label>
+                                        <select name="vendor_group_id" class="form-control form-control-sm"
+                                            onchange="this.form.submit()" style="min-width:180px;">
+                                            <option value="">-- كل التصنيفات --</option>
+                                            @foreach($groups as $g)
+                                                <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="font-weight-bold mb-1 d-block">المورد</label>
+                                        <select name="vendor_id" class="form-control form-control-sm"
+                                            onchange="this.form.submit()" style="min-width:180px;">
+                                            <option value="">-- كل الموردين --</option>
+                                            @foreach($vendors as $v)
+                                                <option value="{{ $v->id }}" {{ request('vendor_id') == $v->id ? 'selected' : '' }}>{{ $v->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
                                     <tr>
