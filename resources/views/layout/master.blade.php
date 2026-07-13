@@ -138,28 +138,28 @@
 
                             {{-- الحركة --}}
                             <!-- <li class="nav-item dropdown">
-                                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    حركة الموردين
-                                                </a>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
-                                                    </li>
-                                                    <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="/transactions">حركة الموردين</a>
-                                                    </li>
-                                                    <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
-                                                    </li>
-                                                </ul>
-                                            </li> -->
+                                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            حركة الموردين
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
+                                                            </li>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="/transactions">حركة الموردين</a>
+                                                            </li>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                                            </li>
+                                                        </ul>
+                                                    </li> -->
 
                             {{-- تصنيفات الموردين --}}
                             {{-- تصنيفات الموردين --}}
@@ -180,7 +180,7 @@
                                         <hr class="dropdown-divider">
                                     </li>
 
-                                    @foreach(\App\VendorGroup::where('company_id', session('company_id'))->orderBy('name')->get() as $vg)
+                                    @foreach(\App\VendorGroup::orderBy('name')->get() as $vg)
                                         <li>
                                             <a class="dropdown-item"
                                                 href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
@@ -336,10 +336,7 @@
                         </div>
 
                         <div class="text-muted">
-                            {{ $companyRec->name ?? '' }}
-                            @if(session()->has('current_year'))
-                                {{ ' | ' }} {{ session('current_year') }}
-                            @endif
+                            {{ session('company_name', '') }}
                         </div>
 
                     </div>

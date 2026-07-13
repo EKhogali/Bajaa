@@ -31,12 +31,17 @@
                             <h3 class="card-title text-right font-weight-bold m-0" style="flex: 1;">
                                 <i class="fas fa-exchange-alt ml-2 text-primary"></i> السجل العام للعمليات المالية
                             </h3>
-                            <div class="card-tools">
-                                <a href="{{ route('transactions.create') }}"
-                                    class="btn btn-success font-weight-bold shadow-sm">
+                            @if($canAddTransaction)
+                                <a href="{{ route('transactions.create', request()->only('vendor_group_id')) }}"
+                                    class="btn btn-success ...">
                                     <i class="fas fa-plus ml-1"></i> تسجيل حركة مالية جديدة
                                 </a>
-                            </div>
+                            @else
+                                <button class="btn btn-secondary" disabled
+                                    title="لا يوجد حسابات (موردين) مرتبطة بهذا التصنيف ضمن الشركة الحالية">
+                                    <i class="fas fa-plus ml-1"></i> تسجيل حركة مالية جديدة
+                                </button>
+                            @endif
                         </div>
 
                         <div class="card-body table-responsive p-0">

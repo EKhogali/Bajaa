@@ -17,14 +17,14 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
 
-        $vendors = Vendor::where('company_id', $companyId)
+        $vendors = Vendor::visibleTo($companyId)
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
-            ->with('tags', 'group')
+            ->with('tags', 'group', 'companies')
             ->get();
 
-        $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $groups = VendorGroup::orderBy('name')->get();
         $activeGroup = $request->filled('vendor_group_id')
             ? $groups->firstWhere('id', $request->vendor_group_id)
             : null;
@@ -34,12 +34,13 @@ class VendorsController extends Controller
 
     public function create()
     {
-        $companyId    = session('company_id');
-        $vendors      = Vendor::where('company_id', $companyId)->get();
+        $companyId = session('company_id');
+        $vendors = Vendor::visibleTo($companyId)->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
-        $groups       = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $groups = VendorGroup::orderBy('name')->get();
+        $companies = \App\company::all();
 
-        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups'));
+        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups', 'companies'));
     }
 
     public function store(Request $request)
@@ -48,17 +49,27 @@ class VendorsController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel'  => 'nullable|string|max:50',
+            'tel' => 'nullable|string|max:50',
             'vendor_group_id' => 'nullable|exists:vendor_groups,id',
+            'vendor_scope' => 'required|in:specific,all',
+            'company_ids' => 'required_if:vendor_scope,specific|array',
+            'company_ids.*' => 'exists:companies,id',
         ]);
 
+        $isGlobal = $request->vendor_scope === 'all';
+
         $vendor = Vendor::create([
-            'company_id' => $companyId,
-            'name'       => $request->name,
-            'tel'        => $request->tel,
-            'balance'    => 0,
+            'company_id' => $companyId, // "home" company, kept for reference
+            'name' => $request->name,
+            'tel' => $request->tel,
+            'balance' => 0,
             'vendor_group_id' => $request->vendor_group_id,
+            'is_global' => $isGlobal,
         ]);
+
+        if (!$isGlobal) {
+            $vendor->companies()->sync($request->company_ids);
+        }
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
@@ -69,31 +80,39 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
 
-        $vendor       = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
+        $vendor = Vendor::with('tags', 'companies')->findOrFail($id);
         $existingTags = VendorTag::where('company_id', $companyId)->get();
-        $groups       = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $groups = VendorGroup::orderBy('name')->get();
+        $companies = \App\company::all();
 
-        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups'));
+        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups', 'companies'));
     }
 
     public function update(Request $request, $id)
     {
-        $companyId = session('company_id');
-        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor = Vendor::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel'  => 'nullable|string|max:50',
+            'tel' => 'nullable|string|max:50',
             'vendor_group_id' => 'nullable|exists:vendor_groups,id',
+            'vendor_scope' => 'required|in:specific,all',
+            'company_ids' => 'required_if:vendor_scope,specific|array',
+            'company_ids.*' => 'exists:companies,id',
         ]);
+
+        $isGlobal = $request->vendor_scope === 'all';
 
         $vendor->update([
             'name' => $request->name,
-            'tel'  => $request->tel,
+            'tel' => $request->tel,
             'vendor_group_id' => $request->vendor_group_id,
+            'is_global' => $isGlobal,
         ]);
 
-        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
+        $vendor->companies()->sync($isGlobal ? [] : $request->company_ids);
+
+        $vendor->tags()->sync($this->resolveTagIds($request, session('company_id')));
 
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
@@ -101,7 +120,7 @@ class VendorsController extends Controller
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
 
         $vendor->delete();
 
@@ -143,15 +162,17 @@ class VendorsController extends Controller
 
         foreach ($submitted as $value) {
             $value = trim($value);
-            if (empty($value)) continue;
+            if (empty($value))
+                continue;
 
             if (str_starts_with($value, 'new:')) {
                 $name = trim(substr($value, 4));
-                if (empty($name)) continue;
+                if (empty($name))
+                    continue;
 
                 $tag = VendorTag::firstOrCreate([
                     'company_id' => $companyId,
-                    'name'       => $name,
+                    'name' => $name,
                 ]);
             } else {
                 $tag = VendorTag::where('company_id', $companyId)

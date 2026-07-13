@@ -15,7 +15,7 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                
+
                 <div class="card card-warning card-outline shadow-sm">
                     <div class="card-header">
                         <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
@@ -27,7 +27,7 @@
                         @csrf
                         @method('PUT')
                         <div class="card-body">
-                            
+
                             <div class="form-group row mb-3">
                                 <label for="name" class="col-sm-3 col-form-label font-weight-bold">إسم المورد <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
@@ -42,19 +42,49 @@
                                 </div>
                             </div>
 
-<div class="form-group row mb-3">
-    <label for="vendor_group_id" class="col-sm-3 col-form-label font-weight-bold">تصنيف المورد</label>
-    <div class="col-sm-9">
-        <select class="form-control" name="vendor_group_id" id="vendor_group_id">
-            <option value="">-- بدون تصنيف --</option>
-            @foreach($groups as $g)
-                <option value="{{ $g->id }}" {{ old('vendor_group_id', $vendor->vendor_group_id) == $g->id ? 'selected' : '' }}>
-                    {{ $g->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-</div>
+                            <div class="form-group row mb-3">
+                                <label for="vendor_group_id" class="col-sm-3 col-form-label font-weight-bold">تصنيف المورد</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="vendor_group_id" id="vendor_group_id">
+                                        <option value="">-- بدون تصنيف --</option>
+                                        @foreach($groups as $g)
+                                            <option value="{{ $g->id }}" {{ old('vendor_group_id', $vendor->vendor_group_id) == $g->id ? 'selected' : '' }}>
+                                                {{ $g->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3">
+                                <label class="col-sm-3 col-form-label font-weight-bold">نطاق المورد</label>
+                                <div class="col-sm-9">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_scope" id="scope_specific" value="specific"
+                                            {{ !$vendor->is_global ? 'checked' : '' }} onchange="toggleCompanyScope()">
+                                        <label class="form-check-label" for="scope_specific">شركة أو شركات محددة</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_scope" id="scope_all" value="all"
+                                            {{ $vendor->is_global ? 'checked' : '' }} onchange="toggleCompanyScope()">
+                                        <label class="form-check-label" for="scope_all">جميع الشركات</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3" id="companyIdsWrap">
+                                <label class="col-sm-3 col-form-label font-weight-bold">الشركات المرتبطة</label>
+                                <div class="col-sm-9">
+                                    @php $selectedCompanyIds = $vendor->companies->pluck('id')->toArray(); @endphp
+                                    @foreach($companies as $c)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="company_ids[]" value="{{ $c->id }}"
+                                                id="company_{{ $c->id }}" {{ in_array($c->id, $selectedCompanyIds) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="company_{{ $c->id }}">{{ $c->name }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
 
                             <div class="form-group row mb-3">
                                 <label for="tags" class="col-sm-3 col-form-label font-weight-bold">الوسوم / التصنيفات</label>
@@ -79,4 +109,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleCompanyScope() {
+        var isAll = document.getElementById('scope_all').checked;
+        document.getElementById('companyIdsWrap').style.display = isAll ? 'none' : '';
+    }
+    document.addEventListener('DOMContentLoaded', toggleCompanyScope);
+</script>
 @endsection

@@ -28,24 +28,36 @@ class VendorTransactionController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        $groups = \App\VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $groups = \App\VendorGroup::orderBy('name')->get();
 
-        // Vendor dropdown is scoped to the selected classification, if any
-        $vendors = Vendor::where('company_id', $companyId)
+        $vendors = Vendor::visibleTo($companyId)
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
             ->orderBy('name')
             ->get();
 
-        return view('vendor_transactions.index', compact('transactions', 'groups', 'vendors'));
+        // Can only add a transaction if there's at least one vendor (account) visible
+        // to the current company under the selected classification (or at all, if none selected)
+        $canAddTransaction = $vendors->isNotEmpty();
+
+        return view('vendor_transactions.index', compact('transactions', 'groups', 'vendors', 'canAddTransaction'));
     }
 
     // 2. نموذج إضافة حركة جديدة
-    public function create()
+    public function create(Request $request)
     {
         $companyId = session('company_id');
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->get();
+
+        if ($vendors->isEmpty()) {
+            return redirect()->route('transactions.index', $request->only('vendor_group_id'))
+                ->with('error', 'عفواً، لا يوجد حسابات (موردين) مرتبطة بهذا التصنيف ضمن الشركة الحالية، لا يمكن إضافة حركة.');
+        }
 
         return view('vendor_transactions.create', compact('vendors'));
     }
@@ -108,7 +120,7 @@ class VendorTransactionController extends Controller
     {
         $companyId = session('company_id');
         $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';

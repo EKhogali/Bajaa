@@ -9,18 +9,18 @@ use Illuminate\Http\Request;
 
 class DebtStatementReportController extends Controller
 {
-    private function resolveCompanyIds(Request $request)
-    {
-        $companyFilter = $request->input('company_filter', 'current');
+    // private function resolveCompanyIds(Request $request)
+    // {
+    //     $companyFilter = $request->input('company_filter', 'current');
 
-        if ($companyFilter === 'all') {
-            return null; // no constraint
-        }
-        if ($companyFilter === 'current') {
-            return [session('company_id')];
-        }
-        return [(int) $companyFilter];
-    }
+    //     if ($companyFilter === 'all') {
+    //         return null; // no constraint
+    //     }
+    //     if ($companyFilter === 'current') {
+    //         return [session('company_id')];
+    //     }
+    //     return [(int) $companyFilter];
+    // }
 
     private function buildQuery(Request $request)
     {
@@ -29,7 +29,7 @@ class DebtStatementReportController extends Controller
         $query = Vendor::query()->with(['company', 'group']);
 
         if ($companyIds !== null) {
-            $query->whereIn('company_id', $companyIds);
+            $query->visibleToAny($companyIds);
         }
 
         if ($request->filled('vendor_id')) {
@@ -47,27 +47,33 @@ class DebtStatementReportController extends Controller
 
         $vendors = $this->buildQuery($request)->orderBy('name')->get();
 
-        $totalDebit  = $vendors->sum(function ($v) { return $v->balance > 0 ? $v->balance : 0; });
-        $totalCredit = $vendors->sum(function ($v) { return $v->balance < 0 ? abs($v->balance) : 0; });
-        $netBalance  = $vendors->sum('balance');
+        $totalDebit = $vendors->sum(function ($v) {
+            return $v->balance > 0 ? $v->balance : 0; });
+        $totalCredit = $vendors->sum(function ($v) {
+            return $v->balance < 0 ? abs($v->balance) : 0; });
+        $netBalance = $vendors->sum('balance');
 
         $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
-        $groups     = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
-        $companies  = company::all();
+        $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $companies = company::all();
 
-        return view('rep.debt_statement', compact(
-            'vendors', 'allVendors', 'groups', 'companies',
-            'totalDebit', 'totalCredit', 'netBalance'
-        ));
+$isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+
+    return view('rep.debt_statement', compact(
+        'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
+        'totalDebit', 'totalCredit', 'netBalance'
+    ));
     }
 
     public function print(Request $request)
     {
         $vendors = $this->buildQuery($request)->orderBy('name')->get();
 
-        $totalDebit  = $vendors->sum(function ($v) { return $v->balance > 0 ? $v->balance : 0; });
-        $totalCredit = $vendors->sum(function ($v) { return $v->balance < 0 ? abs($v->balance) : 0; });
-        $netBalance  = $vendors->sum('balance');
+        $totalDebit = $vendors->sum(function ($v) {
+            return $v->balance > 0 ? $v->balance : 0; });
+        $totalCredit = $vendors->sum(function ($v) {
+            return $v->balance < 0 ? abs($v->balance) : 0; });
+        $netBalance = $vendors->sum('balance');
 
         // Build the scope phrase shown on the printed report
         if ($request->filled('vendor_id')) {
@@ -90,7 +96,28 @@ class DebtStatementReportController extends Controller
         }
 
         return view('rep.debt_statement_print', compact(
-            'vendors', 'totalDebit', 'totalCredit', 'netBalance', 'scopeLabel', 'companyLabel'
+            'vendors',
+            'totalDebit',
+            'totalCredit',
+            'netBalance',
+            'scopeLabel',
+            'companyLabel'
         ));
     }
+
+
+    private function resolveCompanyIds(Request $request)
+{
+    $isPrivileged = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+    $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
+
+    if ($companyFilter === 'all') {
+        return null;
+    }
+    if ($companyFilter === 'current') {
+        return [session('company_id')];
+    }
+    return [(int) $companyFilter];
+}
+
 }

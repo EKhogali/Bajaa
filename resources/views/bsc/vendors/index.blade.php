@@ -46,17 +46,18 @@
 
                         <div class="card-body table-responsive p-0">
 
-<div class="p-3 border-bottom">
-    <form method="GET" class="d-flex align-items-center" style="gap:10px; max-width:400px;">
-        <label class="font-weight-bold mb-0">تصفية حسب التصنيف:</label>
-        <select name="vendor_group_id" class="form-control form-control-sm" onchange="this.form.submit()">
-            <option value="">-- كل التصنيفات --</option>
-            @foreach($groups as $g)
-                <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
-            @endforeach
-        </select>
-    </form>
-</div>
+                            <div class="p-3 border-bottom">
+                                <form method="GET" class="d-flex align-items-center" style="gap:10px; max-width:400px;">
+                                    <label class="font-weight-bold mb-0">تصفية حسب التصنيف:</label>
+                                    <select name="vendor_group_id" class="form-control form-control-sm"
+                                        onchange="this.form.submit()">
+                                        <option value="">-- كل التصنيفات --</option>
+                                        @foreach($groups as $g)
+                                            <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            </div>
 
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
@@ -65,6 +66,7 @@
                                         <th>اسم المورد</th>
                                         <th>رقم الهاتف</th>
                                         <th>الرصيد الحالي</th>
+                                        <th>الشركات</th>
                                         <th>التصنيفات والوسوم</th>
                                         <th>تصنيف المورد</th>
                                         <th style="width: 180px;">العمليات</th>
@@ -81,6 +83,13 @@
                                                 {{ number_format($vendor->balance, 2) }}
                                             </td>
                                             <td>
+                                                @if($vendor->is_global)
+                                                    <span class="badge badge-success">جميع الشركات</span>
+                                                @else
+                                                    {{ $vendor->companies->pluck('name')->implode('، ') ?: '—' }}
+                                                @endif
+                                            </td>
+                                            <td>
                                                 @forelse($vendor->tags as $tag)
                                                     <span class="badge badge-warning px-2 py-1 ml-1 text-dark font-weight-bold">
                                                         {{ $tag->name }}
@@ -90,16 +99,17 @@
                                                 @endforelse
                                             </td>
                                             <td>
-    @if($vendor->group)
-        <span class="badge badge-info px-2 py-1 text-dark font-weight-bold">{{ $vendor->group->name }}</span>
-    @else
-        <span class="text-muted small">بدون تصنيف</span>
-    @endif
-</td>
+                                                @if($vendor->group)
+                                                    <span
+                                                        class="badge badge-info px-2 py-1 text-dark font-weight-bold">{{ $vendor->group->name }}</span>
+                                                @else
+                                                    <span class="text-muted small">بدون تصنيف</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <!-- <a href="#" class="btn btn-sm btn-info ml-1" title="عرض الحركات">
-                                                        <i class="fas fa-eye ml-1"></i> عرض
-                                                    </a> -->
+                                                                        <i class="fas fa-eye ml-1"></i> عرض
+                                                                    </a> -->
                                                 <a href="{{ route('vendors.edit', $vendor->id) }}"
                                                     class="btn btn-sm btn-warning ml-1" title="تعديل">
                                                     <i class="fas fa-edit ml-1"></i> تعديل
