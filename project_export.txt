@@ -2479,6 +2479,132 @@ class Controller extends BaseController
 }
 
 
+--- FILE: app\Http\Controllers\DebtStatementReportController.php ---
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Vendor;
+use App\VendorGroup;
+use App\company;
+use Illuminate\Http\Request;
+
+class DebtStatementReportController extends Controller
+{
+    // private function resolveCompanyIds(Request $request)
+    // {
+    //     $companyFilter = $request->input('company_filter', 'current');
+
+    //     if ($companyFilter === 'all') {
+    //         return null; // no constraint
+    //     }
+    //     if ($companyFilter === 'current') {
+    //         return [session('company_id')];
+    //     }
+    //     return [(int) $companyFilter];
+    // }
+
+    private function buildQuery(Request $request)
+    {
+        $companyIds = $this->resolveCompanyIds($request);
+
+        $query = Vendor::query()->with(['company', 'group']);
+
+        if ($companyIds !== null) {
+            $query->visibleToAny($companyIds);
+        }
+
+        if ($request->filled('vendor_id')) {
+            $query->where('id', $request->vendor_id);
+        } elseif ($request->filled('vendor_group_id')) {
+            $query->where('vendor_group_id', $request->vendor_group_id);
+        }
+
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
+        $companyId = session('company_id');
+
+        $vendors = $this->buildQuery($request)->orderBy('name')->get();
+
+        $totalDebit = $vendors->sum(function ($v) {
+            return $v->balance > 0 ? $v->balance : 0; });
+        $totalCredit = $vendors->sum(function ($v) {
+            return $v->balance < 0 ? abs($v->balance) : 0; });
+        $netBalance = $vendors->sum('balance');
+
+        $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
+        $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $companies = company::all();
+
+$isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+
+    return view('rep.debt_statement', compact(
+        'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
+        'totalDebit', 'totalCredit', 'netBalance'
+    ));
+    }
+
+    public function print(Request $request)
+    {
+        $vendors = $this->buildQuery($request)->orderBy('name')->get();
+
+        $totalDebit = $vendors->sum(function ($v) {
+            return $v->balance > 0 ? $v->balance : 0; });
+        $totalCredit = $vendors->sum(function ($v) {
+            return $v->balance < 0 ? abs($v->balance) : 0; });
+        $netBalance = $vendors->sum('balance');
+
+        // Build the scope phrase shown on the printed report
+        if ($request->filled('vendor_id')) {
+            $vendor = Vendor::find($request->vendor_id);
+            $scopeLabel = 'مورد محدد: ' . ($vendor->name ?? 'غير معروف');
+        } elseif ($request->filled('vendor_group_id')) {
+            $group = VendorGroup::find($request->vendor_group_id);
+            $scopeLabel = 'تصنيف محدد: ' . ($group->name ?? 'غير معروف');
+        } else {
+            $scopeLabel = 'تقرير شامل لكل الموردين';
+        }
+
+        $companyFilter = $request->input('company_filter', 'current');
+        if ($companyFilter === 'all') {
+            $companyLabel = 'كل الشركات';
+        } elseif ($companyFilter === 'current') {
+            $companyLabel = session('company_name', 'الشركة الحالية');
+        } else {
+            $companyLabel = optional(company::find($companyFilter))->name ?? 'غير محدد';
+        }
+
+        return view('rep.debt_statement_print', compact(
+            'vendors',
+            'totalDebit',
+            'totalCredit',
+            'netBalance',
+            'scopeLabel',
+            'companyLabel'
+        ));
+    }
+
+
+    private function resolveCompanyIds(Request $request)
+{
+    $isPrivileged = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+    $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
+
+    if ($companyFilter === 'all') {
+        return null;
+    }
+    if ($companyFilter === 'current') {
+        return [session('company_id')];
+    }
+    return [(int) $companyFilter];
+}
+
+}
+
 --- FILE: app\Http\Controllers\DepartmentController.php ---
 
 <?php
@@ -11043,6 +11169,84 @@ public function store(Request $request)
 }
 
 
+--- FILE: app\Http\Controllers\VendorGroupController.php ---
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\VendorGroup;
+use App\Vendor;
+use Illuminate\Http\Request;
+
+class VendorGroupController extends Controller
+{
+    public function index()
+    {
+        $companyId = session('company_id');
+
+        $groups = VendorGroup::where('company_id', $companyId)
+            ->withCount('vendors')
+            ->orderBy('name')
+            ->get();
+
+        return view('vendor_groups.index', compact('groups'));
+    }
+
+    public function create()
+    {
+        return view('vendor_groups.create');
+    }
+
+    public function store(Request $request)
+    {
+        $companyId = session('company_id');
+
+        $request->validate(['name' => 'required|string|max:255']);
+
+        VendorGroup::create([
+            'company_id' => $companyId,
+            'name'       => $request->name,
+        ]);
+
+        return redirect()->route('vendor_groups.index')->with('success', 'تمت إضافة تصنيف المورد بنجاح.');
+    }
+
+    public function edit($id)
+    {
+        $companyId = session('company_id');
+        $group = VendorGroup::where('company_id', $companyId)->findOrFail($id);
+
+        return view('vendor_groups.edit', compact('group'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $companyId = session('company_id');
+        $group = VendorGroup::where('company_id', $companyId)->findOrFail($id);
+
+        $request->validate(['name' => 'required|string|max:255']);
+
+        $group->update(['name' => $request->name]);
+
+        return redirect()->route('vendor_groups.index')->with('success', 'تم تحديث التصنيف بنجاح.');
+    }
+
+    public function destroy($id)
+    {
+        $companyId = session('company_id');
+        $group = VendorGroup::where('company_id', $companyId)->findOrFail($id);
+
+        if (Vendor::where('vendor_group_id', $group->id)->exists()) {
+            return back()->with('error', 'عفواً، لا يمكن حذف هذا التصنيف لارتباطه بموردين حاليين.');
+        }
+
+        $group->delete();
+
+        return redirect()->route('vendor_groups.index')->with('success', 'تم حذف التصنيف بنجاح.');
+    }
+}
+
 --- FILE: app\Http\Controllers\VendorReportController.php ---
 
 <?php
@@ -11300,23 +11504,53 @@ use Illuminate\Support\Facades\DB;
 class VendorTransactionController extends Controller
 {
     // 1. عرض جدول الحركات
-    public function index()
+    public function index(Request $request)
     {
         $companyId = session('company_id');
 
         $transactions = VendorTransaction::where('company_id', $companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->whereHas('vendor', function ($v) use ($request) {
+                    $v->where('vendor_group_id', $request->vendor_group_id);
+                });
+            })
+            ->when($request->filled('vendor_id'), function ($q) use ($request) {
+                $q->where('vendor_id', $request->vendor_id);
+            })
             ->with(['vendor', 'tags'])
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('vendor_transactions.index', compact('transactions'));
+        $groups = \App\VendorGroup::orderBy('name')->get();
+
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->orderBy('name')
+            ->get();
+
+        // Can only add a transaction if there's at least one vendor (account) visible
+        // to the current company under the selected classification (or at all, if none selected)
+        $canAddTransaction = $vendors->isNotEmpty();
+
+        return view('vendor_transactions.index', compact('transactions', 'groups', 'vendors', 'canAddTransaction'));
     }
 
     // 2. نموذج إضافة حركة جديدة
-    public function create()
+    public function create(Request $request)
     {
         $companyId = session('company_id');
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->get();
+
+        if ($vendors->isEmpty()) {
+            return redirect()->route('transactions.index', $request->only('vendor_group_id'))
+                ->with('error', 'عفواً، لا يوجد حسابات (موردين) مرتبطة بهذا التصنيف ضمن الشركة الحالية، لا يمكن إضافة حركة.');
+        }
 
         return view('vendor_transactions.create', compact('vendors'));
     }
@@ -11379,7 +11613,7 @@ class VendorTransactionController extends Controller
     {
         $companyId = session('company_id');
         $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
@@ -11504,6 +11738,7 @@ namespace App\Http\Controllers;
 
 use App\Vendor;
 use App\VendorTag;
+use App\VendorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\TransactionTag;
@@ -11512,25 +11747,35 @@ use App\VendorTransaction;
 
 class VendorsController extends Controller
 {
-    public function index()
-{
-    $companyId = session('company_id');
+    public function index(Request $request)
+    {
+        $companyId = session('company_id');
 
-    $vendors = Vendor::where('company_id', $companyId)
-        ->with('tags')
-        ->get();
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->with('tags', 'group', 'companies')
+            ->get();
 
-    return view('bsc.vendors.index', compact('vendors'));
-}
+        $groups = VendorGroup::orderBy('name')->get();
+        $activeGroup = $request->filled('vendor_group_id')
+            ? $groups->firstWhere('id', $request->vendor_group_id)
+            : null;
 
-public function create()
-{
-    $companyId    = session('company_id');
-    $vendors      = Vendor::where('company_id', $companyId)->get();
-    $existingTags = TransactionTag::where('company_id', $companyId)->get(); // ← add this
+        return view('bsc.vendors.index', compact('vendors', 'groups', 'activeGroup'));
+    }
 
-    return view('bsc.vendors.create', compact('vendors', 'existingTags'));
-}
+    public function create()
+    {
+        $companyId = session('company_id');
+        $vendors = Vendor::visibleTo($companyId)->get();
+        $existingTags = TransactionTag::where('company_id', $companyId)->get();
+        $groups = VendorGroup::orderBy('name')->get();
+        $companies = \App\company::all();
+
+        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups', 'companies'));
+    }
 
     public function store(Request $request)
     {
@@ -11538,15 +11783,27 @@ public function create()
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel'  => 'nullable|string|max:50',
+            'tel' => 'nullable|string|max:50',
+            'vendor_group_id' => 'nullable|exists:vendor_groups,id',
+            'vendor_scope' => 'required|in:specific,all',
+            'company_ids' => 'required_if:vendor_scope,specific|array',
+            'company_ids.*' => 'exists:companies,id',
         ]);
 
+        $isGlobal = $request->vendor_scope === 'all';
+
         $vendor = Vendor::create([
-            'company_id' => $companyId,
-            'name'       => $request->name,
-            'tel'        => $request->tel,
-            'balance'    => 0,
+            'company_id' => $companyId, // "home" company, kept for reference
+            'name' => $request->name,
+            'tel' => $request->tel,
+            'balance' => 0,
+            'vendor_group_id' => $request->vendor_group_id,
+            'is_global' => $isGlobal,
         ]);
+
+        if (!$isGlobal) {
+            $vendor->companies()->sync($request->company_ids);
+        }
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
@@ -11557,28 +11814,39 @@ public function create()
     {
         $companyId = session('company_id');
 
-        $vendor       = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
+        $vendor = Vendor::with('tags', 'companies')->findOrFail($id);
         $existingTags = VendorTag::where('company_id', $companyId)->get();
+        $groups = VendorGroup::orderBy('name')->get();
+        $companies = \App\company::all();
 
-        return view('bsc.vendors.edit', compact('vendor', 'existingTags'));
+        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups', 'companies'));
     }
 
     public function update(Request $request, $id)
     {
-        $companyId = session('company_id');
-        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor = Vendor::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel'  => 'nullable|string|max:50',
+            'tel' => 'nullable|string|max:50',
+            'vendor_group_id' => 'nullable|exists:vendor_groups,id',
+            'vendor_scope' => 'required|in:specific,all',
+            'company_ids' => 'required_if:vendor_scope,specific|array',
+            'company_ids.*' => 'exists:companies,id',
         ]);
+
+        $isGlobal = $request->vendor_scope === 'all';
 
         $vendor->update([
             'name' => $request->name,
-            'tel'  => $request->tel,
+            'tel' => $request->tel,
+            'vendor_group_id' => $request->vendor_group_id,
+            'is_global' => $isGlobal,
         ]);
 
-        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
+        $vendor->companies()->sync($isGlobal ? [] : $request->company_ids);
+
+        $vendor->tags()->sync($this->resolveTagIds($request, session('company_id')));
 
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
@@ -11586,7 +11854,7 @@ public function create()
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
 
         $vendor->delete();
 
@@ -11617,41 +11885,39 @@ public function create()
      * Existing tag IDs are used directly.
      */
     private function resolveTagIds(Request $request, int $companyId): array
-{
-    $submitted = $request->input('tags') ?? []; // ← null-safe fallback
+    {
+        $submitted = $request->input('tags') ?? [];
 
-    if (empty($submitted) || !is_array($submitted)) {
-        return [];
-    }
-
-    $tagIds = [];
-
-    foreach ($submitted as $value) {
-        $value = trim($value);
-        if (empty($value)) continue;
-
-        if (str_starts_with($value, 'new:')) {
-            $name = trim(substr($value, 4));
-            if (empty($name)) continue;
-
-            $tag = VendorTag::firstOrCreate([
-                'company_id' => $companyId,
-                'name'       => $name,
-            ]);
-        } else {
-            $tag = VendorTag::where('company_id', $companyId)
-                ->findOrFail((int) $value);
+        if (empty($submitted) || !is_array($submitted)) {
+            return [];
         }
 
-        $tagIds[] = $tag->id;
+        $tagIds = [];
+
+        foreach ($submitted as $value) {
+            $value = trim($value);
+            if (empty($value))
+                continue;
+
+            if (str_starts_with($value, 'new:')) {
+                $name = trim(substr($value, 4));
+                if (empty($name))
+                    continue;
+
+                $tag = VendorTag::firstOrCreate([
+                    'company_id' => $companyId,
+                    'name' => $name,
+                ]);
+            } else {
+                $tag = VendorTag::where('company_id', $companyId)
+                    ->findOrFail((int) $value);
+            }
+
+            $tagIds[] = $tag->id;
+        }
+
+        return array_unique($tagIds);
     }
-
-    return array_unique($tagIds);
-}
-
-
-
-
 }
 
 --- FILE: app\Http\Controllers\important.txt ---
@@ -12329,18 +12595,72 @@ class Vendor extends Model
 {
     // use HasFactory;
 
-    protected $fillable = ['company_id', 'name', 'tel', 'balance'];
+    protected $fillable = ['company_id', 'name', 'tel', 'balance', 'vendor_group_id', 'is_global'];
 
-    // Relationship with Transactions
+
     public function transactions()
     {
         return $this->hasMany(VendorTransaction::class);
     }
 
-    // Relationship with Vendor Tags (Many-to-Many)
     public function tags()
     {
         return $this->belongsToMany(VendorTag::class, 'vendor_vendor_tag', 'vendor_id', 'vendor_tag_id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(VendorGroup::class, 'vendor_group_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\company::class, 'company_id');
+    }
+
+    public function companies()
+{
+    return $this->belongsToMany(\App\company::class, 'company_vendor', 'vendor_id', 'company_id');
+}
+
+// Vendors visible to a single company: global vendors + vendors explicitly linked to it
+public function scopeVisibleTo($query, $companyId)
+{
+    return $query->where(function ($q) use ($companyId) {
+        $q->where('is_global', true)
+          ->orWhereHas('companies', function ($q2) use ($companyId) {
+              $q2->where('companies.id', $companyId);
+          });
+    });
+}
+
+// Same, but for a set of companies (used by the "specific company" report filter)
+public function scopeVisibleToAny($query, array $companyIds)
+{
+    return $query->where(function ($q) use ($companyIds) {
+        $q->where('is_global', true)
+          ->orWhereHas('companies', function ($q2) use ($companyIds) {
+              $q2->whereIn('companies.id', $companyIds);
+          });
+    });
+}
+}
+
+--- FILE: app\VendorGroup.php ---
+
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VendorGroup extends Model
+{
+    protected $fillable = ['company_id', 'name'];
+
+    public function vendors()
+    {
+        return $this->hasMany(Vendor::class, 'vendor_group_id');
     }
 }
 
@@ -23968,6 +24288,128 @@ class CreateTransactionTagsTable extends Migration
     {
         Schema::dropIfExists('transaction_transaction_tag');
         Schema::dropIfExists('transaction_tags');
+    }
+}
+
+--- FILE: database\migrations\2026_07_06_202405_create_vendor_groups_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateVendorGroupsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('vendor_groups', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id');
+            $table->string('name');
+            $table->timestamps();
+
+            $table->index('company_id');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('vendor_groups');
+    }
+}
+
+--- FILE: database\migrations\2026_07_06_203108_add_vendor_group_id_to_vendors_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddVendorGroupIdToVendorsTable extends Migration
+{
+    public function up()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->unsignedBigInteger('vendor_group_id')->nullable()->after('company_id');
+            $table->foreign('vendor_group_id')
+                  ->references('id')->on('vendor_groups')
+                  ->onDelete('set null');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->dropForeign(['vendor_group_id']);
+            $table->dropColumn('vendor_group_id');
+        });
+    }
+}
+
+--- FILE: database\migrations\2026_07_13_163120_add_is_global_to_vendors_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddIsGlobalToVendorsTable extends Migration
+{
+    public function up()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->boolean('is_global')->default(false)->after('vendor_group_id');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->dropColumn('is_global');
+        });
+    }
+}
+
+--- FILE: database\migrations\2026_07_13_163125_create_company_vendor_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+class CreateCompanyVendorTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('company_vendor', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('vendor_id');
+            $table->timestamps();
+
+            $table->unique(['company_id', 'vendor_id']);
+        });
+
+        // Backfill: every existing vendor becomes "dedicated" to its current home company
+        $vendors = DB::table('vendors')->select('id', 'company_id')->get();
+        foreach ($vendors as $vendor) {
+            DB::table('company_vendor')->insert([
+                'company_id' => $vendor->company_id,
+                'vendor_id'  => $vendor->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('company_vendor');
     }
 }
 
@@ -27829,6 +28271,132 @@ class Controller extends BaseController
 }
 
 
+--- FILE: app\Http\Controllers\DebtStatementReportController.php ---
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Vendor;
+use App\VendorGroup;
+use App\company;
+use Illuminate\Http\Request;
+
+class DebtStatementReportController extends Controller
+{
+    // private function resolveCompanyIds(Request $request)
+    // {
+    //     $companyFilter = $request->input('company_filter', 'current');
+
+    //     if ($companyFilter === 'all') {
+    //         return null; // no constraint
+    //     }
+    //     if ($companyFilter === 'current') {
+    //         return [session('company_id')];
+    //     }
+    //     return [(int) $companyFilter];
+    // }
+
+    private function buildQuery(Request $request)
+    {
+        $companyIds = $this->resolveCompanyIds($request);
+
+        $query = Vendor::query()->with(['company', 'group']);
+
+        if ($companyIds !== null) {
+            $query->visibleToAny($companyIds);
+        }
+
+        if ($request->filled('vendor_id')) {
+            $query->where('id', $request->vendor_id);
+        } elseif ($request->filled('vendor_group_id')) {
+            $query->where('vendor_group_id', $request->vendor_group_id);
+        }
+
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
+        $companyId = session('company_id');
+
+        $vendors = $this->buildQuery($request)->orderBy('name')->get();
+
+        $totalDebit = $vendors->sum(function ($v) {
+            return $v->balance > 0 ? $v->balance : 0; });
+        $totalCredit = $vendors->sum(function ($v) {
+            return $v->balance < 0 ? abs($v->balance) : 0; });
+        $netBalance = $vendors->sum('balance');
+
+        $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
+        $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
+        $companies = company::all();
+
+$isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+
+    return view('rep.debt_statement', compact(
+        'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
+        'totalDebit', 'totalCredit', 'netBalance'
+    ));
+    }
+
+    public function print(Request $request)
+    {
+        $vendors = $this->buildQuery($request)->orderBy('name')->get();
+
+        $totalDebit = $vendors->sum(function ($v) {
+            return $v->balance > 0 ? $v->balance : 0; });
+        $totalCredit = $vendors->sum(function ($v) {
+            return $v->balance < 0 ? abs($v->balance) : 0; });
+        $netBalance = $vendors->sum('balance');
+
+        // Build the scope phrase shown on the printed report
+        if ($request->filled('vendor_id')) {
+            $vendor = Vendor::find($request->vendor_id);
+            $scopeLabel = 'مورد محدد: ' . ($vendor->name ?? 'غير معروف');
+        } elseif ($request->filled('vendor_group_id')) {
+            $group = VendorGroup::find($request->vendor_group_id);
+            $scopeLabel = 'تصنيف محدد: ' . ($group->name ?? 'غير معروف');
+        } else {
+            $scopeLabel = 'تقرير شامل لكل الموردين';
+        }
+
+        $companyFilter = $request->input('company_filter', 'current');
+        if ($companyFilter === 'all') {
+            $companyLabel = 'كل الشركات';
+        } elseif ($companyFilter === 'current') {
+            $companyLabel = session('company_name', 'الشركة الحالية');
+        } else {
+            $companyLabel = optional(company::find($companyFilter))->name ?? 'غير محدد';
+        }
+
+        return view('rep.debt_statement_print', compact(
+            'vendors',
+            'totalDebit',
+            'totalCredit',
+            'netBalance',
+            'scopeLabel',
+            'companyLabel'
+        ));
+    }
+
+
+    private function resolveCompanyIds(Request $request)
+{
+    $isPrivileged = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+    $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
+
+    if ($companyFilter === 'all') {
+        return null;
+    }
+    if ($companyFilter === 'current') {
+        return [session('company_id')];
+    }
+    return [(int) $companyFilter];
+}
+
+}
+
 --- FILE: app\Http\Controllers\DepartmentController.php ---
 
 <?php
@@ -36393,6 +36961,84 @@ public function store(Request $request)
 }
 
 
+--- FILE: app\Http\Controllers\VendorGroupController.php ---
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\VendorGroup;
+use App\Vendor;
+use Illuminate\Http\Request;
+
+class VendorGroupController extends Controller
+{
+    public function index()
+    {
+        $companyId = session('company_id');
+
+        $groups = VendorGroup::where('company_id', $companyId)
+            ->withCount('vendors')
+            ->orderBy('name')
+            ->get();
+
+        return view('vendor_groups.index', compact('groups'));
+    }
+
+    public function create()
+    {
+        return view('vendor_groups.create');
+    }
+
+    public function store(Request $request)
+    {
+        $companyId = session('company_id');
+
+        $request->validate(['name' => 'required|string|max:255']);
+
+        VendorGroup::create([
+            'company_id' => $companyId,
+            'name'       => $request->name,
+        ]);
+
+        return redirect()->route('vendor_groups.index')->with('success', 'تمت إضافة تصنيف المورد بنجاح.');
+    }
+
+    public function edit($id)
+    {
+        $companyId = session('company_id');
+        $group = VendorGroup::where('company_id', $companyId)->findOrFail($id);
+
+        return view('vendor_groups.edit', compact('group'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $companyId = session('company_id');
+        $group = VendorGroup::where('company_id', $companyId)->findOrFail($id);
+
+        $request->validate(['name' => 'required|string|max:255']);
+
+        $group->update(['name' => $request->name]);
+
+        return redirect()->route('vendor_groups.index')->with('success', 'تم تحديث التصنيف بنجاح.');
+    }
+
+    public function destroy($id)
+    {
+        $companyId = session('company_id');
+        $group = VendorGroup::where('company_id', $companyId)->findOrFail($id);
+
+        if (Vendor::where('vendor_group_id', $group->id)->exists()) {
+            return back()->with('error', 'عفواً، لا يمكن حذف هذا التصنيف لارتباطه بموردين حاليين.');
+        }
+
+        $group->delete();
+
+        return redirect()->route('vendor_groups.index')->with('success', 'تم حذف التصنيف بنجاح.');
+    }
+}
+
 --- FILE: app\Http\Controllers\VendorReportController.php ---
 
 <?php
@@ -36650,23 +37296,53 @@ use Illuminate\Support\Facades\DB;
 class VendorTransactionController extends Controller
 {
     // 1. عرض جدول الحركات
-    public function index()
+    public function index(Request $request)
     {
         $companyId = session('company_id');
 
         $transactions = VendorTransaction::where('company_id', $companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->whereHas('vendor', function ($v) use ($request) {
+                    $v->where('vendor_group_id', $request->vendor_group_id);
+                });
+            })
+            ->when($request->filled('vendor_id'), function ($q) use ($request) {
+                $q->where('vendor_id', $request->vendor_id);
+            })
             ->with(['vendor', 'tags'])
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('vendor_transactions.index', compact('transactions'));
+        $groups = \App\VendorGroup::orderBy('name')->get();
+
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->orderBy('name')
+            ->get();
+
+        // Can only add a transaction if there's at least one vendor (account) visible
+        // to the current company under the selected classification (or at all, if none selected)
+        $canAddTransaction = $vendors->isNotEmpty();
+
+        return view('vendor_transactions.index', compact('transactions', 'groups', 'vendors', 'canAddTransaction'));
     }
 
     // 2. نموذج إضافة حركة جديدة
-    public function create()
+    public function create(Request $request)
     {
         $companyId = session('company_id');
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->get();
+
+        if ($vendors->isEmpty()) {
+            return redirect()->route('transactions.index', $request->only('vendor_group_id'))
+                ->with('error', 'عفواً، لا يوجد حسابات (موردين) مرتبطة بهذا التصنيف ضمن الشركة الحالية، لا يمكن إضافة حركة.');
+        }
 
         return view('vendor_transactions.create', compact('vendors'));
     }
@@ -36729,7 +37405,7 @@ class VendorTransactionController extends Controller
     {
         $companyId = session('company_id');
         $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
@@ -36854,6 +37530,7 @@ namespace App\Http\Controllers;
 
 use App\Vendor;
 use App\VendorTag;
+use App\VendorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\TransactionTag;
@@ -36862,25 +37539,35 @@ use App\VendorTransaction;
 
 class VendorsController extends Controller
 {
-    public function index()
-{
-    $companyId = session('company_id');
+    public function index(Request $request)
+    {
+        $companyId = session('company_id');
 
-    $vendors = Vendor::where('company_id', $companyId)
-        ->with('tags')
-        ->get();
+        $vendors = Vendor::visibleTo($companyId)
+            ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
+                $q->where('vendor_group_id', $request->vendor_group_id);
+            })
+            ->with('tags', 'group', 'companies')
+            ->get();
 
-    return view('bsc.vendors.index', compact('vendors'));
-}
+        $groups = VendorGroup::orderBy('name')->get();
+        $activeGroup = $request->filled('vendor_group_id')
+            ? $groups->firstWhere('id', $request->vendor_group_id)
+            : null;
 
-public function create()
-{
-    $companyId    = session('company_id');
-    $vendors      = Vendor::where('company_id', $companyId)->get();
-    $existingTags = TransactionTag::where('company_id', $companyId)->get(); // ← add this
+        return view('bsc.vendors.index', compact('vendors', 'groups', 'activeGroup'));
+    }
 
-    return view('bsc.vendors.create', compact('vendors', 'existingTags'));
-}
+    public function create()
+    {
+        $companyId = session('company_id');
+        $vendors = Vendor::visibleTo($companyId)->get();
+        $existingTags = TransactionTag::where('company_id', $companyId)->get();
+        $groups = VendorGroup::orderBy('name')->get();
+        $companies = \App\company::all();
+
+        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups', 'companies'));
+    }
 
     public function store(Request $request)
     {
@@ -36888,15 +37575,27 @@ public function create()
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel'  => 'nullable|string|max:50',
+            'tel' => 'nullable|string|max:50',
+            'vendor_group_id' => 'nullable|exists:vendor_groups,id',
+            'vendor_scope' => 'required|in:specific,all',
+            'company_ids' => 'required_if:vendor_scope,specific|array',
+            'company_ids.*' => 'exists:companies,id',
         ]);
 
+        $isGlobal = $request->vendor_scope === 'all';
+
         $vendor = Vendor::create([
-            'company_id' => $companyId,
-            'name'       => $request->name,
-            'tel'        => $request->tel,
-            'balance'    => 0,
+            'company_id' => $companyId, // "home" company, kept for reference
+            'name' => $request->name,
+            'tel' => $request->tel,
+            'balance' => 0,
+            'vendor_group_id' => $request->vendor_group_id,
+            'is_global' => $isGlobal,
         ]);
+
+        if (!$isGlobal) {
+            $vendor->companies()->sync($request->company_ids);
+        }
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
@@ -36907,28 +37606,39 @@ public function create()
     {
         $companyId = session('company_id');
 
-        $vendor       = Vendor::where('company_id', $companyId)->with('tags')->findOrFail($id);
+        $vendor = Vendor::with('tags', 'companies')->findOrFail($id);
         $existingTags = VendorTag::where('company_id', $companyId)->get();
+        $groups = VendorGroup::orderBy('name')->get();
+        $companies = \App\company::all();
 
-        return view('bsc.vendors.edit', compact('vendor', 'existingTags'));
+        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups', 'companies'));
     }
 
     public function update(Request $request, $id)
     {
-        $companyId = session('company_id');
-        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor = Vendor::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'tel'  => 'nullable|string|max:50',
+            'tel' => 'nullable|string|max:50',
+            'vendor_group_id' => 'nullable|exists:vendor_groups,id',
+            'vendor_scope' => 'required|in:specific,all',
+            'company_ids' => 'required_if:vendor_scope,specific|array',
+            'company_ids.*' => 'exists:companies,id',
         ]);
+
+        $isGlobal = $request->vendor_scope === 'all';
 
         $vendor->update([
             'name' => $request->name,
-            'tel'  => $request->tel,
+            'tel' => $request->tel,
+            'vendor_group_id' => $request->vendor_group_id,
+            'is_global' => $isGlobal,
         ]);
 
-        $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
+        $vendor->companies()->sync($isGlobal ? [] : $request->company_ids);
+
+        $vendor->tags()->sync($this->resolveTagIds($request, session('company_id')));
 
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
@@ -36936,7 +37646,7 @@ public function create()
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $vendor    = Vendor::where('company_id', $companyId)->findOrFail($id);
+        $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
 
         $vendor->delete();
 
@@ -36967,41 +37677,39 @@ public function create()
      * Existing tag IDs are used directly.
      */
     private function resolveTagIds(Request $request, int $companyId): array
-{
-    $submitted = $request->input('tags') ?? []; // ← null-safe fallback
+    {
+        $submitted = $request->input('tags') ?? [];
 
-    if (empty($submitted) || !is_array($submitted)) {
-        return [];
-    }
-
-    $tagIds = [];
-
-    foreach ($submitted as $value) {
-        $value = trim($value);
-        if (empty($value)) continue;
-
-        if (str_starts_with($value, 'new:')) {
-            $name = trim(substr($value, 4));
-            if (empty($name)) continue;
-
-            $tag = VendorTag::firstOrCreate([
-                'company_id' => $companyId,
-                'name'       => $name,
-            ]);
-        } else {
-            $tag = VendorTag::where('company_id', $companyId)
-                ->findOrFail((int) $value);
+        if (empty($submitted) || !is_array($submitted)) {
+            return [];
         }
 
-        $tagIds[] = $tag->id;
+        $tagIds = [];
+
+        foreach ($submitted as $value) {
+            $value = trim($value);
+            if (empty($value))
+                continue;
+
+            if (str_starts_with($value, 'new:')) {
+                $name = trim(substr($value, 4));
+                if (empty($name))
+                    continue;
+
+                $tag = VendorTag::firstOrCreate([
+                    'company_id' => $companyId,
+                    'name' => $name,
+                ]);
+            } else {
+                $tag = VendorTag::where('company_id', $companyId)
+                    ->findOrFail((int) $value);
+            }
+
+            $tagIds[] = $tag->id;
+        }
+
+        return array_unique($tagIds);
     }
-
-    return array_unique($tagIds);
-}
-
-
-
-
 }
 
 --- FILE: app\Http\Controllers\important.txt ---
@@ -37679,18 +38387,72 @@ class Vendor extends Model
 {
     // use HasFactory;
 
-    protected $fillable = ['company_id', 'name', 'tel', 'balance'];
+    protected $fillable = ['company_id', 'name', 'tel', 'balance', 'vendor_group_id', 'is_global'];
 
-    // Relationship with Transactions
+
     public function transactions()
     {
         return $this->hasMany(VendorTransaction::class);
     }
 
-    // Relationship with Vendor Tags (Many-to-Many)
     public function tags()
     {
         return $this->belongsToMany(VendorTag::class, 'vendor_vendor_tag', 'vendor_id', 'vendor_tag_id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(VendorGroup::class, 'vendor_group_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\company::class, 'company_id');
+    }
+
+    public function companies()
+{
+    return $this->belongsToMany(\App\company::class, 'company_vendor', 'vendor_id', 'company_id');
+}
+
+// Vendors visible to a single company: global vendors + vendors explicitly linked to it
+public function scopeVisibleTo($query, $companyId)
+{
+    return $query->where(function ($q) use ($companyId) {
+        $q->where('is_global', true)
+          ->orWhereHas('companies', function ($q2) use ($companyId) {
+              $q2->where('companies.id', $companyId);
+          });
+    });
+}
+
+// Same, but for a set of companies (used by the "specific company" report filter)
+public function scopeVisibleToAny($query, array $companyIds)
+{
+    return $query->where(function ($q) use ($companyIds) {
+        $q->where('is_global', true)
+          ->orWhereHas('companies', function ($q2) use ($companyIds) {
+              $q2->whereIn('companies.id', $companyIds);
+          });
+    });
+}
+}
+
+--- FILE: app\VendorGroup.php ---
+
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VendorGroup extends Model
+{
+    protected $fillable = ['company_id', 'name'];
+
+    public function vendors()
+    {
+        return $this->hasMany(Vendor::class, 'vendor_group_id');
     }
 }
 
@@ -49321,6 +50083,128 @@ class CreateTransactionTagsTable extends Migration
     }
 }
 
+--- FILE: database\migrations\2026_07_06_202405_create_vendor_groups_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateVendorGroupsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('vendor_groups', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id');
+            $table->string('name');
+            $table->timestamps();
+
+            $table->index('company_id');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('vendor_groups');
+    }
+}
+
+--- FILE: database\migrations\2026_07_06_203108_add_vendor_group_id_to_vendors_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddVendorGroupIdToVendorsTable extends Migration
+{
+    public function up()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->unsignedBigInteger('vendor_group_id')->nullable()->after('company_id');
+            $table->foreign('vendor_group_id')
+                  ->references('id')->on('vendor_groups')
+                  ->onDelete('set null');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->dropForeign(['vendor_group_id']);
+            $table->dropColumn('vendor_group_id');
+        });
+    }
+}
+
+--- FILE: database\migrations\2026_07_13_163120_add_is_global_to_vendors_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddIsGlobalToVendorsTable extends Migration
+{
+    public function up()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->boolean('is_global')->default(false)->after('vendor_group_id');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->dropColumn('is_global');
+        });
+    }
+}
+
+--- FILE: database\migrations\2026_07_13_163125_create_company_vendor_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+class CreateCompanyVendorTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('company_vendor', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('vendor_id');
+            $table->timestamps();
+
+            $table->unique(['company_id', 'vendor_id']);
+        });
+
+        // Backfill: every existing vendor becomes "dedicated" to its current home company
+        $vendors = DB::table('vendors')->select('id', 'company_id')->get();
+        foreach ($vendors as $vendor) {
+            DB::table('company_vendor')->insert([
+                'company_id' => $vendor->company_id,
+                'vendor_id'  => $vendor->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('company_vendor');
+    }
+}
+
 --- FILE: database\seeds\AccountsSeeder.php ---
 
 <?php
@@ -52055,69 +52939,123 @@ $cyan: #6cb2eb;
 @extends('layout.master')
 
 @section('content')
-<div class="content-header text-right">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark">إضافة مورد جديد</h1>
+    <div class="content-header text-right">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">إضافة مورد جديد</h1>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="content text-right" dir="rtl">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                
-                <div class="card card-primary card-outline shadow-sm">
-                    <div class="card-header">
-                        <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
-                            <i class="fas fa-plus ml-2 text-primary"></i> بيانات المورد الجديد
-                        </h3>
+    <div class="content text-right" dir="rtl">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+
+                    <div class="card card-primary card-outline shadow-sm">
+                        <div class="card-header">
+                            <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
+                                <i class="fas fa-plus ml-2 text-primary"></i> بيانات المورد الجديد
+                            </h3>
+                        </div>
+
+                        <form action="{{ route('vendors.store') }}" method="POST">
+                            @csrf
+                            <div class="card-body">
+
+                                <div class="form-group row mb-3">
+                                    <label for="name" class="col-sm-3 col-form-label font-weight-bold">إسم المورد <span
+                                            class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-3">
+                                    <label for="tel" class="col-sm-3 col-form-label font-weight-bold">رقم الهاتف</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control text-left" id="tel" name="tel">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-3">
+                                    <label for="vendor_group_id" class="col-sm-3 col-form-label font-weight-bold">تصنيف
+                                        المورد</label>
+                                    <div class="col-sm-9">
+                                        <select class="form-control" name="vendor_group_id" id="vendor_group_id">
+                                            <option value="">-- بدون تصنيف --</option>
+                                            @foreach($groups as $g)
+                                                <option value="{{ $g->id }}" {{ old('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-3">
+                                    <label class="col-sm-3 col-form-label font-weight-bold">نطاق المورد</label>
+                                    <div class="col-sm-9">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="vendor_scope" id="scope_specific" value="specific"
+                                                {{ old('vendor_scope', 'specific') == 'specific' ? 'checked' : '' }} onchange="toggleCompanyScope()">
+                                            <label class="form-check-label" for="scope_specific">شركة أو شركات محددة</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="vendor_scope" id="scope_all" value="all"
+                                                {{ old('vendor_scope') == 'all' ? 'checked' : '' }} onchange="toggleCompanyScope()">
+                                            <label class="form-check-label" for="scope_all">جميع الشركات</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-3" id="companyIdsWrap">
+                                    <label class="col-sm-3 col-form-label font-weight-bold">الشركات المرتبطة</label>
+                                    <div class="col-sm-9">
+                                        @php $selectedCompanyIds = old('company_ids', [session('company_id')]); @endphp
+                                        @foreach($companies as $c)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="company_ids[]" value="{{ $c->id }}"
+                                                    id="company_{{ $c->id }}" {{ in_array($c->id, $selectedCompanyIds) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="company_{{ $c->id }}">{{ $c->name }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-3">
+                                    <label for="tags" class="col-sm-3 col-form-label font-weight-bold">الوسوم /
+                                        التصنيفات</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="tags" name="tags">
+                                        <small class="form-text text-muted mt-1">اكتب الأسماء مفصولة بفاصلة عادية ( ,
+                                            ).</small>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="card-footer d-flex justify-content-start">
+                                <button type="submit" class="btn btn-success font-weight-bold ml-2">
+                                    <i class="fas fa-save ml-1"></i> حفظ المورد
+                                </button>
+                                <a href="{{ route('vendors.index') }}" class="btn btn-default">إلغاء الأمر</a>
+                            </div>
+                        </form>
                     </div>
 
-                    <form action="{{ route('vendors.store') }}" method="POST">
-                        @csrf
-                        <div class="card-body">
-                            
-                            <div class="form-group row mb-3">
-                                <label for="name" class="col-sm-3 col-form-label font-weight-bold">إسم المورد <span class="text-danger">*</span></label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="name" name="name" required >
-                                </div>
-                            </div>
-
-                            <div class="form-group row mb-3">
-                                <label for="tel" class="col-sm-3 col-form-label font-weight-bold">رقم الهاتف</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control text-left" id="tel" name="tel" >
-                                </div>
-                            </div>
-
-                            <div class="form-group row mb-3">
-                                <label for="tags" class="col-sm-3 col-form-label font-weight-bold">الوسوم / التصنيفات</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="tags" name="tags" >
-                                    <small class="form-text text-muted mt-1">اكتب الأسماء مفصولة بفاصلة عادية ( , ).</small>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="card-footer d-flex justify-content-start">
-                            <button type="submit" class="btn btn-success font-weight-bold ml-2">
-                                <i class="fas fa-save ml-1"></i> حفظ المورد
-                            </button>
-                            <a href="{{ route('vendors.index') }}" class="btn btn-default">إلغاء الأمر</a>
-                        </div>
-                    </form>
                 </div>
-
             </div>
         </div>
     </div>
-</div>
+
+    <script>
+        function toggleCompanyScope() {
+            var isAll = document.getElementById('scope_all').checked;
+            document.getElementById('companyIdsWrap').style.display = isAll ? 'none' : '';
+        }
+        document.addEventListener('DOMContentLoaded', toggleCompanyScope);
+    </script>
 @endsection
 
 --- FILE: resources\views\bsc\vendors\edit.blade.php ---
@@ -52139,7 +53077,7 @@ $cyan: #6cb2eb;
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                
+
                 <div class="card card-warning card-outline shadow-sm">
                     <div class="card-header">
                         <h3 class="card-title text-right w-100 font-weight-bold" style="float: right;">
@@ -52151,7 +53089,7 @@ $cyan: #6cb2eb;
                         @csrf
                         @method('PUT')
                         <div class="card-body">
-                            
+
                             <div class="form-group row mb-3">
                                 <label for="name" class="col-sm-3 col-form-label font-weight-bold">إسم المورد <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
@@ -52163,6 +53101,50 @@ $cyan: #6cb2eb;
                                 <label for="tel" class="col-sm-3 col-form-label font-weight-bold">رقم الهاتف</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control text-left" id="tel" name="tel" value="{{ old('tel', $vendor->tel) }}" dir="ltr">
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3">
+                                <label for="vendor_group_id" class="col-sm-3 col-form-label font-weight-bold">تصنيف المورد</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="vendor_group_id" id="vendor_group_id">
+                                        <option value="">-- بدون تصنيف --</option>
+                                        @foreach($groups as $g)
+                                            <option value="{{ $g->id }}" {{ old('vendor_group_id', $vendor->vendor_group_id) == $g->id ? 'selected' : '' }}>
+                                                {{ $g->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3">
+                                <label class="col-sm-3 col-form-label font-weight-bold">نطاق المورد</label>
+                                <div class="col-sm-9">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_scope" id="scope_specific" value="specific"
+                                            {{ !$vendor->is_global ? 'checked' : '' }} onchange="toggleCompanyScope()">
+                                        <label class="form-check-label" for="scope_specific">شركة أو شركات محددة</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_scope" id="scope_all" value="all"
+                                            {{ $vendor->is_global ? 'checked' : '' }} onchange="toggleCompanyScope()">
+                                        <label class="form-check-label" for="scope_all">جميع الشركات</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row mb-3" id="companyIdsWrap">
+                                <label class="col-sm-3 col-form-label font-weight-bold">الشركات المرتبطة</label>
+                                <div class="col-sm-9">
+                                    @php $selectedCompanyIds = $vendor->companies->pluck('id')->toArray(); @endphp
+                                    @foreach($companies as $c)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="company_ids[]" value="{{ $c->id }}"
+                                                id="company_{{ $c->id }}" {{ in_array($c->id, $selectedCompanyIds) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="company_{{ $c->id }}">{{ $c->name }}</label>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
 
@@ -52189,6 +53171,14 @@ $cyan: #6cb2eb;
         </div>
     </div>
 </div>
+
+<script>
+    function toggleCompanyScope() {
+        var isAll = document.getElementById('scope_all').checked;
+        document.getElementById('companyIdsWrap').style.display = isAll ? 'none' : '';
+    }
+    document.addEventListener('DOMContentLoaded', toggleCompanyScope);
+</script>
 @endsection
 
 --- FILE: resources\views\bsc\vendors\index.blade.php ---
@@ -52240,6 +53230,20 @@ $cyan: #6cb2eb;
                         </div>
 
                         <div class="card-body table-responsive p-0">
+
+                            <div class="p-3 border-bottom">
+                                <form method="GET" class="d-flex align-items-center" style="gap:10px; max-width:400px;">
+                                    <label class="font-weight-bold mb-0">تصفية حسب التصنيف:</label>
+                                    <select name="vendor_group_id" class="form-control form-control-sm"
+                                        onchange="this.form.submit()">
+                                        <option value="">-- كل التصنيفات --</option>
+                                        @foreach($groups as $g)
+                                            <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            </div>
+
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
                                     <tr>
@@ -52247,7 +53251,9 @@ $cyan: #6cb2eb;
                                         <th>اسم المورد</th>
                                         <th>رقم الهاتف</th>
                                         <th>الرصيد الحالي</th>
+                                        <th>الشركات</th>
                                         <th>التصنيفات والوسوم</th>
+                                        <th>تصنيف المورد</th>
                                         <th style="width: 180px;">العمليات</th>
                                     </tr>
                                 </thead>
@@ -52262,6 +53268,13 @@ $cyan: #6cb2eb;
                                                 {{ number_format($vendor->balance, 2) }}
                                             </td>
                                             <td>
+                                                @if($vendor->is_global)
+                                                    <span class="badge badge-success">جميع الشركات</span>
+                                                @else
+                                                    {{ $vendor->companies->pluck('name')->implode('، ') ?: '—' }}
+                                                @endif
+                                            </td>
+                                            <td>
                                                 @forelse($vendor->tags as $tag)
                                                     <span class="badge badge-warning px-2 py-1 ml-1 text-dark font-weight-bold">
                                                         {{ $tag->name }}
@@ -52271,9 +53284,17 @@ $cyan: #6cb2eb;
                                                 @endforelse
                                             </td>
                                             <td>
+                                                @if($vendor->group)
+                                                    <span
+                                                        class="badge badge-info px-2 py-1 text-dark font-weight-bold">{{ $vendor->group->name }}</span>
+                                                @else
+                                                    <span class="text-muted small">بدون تصنيف</span>
+                                                @endif
+                                            </td>
+                                            <td>
                                                 <!-- <a href="#" class="btn btn-sm btn-info ml-1" title="عرض الحركات">
-                                                        <i class="fas fa-eye ml-1"></i> عرض
-                                                    </a> -->
+                                                                        <i class="fas fa-eye ml-1"></i> عرض
+                                                                    </a> -->
                                                 <a href="{{ route('vendors.edit', $vendor->id) }}"
                                                     class="btn btn-sm btn-warning ml-1" title="تعديل">
                                                     <i class="fas fa-edit ml-1"></i> تعديل
@@ -52292,7 +53313,7 @@ $cyan: #6cb2eb;
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4 text-muted">
+                                            <td colspan="7" class="text-center py-4 text-muted">
                                                 <i class="fas fa-folder-open d-block mb-2 fa-2x text-secondary"></i>
                                                 لا يوجد أي موردين مسجلين حالياً.
                                             </td>
@@ -53907,88 +54928,172 @@ $cyan: #6cb2eb;
 --- FILE: resources\views\home\home.blade.php ---
 
 @extends('layout.master')
+
 @section('content')
-    <!doctype html>
-<html lang="ar">
 <style>
-    body {
-        background-image: url('images/bg02.jpg');
+    .home-hero {
+        background-image: linear-gradient(rgba(255,255,255,.90), rgba(255,255,255,.90)), url('{{ asset('images/bg02.jpg') }}');
         background-repeat: no-repeat;
         background-position: center center;
         background-size: cover;
+        border-radius: 16px;
+        padding: 32px 28px;
+        margin: -8px -8px 0;
+    }
+
+    .branch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 18px;
+        margin-top: 24px;
+    }
+
+    .branch-card {
+        position: relative;
+        display: block;
+        text-decoration: none;
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-top: 4px solid var(--accent, #2c3e50);
+        border-radius: 14px;
+        padding: 22px 18px 18px;
+        text-align: center;
+        transition: transform .18s ease, box-shadow .18s ease;
+        box-shadow: 0 1px 3px rgba(20, 30, 60, .05);
+        overflow: hidden;
+    }
+
+    .branch-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 26px rgba(20, 30, 60, .14);
+    }
+
+    .branch-card:hover .branch-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .branch-avatar {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: var(--accent, #2c3e50);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .branch-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .branch-year-badge {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--accent, #2c3e50);
+        background: var(--accent-tint, #eef2f6);
+        border-radius: 20px;
+        padding: 3px 12px;
+    }
+
+    .branch-arrow {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        opacity: 0;
+        transform: translateX(6px);
+        transition: opacity .18s ease, transform .18s ease;
+        color: var(--accent, #2c3e50);
+    }
+
+    .branch-card.disabled {
+        opacity: .5;
+        pointer-events: none;
+        cursor: not-allowed;
+        border-top-color: #b0b6bd !important;
+    }
+
+    .branch-card.disabled .branch-avatar {
+        background: #b0b6bd !important;
+    }
+
+    .page-title {
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+        color: #6b7280;
+        font-size: 14px;
     }
 </style>
-<body>
-<h1>المحاسبة الرقمية | Digital Accounting</h1>
 
-<div class="row">
-    <div class="column col-5">
-        <br><br>
-        <div class="card">
-            <div class="card-header">
-                <h4>الشركات -> السنوات المالية</h4>
-            </div>
+<div class="text-right home-hero" dir="rtl">
+    <h1 class="page-title">المحاسبة الرقمية | Digital Accounting</h1>
+    <div class="page-subtitle">اختر الفرع للمتابعة</div>
 
+    @php
+        $palette = [
+            ['accent' => '#2563eb', 'tint' => '#e8f0fe'],
+            ['accent' => '#059669', 'tint' => '#e4f5ee'],
+            ['accent' => '#d97706', 'tint' => '#fdf1e0'],
+            ['accent' => '#7c3aed', 'tint' => '#f0eafd'],
+            ['accent' => '#dc2626', 'tint' => '#fbe9e9'],
+            ['accent' => '#0891b2', 'tint' => '#e3f5f9'],
+        ];
+    @endphp
 
-            <div class="card-body">
-                {{-- List of companies --}}
-{{--                <table class="table">--}}
-{{--                    <tbody>--}}
-{{--                    @foreach($companies as $company)--}}
-{{--                        <tr>--}}
-{{--                            <td>--}}
-{{--                                <h2>{{$company->name}}</h2>--}}
-{{--                            </td>--}}
-{{--                            <td>--}}
-{{--                                <ul class="list-group">--}}
-{{--                                    @forelse($financial_years->where('company_id', $company->id) as $financial_year)--}}
-{{--                                        <li class="list-group-item">--}}
-{{--                                            <a href="/company_and_financial_year?financial_year_id={{$financial_year->id}}&company_id={{$company->id}}">--}}
-{{--                                                {{$financial_year->financial_year}}--}}
-{{--                                            </a>--}}
-{{--                                        </li>--}}
-{{--                                    @empty--}}
-{{--                                        <li class="list-group-item">No financial years found for this company.</li>--}}
-{{--                                    @endforelse--}}
-{{--                                </ul>--}}
-{{--                            </td>--}}
-{{--                        </tr>--}}
-{{--                    @endforeach--}}
-{{--                    </tbody>--}}
-{{--                </table>--}}
+    <div class="branch-grid">
+        @foreach($companies as $company)
+            @php
+                $fy = $financial_years->where('company_id', $company->id)->first();
+                $colors = $palette[$loop->index % count($palette)];
+            @endphp
 
-                                <ul class="list-group">
-                    @foreach($companies as $company)
-                        <li class="list-group-item">
-                            <h2>{{$company->name}}</h2>
-                            <ul class="list-group">
-                                @forelse($financial_years->where('company_id', $company->id) as $financial_year)
-                                    <li class="list-group-item">
-                                        <a href="/company_and_financial_year?financial_year_id={{$financial_year->id}}&company_id={{$company->id}}">
-                                            {{$financial_year->financial_year}}
-                                        </a>
-                                    </li>
-                                @empty
-                                    <li class="list-group-item">No financial years found for this company.</li>
-                                @endforelse
-                            </ul>
-                        </li>
-                    @endforeach
-                </ul>
-                {{-- End list of companies --}}
-            </div>
+            @if($fy)
+                <a href="/company_and_financial_year?financial_year_id={{ $fy->id }}&company_id={{ $company->id }}"
+                   class="branch-card" style="--accent: {{ $colors['accent'] }}; --accent-tint: {{ $colors['tint'] }};">
+                    <div class="branch-avatar">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 9.5L4.2 4H19.8L21 9.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 9.5C3 10.9 4.1 12 5.5 12C6.9 12 8 10.9 8 9.5C8 10.9 9.1 12 10.5 12C11.9 12 13 10.9 13 9.5C13 10.9 14.1 12 15.5 12C16.9 12 18 10.9 18 9.5C18 10.9 19.1 12 20.5 12C21 12 21 11.6 21 11.2V9.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.5 12V19C4.5 19.55 4.95 20 5.5 20H18.5C19.05 20 19.5 19.55 19.5 19V12" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9.5 20V15C9.5 14.45 9.95 14 10.5 14H13.5C14.05 14 14.5 14.45 14.5 15V20" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="branch-name">{{ $company->name }}</div>
+                    <span class="branch-year-badge">{{ $fy->financial_year ?? $fy->year }}</span>
 
-        </div>
-    </div>
-    <div class="column col-7">
-        {{-- Additional content column --}}
+                    <span class="branch-arrow">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12H18M18 12L13 7M18 12L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </a>
+            @else
+                <div class="branch-card disabled" title="لا توجد سنة مالية مسجلة لهذا الفرع">
+                    <div class="branch-avatar">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 9.5L4.2 4H19.8L21 9.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4.5 12V19C4.5 19.55 4.95 20 5.5 20H18.5C19.05 20 19.5 19.55 19.5 19V12" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="branch-name">{{ $company->name }}</div>
+                    <span class="branch-year-badge">لا توجد سنة مالية</span>
+                </div>
+            @endif
+        @endforeach
     </div>
 </div>
-
-</body>
-</html>
 @endsection
-
 
 --- FILE: resources\views\home\images\coa.webp ---
 
@@ -54959,6 +56064,24 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 
     {{-- Select2 --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+
+
+    <style>
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            display: none;
+        }
+
+        .dropdown-submenu:hover>.dropdown-menu {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
@@ -54990,7 +56113,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                 {{-- Menu --}}
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
-                <!-- <li class="nav-item">
+                    <!-- <li class="nav-item">
     <a href="{{ route('vendors.index') }}" class="nav-link">
         <i class="nav-icon fas fa-boxes"></i>
         <p>الموردين</p>
@@ -55008,8 +56131,8 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
     <a href="{{ route('reports.vendor_report') }}" class="nav-link">
         <i class="nav-icon fas fa-chart-line"></i>
         <p>تقرير الموردين</p> -->
-    </a>
-</li>
+                    </a>
+                    </li>
 
                     <li class="nav-item">
                         <a class="nav-link active" href="/">الرئيسية</a>
@@ -55058,26 +56181,67 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                             </li>
 
                             {{-- الحركة --}}
+                            <!-- <li class="nav-item dropdown">
+                                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            حركة الموردين
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
+                                                            </li>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="/transactions">حركة الموردين</a>
+                                                            </li>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                                            </li>
+                                                        </ul>
+                                                    </li> -->
+
+                            {{-- تصنيفات الموردين --}}
+                            {{-- تصنيفات الموردين --}}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
-                                    حركة الموردين
+                                    الحسابات العامة
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" href="/vendors">بيانات الموردين</a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="/transactions">حركة الموردين</a>
-                                    </li>
+                                    @if($isAdminOrSupervisor)
+                                        <li><a class="dropdown-item" href="{{ route('vendor_groups.index') }}">إدارة التصنيفات</a>
+                                        </li>
+                                    @endif
+
+                                    <li><a class="dropdown-item" href="{{ route('vendors.index') }}">قائمة الحسابات</a></li>
+
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
+
+                                    @foreach(\App\VendorGroup::orderBy('name')->get() as $vg)
+                                        <li>
+                                            <a class="dropdown-item"
+                                                href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
+                                                {{ $vg->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+
                                     <li>
                                         <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('reports.debt_statement') }}">كشف المديونية</a>
                                     </li>
                                 </ul>
                             </li>
@@ -55114,7 +56278,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                             @endif
 
                             {{-- التقارير --}}
-                            @if($isAdminOrSupervisor )
+                            @if($isAdminOrSupervisor)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                         aria-expanded="false">
@@ -55216,10 +56380,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                         </div>
 
                         <div class="text-muted">
-                            {{ $companyRec->name ?? '' }}
-                            @if(session()->has('current_year'))
-                                {{ ' | ' }} {{ session('current_year') }}
-                            @endif
+                            {{ session('company_name', '') }}
                         </div>
 
                     </div>
@@ -57778,6 +58939,274 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
     </html>
 
 @endsection
+
+--- FILE: resources\views\rep\debt_statement.blade.php ---
+
+@extends('layout.master')
+
+@section('content')
+    <div class="content-header text-right">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-12">
+                    <h1 class="m-0 text-dark"><i class="fas fa-file-invoice-dollar ml-2 text-primary"></i> كشف المديونية
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content text-right" dir="rtl">
+        <div class="container-fluid">
+
+            {{-- FILTER CARD --}}
+            <div class="card card-primary card-outline shadow-sm mb-4 no-print">
+                <div class="card-header">
+                    <h3 class="card-title font-weight-bold"><i class="fas fa-sliders-h ml-2 text-primary"></i> خيارات البحث
+                        والفلترة</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('reports.debt_statement') }}" method="GET">
+                        <div class="row align-items-end">
+
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">المورد</label>
+                                <select class="form-control" name="vendor_id">
+                                    <option value="">-- كل الموردين --</option>
+                                    @foreach($allVendors as $v)
+                                        <option value="{{ $v->id }}" {{ request('vendor_id') == $v->id ? 'selected' : '' }}>
+                                            {{ $v->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">التصنيف</label>
+                                <select class="form-control" name="vendor_group_id">
+                                    <option value="">-- كل التصنيفات --</option>
+                                    @foreach($groups as $g)
+                                        <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>
+                                            {{ $g->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">الشركة</label>
+                                @if($isAdminOrSupervisor)
+                                    <select class="form-control" name="company_filter">
+                                        <option value="current" {{ request('company_filter', 'current') == 'current' ? 'selected' : '' }}>الشركة الحالية</option>
+                                        <option value="all" {{ request('company_filter') == 'all' ? 'selected' : '' }}>كل الشركات
+                                        </option>
+                                        @foreach($companies as $c)
+                                            <option value="{{ $c->id }}" {{ request('company_filter') == $c->id ? 'selected' : '' }}>
+                                                {{ $c->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <input type="text" class="form-control"
+                                        value="{{ session('company_name', 'الشركة الحالية') }}" disabled>
+                                    <input type="hidden" name="company_filter" value="current">
+                                @endif
+                            </div>
+
+                            <div class="col-md-3 form-group mb-3 d-flex" style="gap:8px;">
+                                <button type="submit" class="btn btn-primary font-weight-bold flex-grow-1">
+                                    <i class="fas fa-search ml-1"></i> استخراج التقرير
+                                </button>
+                                <a href="{{ route('reports.debt_statement') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo ml-1"></i> إعادة تعيين
+                                </a>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- SUMMARY --}}
+            <div class="row mb-4">
+                <div class="col-6 col-md-4 mb-2">
+                    <div class="p-3 bg-white border rounded text-center shadow-sm">
+                        <span class="d-block small text-muted font-weight-bold">إجمالي المدين</span>
+                        <span class="d-block h5 text-success font-weight-bold">{{ number_format($totalDebit, 2) }}</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 mb-2">
+                    <div class="p-3 bg-white border rounded text-center shadow-sm">
+                        <span class="d-block small text-muted font-weight-bold">إجمالي الدائن</span>
+                        <span class="d-block h5 text-danger font-weight-bold">{{ number_format($totalCredit, 2) }}</span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4 mb-2">
+                    <div class="p-3 bg-dark rounded text-center shadow-sm">
+                        <span class="d-block small text-white-50 font-weight-bold">صافي الرصيد</span>
+                        <span class="d-block h5 text-warning font-weight-bold">{{ number_format($netBalance, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- RESULTS TABLE --}}
+            <div class="card card-outline card-secondary shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title font-weight-bold m-0">
+                        <i class="fas fa-table ml-2 text-secondary"></i> قائمة الموردين
+                        <small class="text-muted font-weight-normal mr-2">({{ $vendors->count() }} مورد)</small>
+                    </h3>
+                    <a href="{{ route('reports.debt_statement_print') . '?' . http_build_query(request()->all()) }}"
+                        target="_blank" class="btn btn-sm btn-outline-secondary font-weight-bold">
+                        <i class="fas fa-print ml-1"></i> طباعة
+                    </a>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-bordered table-hover table-sm text-center mb-0">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th style="width:45px;">#</th>
+                                <th>اسم المورد</th>
+                                <th>الشركة</th>
+                                <th>التصنيف</th>
+                                <th style="width:150px;">الرصيد الحالي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($vendors as $vendor)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td class="font-weight-bold text-primary">{{ $vendor->name }}</td>
+                                    <td>{{ $vendor->company->name ?? '—' }}</td>
+                                    <td>{{ $vendor->group->name ?? '—' }}</td>
+                                    <td class="font-weight-bold {{ $vendor->balance < 0 ? 'text-danger' : 'text-success' }}">
+                                        {{ number_format($vendor->balance, 2) }}
+                                        {{ $vendor->balance < 0 ? '(دائن)' : ($vendor->balance > 0 ? '(مدين)' : '') }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">لا توجد بيانات مطابقة لمعايير البحث.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+--- FILE: resources\views\rep\debt_statement_print.blade.php ---
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>كشف المديونية</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @page { size: A4 portrait; margin: 12mm 10mm; }
+        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; font-size: 13px; color: #1a1a1a; direction: rtl; }
+        .report-header { display: flex; justify-content: space-between; border-bottom: 3px solid #2c3e50; padding-bottom: 10px; margin-bottom: 14px; }
+        .company-name { font-size: 22px; font-weight: 800; color: #2c3e50; }
+        .report-title { font-size: 14px; font-weight: 600; color: #666; margin-top: 4px; }
+        .meta-block { text-align: left; font-size: 12px; color: #555; line-height: 1.9; }
+        .scope-bar {
+            background: #f4f6f8; border: 1px solid #dde1e6; border-radius: 5px;
+            padding: 8px 12px; margin-bottom: 12px; font-size: 13px; font-weight: 700; color: #2c3e50;
+            -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        }
+        .summary-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+        .summary-card { border: 1px solid #dde1e6; border-radius: 6px; padding: 8px 10px; text-align: center; }
+        .summary-card .s-label { font-size: 11px; color: #777; font-weight: 600; display: block; margin-bottom: 4px; }
+        .summary-card .s-value { font-size: 18px; font-weight: 800; display: block; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+        thead tr { background: #2c3e50; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        thead th { padding: 9px 10px; font-weight: 700; text-align: center; border: 1px solid #1a252f; }
+        tbody tr:nth-child(even) { background: #f9fafb; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        tbody td { padding: 7px 10px; text-align: center; border: 1px solid #e0e3e8; }
+        .text-success { color: #27ae60; }
+        .text-danger { color: #c0392b; }
+        .print-toolbar { position: fixed; top: 0; left: 0; right: 0; background: #2c3e50; color: #fff; padding: 9px 20px; display: flex; align-items: center; gap: 12px; z-index: 999; font-size: 13px; }
+        .print-toolbar .btn-print { background: #27ae60; color: #fff; border: none; padding: 7px 22px; border-radius: 4px; font-weight: 700; cursor: pointer; }
+        .print-toolbar .btn-back { background: #c0392b; color: #fff; border: none; padding: 7px 18px; border-radius: 4px; font-weight: 700; cursor: pointer; margin-right: auto; }
+        @media print {
+            .no-print { display: none !important; }
+            body { padding-top: 0 !important; }
+        }
+        body { padding-top: 48px; }
+    </style>
+</head>
+<body>
+
+<div class="print-toolbar no-print">
+    <button class="btn-print" onclick="window.print()">🖨 طباعة التقرير</button>
+    <span>معاينة التقرير قبل الطباعة</span>
+    <button class="btn-back" onclick="window.history.back()">✕ رجوع</button>
+</div>
+
+<div class="page">
+    <div class="report-header">
+        <div>
+            <div class="company-name">{{ session('company_name', 'الشركة') }}</div>
+            <div class="report-title">كشف المديونية</div>
+        </div>
+        <div class="meta-block">
+            <div><strong>تاريخ الطباعة:</strong> {{ now()->format('Y-m-d') }}</div>
+            <div><strong>وقت الطباعة:</strong> {{ now()->format('H:i') }}</div>
+            <div><strong>عدد الموردين:</strong> {{ $vendors->count() }}</div>
+        </div>
+    </div>
+
+    {{-- Scope phrase: comprehensive / specific company / specific classification / specific vendor --}}
+    <div class="scope-bar">
+        النطاق: {{ $scopeLabel }} &nbsp;|&nbsp; الشركة: {{ $companyLabel }}
+    </div>
+
+    <div class="summary-row">
+        <div class="summary-card">
+            <span class="s-label">إجمالي المدين</span>
+            <span class="s-value text-success">{{ number_format($totalDebit, 2) }}</span>
+        </div>
+        <div class="summary-card">
+            <span class="s-label">إجمالي الدائن</span>
+            <span class="s-value text-danger">{{ number_format($totalCredit, 2) }}</span>
+        </div>
+        <div class="summary-card">
+            <span class="s-label">صافي الرصيد</span>
+            <span class="s-value">{{ number_format($netBalance, 2) }}</span>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:30px;">#</th>
+                <th>اسم المورد</th>
+                <th>الشركة</th>
+                <th>التصنيف</th>
+                <th style="width:130px;">الرصيد الحالي</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($vendors as $vendor)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td style="font-weight:700; color:#2980b9;">{{ $vendor->name }}</td>
+                    <td>{{ $vendor->company->name ?? '—' }}</td>
+                    <td>{{ $vendor->group->name ?? '—' }}</td>
+                    <td class="{{ $vendor->balance < 0 ? 'text-danger' : 'text-success' }}" style="font-weight:700;">
+                        {{ number_format($vendor->balance, 2) }}
+                        {{ $vendor->balance < 0 ? '(دائن)' : ($vendor->balance > 0 ? '(مدين)' : '') }}
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="5" style="text-align:center; padding:24px; color:#999;">لا توجد بيانات مطابقة.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
 
 --- FILE: resources\views\rep\estimated_expense_report.blade.php ---
 
@@ -62660,6 +64089,158 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 @endsection
 
 
+--- FILE: resources\views\vendor_groups\create.blade.php ---
+
+@extends('layout.master')
+
+@section('content')
+<div class="content-header text-right">
+    <div class="container-fluid">
+        <div class="row mb-2"><div class="col-sm-6"><h1 class="m-0 text-dark">إضافة تصنيف مورد جديد</h1></div></div>
+    </div>
+</div>
+
+<div class="content text-right" dir="rtl">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-primary card-outline shadow-sm">
+                    <div class="card-header"><h3 class="card-title font-weight-bold">بيانات التصنيف</h3></div>
+                    <form action="{{ route('vendor_groups.store') }}" method="POST">
+                        @csrf
+                        <div class="card-body">
+                            <div class="form-group row mb-3">
+                                <label class="col-sm-3 col-form-label font-weight-bold">اسم التصنيف <span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-start">
+                            <button type="submit" class="btn btn-success font-weight-bold ml-2"><i class="fas fa-save ml-1"></i> حفظ</button>
+                            <a href="{{ route('vendor_groups.index') }}" class="btn btn-default">إلغاء الأمر</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+--- FILE: resources\views\vendor_groups\edit.blade.php ---
+
+@extends('layout.master')
+
+@section('content')
+<div class="content-header text-right">
+    <div class="container-fluid">
+        <div class="row mb-2"><div class="col-sm-6"><h1 class="m-0 text-dark">تعديل تصنيف</h1></div></div>
+    </div>
+</div>
+
+<div class="content text-right" dir="rtl">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-warning card-outline shadow-sm">
+                    <div class="card-header"><h3 class="card-title font-weight-bold">تعديل: {{ $group->name }}</h3></div>
+                    <form action="{{ route('vendor_groups.update', $group->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="card-body">
+                            <div class="form-group row mb-3">
+                                <label class="col-sm-3 col-form-label font-weight-bold">اسم التصنيف <span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="name" value="{{ old('name', $group->name) }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-start">
+                            <button type="submit" class="btn btn-warning font-weight-bold ml-2"><i class="fas fa-sync ml-1"></i> تحديث</button>
+                            <a href="{{ route('vendor_groups.index') }}" class="btn btn-default">إلغاء الأمر</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+--- FILE: resources\views\vendor_groups\index.blade.php ---
+
+@extends('layout.master')
+
+@section('content')
+<div class="content-header text-right">
+    <div class="container-fluid">
+        <div class="row mb-2"><div class="col-sm-6"><h1 class="m-0 text-dark">تصنيفات الموردين</h1></div></div>
+    </div>
+</div>
+
+<div class="content text-right" dir="rtl">
+    <div class="container-fluid">
+
+        @if(session()->has('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session()->get('success') }}
+                <button type="button" class="close float-left" data-dismiss="alert"><span>&times;</span></button>
+            </div>
+        @endif
+        @if(session()->has('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session()->get('error') }}
+                <button type="button" class="close float-left" data-dismiss="alert"><span>&times;</span></button>
+            </div>
+        @endif
+
+        <div class="card card-primary card-outline shadow-sm">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 class="card-title font-weight-bold m-0"><i class="fas fa-tags ml-2 text-primary"></i> قائمة تصنيفات الموردين</h3>
+                <a href="{{ route('vendor_groups.create') }}" class="btn btn-success font-weight-bold">
+                    <i class="fas fa-plus ml-1"></i> إضافة تصنيف جديد
+                </a>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover table-striped text-center mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width:70px;">#</th>
+                            <th>اسم التصنيف</th>
+                            <th>عدد الموردين</th>
+                            <th style="width:180px;">العمليات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($groups as $group)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="font-weight-bold text-primary">{{ $group->name }}</td>
+                                <td>{{ $group->vendors_count }}</td>
+                                <td>
+                                    <a href="{{ route('vendor_groups.edit', $group->id) }}" class="btn btn-sm btn-warning ml-1">
+                                        <i class="fas fa-edit ml-1"></i> تعديل
+                                    </a>
+                                    <form action="{{ route('vendor_groups.destroy', $group->id) }}" method="POST" class="d-inline-block"
+                                        onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذا التصنيف؟');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash ml-1"></i> حذف</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="text-center py-4 text-muted">لا توجد تصنيفات مسجلة حالياً.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
 --- FILE: resources\views\vendor_transactions\create.blade.php ---
 
 @extends('layout.master')
@@ -63092,15 +64673,46 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                             <h3 class="card-title text-right font-weight-bold m-0" style="flex: 1;">
                                 <i class="fas fa-exchange-alt ml-2 text-primary"></i> السجل العام للعمليات المالية
                             </h3>
-                            <div class="card-tools">
-                                <a href="{{ route('transactions.create') }}"
-                                    class="btn btn-success font-weight-bold shadow-sm">
+                            @if($canAddTransaction)
+                                <a href="{{ route('transactions.create', request()->only('vendor_group_id')) }}"
+                                    class="btn btn-success ...">
                                     <i class="fas fa-plus ml-1"></i> تسجيل حركة مالية جديدة
                                 </a>
-                            </div>
+                            @else
+                                <button class="btn btn-secondary" disabled
+                                    title="لا يوجد حسابات (موردين) مرتبطة بهذا التصنيف ضمن الشركة الحالية">
+                                    <i class="fas fa-plus ml-1"></i> تسجيل حركة مالية جديدة
+                                </button>
+                            @endif
                         </div>
 
                         <div class="card-body table-responsive p-0">
+
+                            <div class="p-3 border-bottom">
+                                <form method="GET" class="d-flex align-items-center flex-wrap" style="gap:10px;">
+                                    <div>
+                                        <label class="font-weight-bold mb-1 d-block">التصنيف</label>
+                                        <select name="vendor_group_id" class="form-control form-control-sm"
+                                            onchange="this.form.submit()" style="min-width:180px;">
+                                            <option value="">-- كل التصنيفات --</option>
+                                            @foreach($groups as $g)
+                                                <option value="{{ $g->id }}" {{ request('vendor_group_id') == $g->id ? 'selected' : '' }}>{{ $g->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="font-weight-bold mb-1 d-block">المورد</label>
+                                        <select name="vendor_id" class="form-control form-control-sm"
+                                            onchange="this.form.submit()" style="min-width:180px;">
+                                            <option value="">-- كل الموردين --</option>
+                                            @foreach($vendors as $v)
+                                                <option value="{{ $v->id }}" {{ request('vendor_id') == $v->id ? 'selected' : '' }}>{{ $v->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
                                     <tr>
@@ -63865,6 +65477,11 @@ Route::get('reports/vendor-report', 'VendorReportController@index')->name('repor
 Route::get('reports/vendor-report/print', 'VendorReportController@print')->name('reports.vendor_report_print');
 Route::get('transactions/{id}/receipt', 'VendorTransactionController@receipt')
     ->name('transactions.receipt');
+
+Route::resource('/vendor_groups', 'VendorGroupController');
+
+Route::get('reports/debt-statement', 'DebtStatementReportController@index')->name('reports.debt_statement');
+Route::get('reports/debt-statement/print', 'DebtStatementReportController@print')->name('reports.debt_statement_print');
 
 
 --- FILE: server.php ---

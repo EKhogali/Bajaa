@@ -60,7 +60,7 @@
 
     {{-- Scope phrase: comprehensive / specific company / specific classification / specific vendor --}}
     <div class="scope-bar">
-        النطاق: {{ $scopeLabel }} &nbsp;|&nbsp; الشركة: {{ $companyLabel }}
+        النطاق: {{ $scopeLabel }} &nbsp;|&nbsp; الشركة: {{ $companyLabel }} &nbsp;|&nbsp; {{ $periodLabel }}
     </div>
 
     <div class="summary-row">
@@ -85,7 +85,7 @@
                 <th>اسم المورد</th>
                 <th>الشركة</th>
                 <th>التصنيف</th>
-                <th style="width:130px;">الرصيد الحالي</th>
+                <th style="width:130px;">{{ $periodLabel === 'كل الفترات' ? 'الرصيد الحالي' : 'صافي حركة الفترة' }}</th>
             </tr>
         </thead>
         <tbody>
@@ -95,9 +95,9 @@
                     <td style="font-weight:700; color:#2980b9;">{{ $vendor->name }}</td>
                     <td>{{ $vendor->company->name ?? '—' }}</td>
                     <td>{{ $vendor->group->name ?? '—' }}</td>
-                    <td class="{{ $vendor->balance < 0 ? 'text-danger' : 'text-success' }}" style="font-weight:700;">
-                        {{ number_format($vendor->balance, 2) }}
-                        {{ $vendor->balance < 0 ? '(دائن)' : ($vendor->balance > 0 ? '(مدين)' : '') }}
+                    <td class="{{ $vendor->display_balance < 0 ? 'text-danger' : 'text-success' }}" style="font-weight:700;">
+                        {{ number_format($vendor->display_balance, 2) }}
+                        {{ $vendor->display_balance < 0 ? '(دائن)' : ($vendor->display_balance > 0 ? '(مدين)' : '') }}
                     </td>
                 </tr>
             @empty

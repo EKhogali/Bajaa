@@ -76,6 +76,24 @@
                             </div>
 
                         </div>
+
+                        {{-- DATE RANGE --}}
+                        <div class="row align-items-end">
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">من تاريخ</label>
+                                <input type="date" class="form-control" name="fromdate" value="{{ request('fromdate') }}">
+                            </div>
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">إلى تاريخ</label>
+                                <input type="date" class="form-control" name="todate" value="{{ request('todate') }}">
+                            </div>
+                            <div class="col-md-6 form-group mb-3 d-flex align-items-end">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle ml-1"></i>
+                                    عند تحديد فترة، يتم عرض صافي حركة كل مورد خلال هذه الفترة بدل الرصيد الكلي التراكمي.
+                                </small>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -122,7 +140,9 @@
                                 <th>اسم المورد</th>
                                 <th>الشركة</th>
                                 <th>التصنيف</th>
-                                <th style="width:150px;">الرصيد الحالي</th>
+                                <th style="width:150px;">
+                                    {{ request('fromdate') || request('todate') ? 'صافي حركة الفترة' : 'الرصيد الحالي' }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -132,9 +152,9 @@
                                     <td class="font-weight-bold text-primary">{{ $vendor->name }}</td>
                                     <td>{{ $vendor->company->name ?? '—' }}</td>
                                     <td>{{ $vendor->group->name ?? '—' }}</td>
-                                    <td class="font-weight-bold {{ $vendor->balance < 0 ? 'text-danger' : 'text-success' }}">
-                                        {{ number_format($vendor->balance, 2) }}
-                                        {{ $vendor->balance < 0 ? '(دائن)' : ($vendor->balance > 0 ? '(مدين)' : '') }}
+                                    <td class="font-weight-bold {{ $vendor->display_balance < 0 ? 'text-danger' : 'text-success' }}">
+                                        {{ number_format($vendor->display_balance, 2) }}
+                                        {{ $vendor->display_balance < 0 ? '(دائن)' : ($vendor->display_balance > 0 ? '(مدين)' : '') }}
                                     </td>
                                 </tr>
                             @empty
