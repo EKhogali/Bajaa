@@ -62,7 +62,8 @@
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th style="width: 70px;">#</th>
+                                        <th style="width: 60px;">#</th>
+                                        <th style="width: 70px;">ID</th>
                                         <th>اسم المورد</th>
                                         <th>رقم الهاتف</th>
                                         <th>الرصيد الحالي</th>
@@ -76,6 +77,7 @@
                                     @forelse($vendors as $vendor)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td class="text-muted">{{ $vendor->id }}</td>
                                             <td class="font-weight-bold text-primary">{{ $vendor->name }}</td>
                                             <td>{{ $vendor->tel ?? '---' }}</td>
                                             <td
@@ -128,7 +130,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">
+                                            <td colspan="9" class="text-center py-4 text-muted">
                                                 <i class="fas fa-folder-open d-block mb-2 fa-2x text-secondary"></i>
                                                 لا يوجد أي موردين مسجلين حالياً.
                                             </td>

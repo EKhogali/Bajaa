@@ -16,6 +16,7 @@ class VendorTransactionController extends Controller
         $companyId = session('company_id');
 
         $transactions = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->whereHas('vendor', function ($v) use ($request) {
                     $v->where('vendor_group_id', $request->vendor_group_id);
@@ -31,6 +32,7 @@ class VendorTransactionController extends Controller
         $groups = \App\VendorGroup::orderBy('name')->get();
 
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -49,6 +51,7 @@ class VendorTransactionController extends Controller
     {
         $companyId = session('company_id');
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -74,6 +77,11 @@ class VendorTransactionController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
         ]);
+
+        $targetVendor = Vendor::findOrFail($request->vendor_id);
+        if (!$targetVendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         DB::transaction(function () use ($request, $companyId) {
             // تحديد القيمة بناءً على نوع الحركة
@@ -119,8 +127,13 @@ class VendorTransactionController extends Controller
     public function edit($id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::visibleTo($companyId)->get();
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags', 'vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
+        $vendors = Vendor::visibleTo($companyId)->visibleToUser(auth()->id())->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
@@ -139,7 +152,11 @@ class VendorTransactionController extends Controller
     public function update(Request $request, $id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->findOrFail($id);
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         $request->validate([
             'vendor_id' => 'required|exists:vendors,id',
@@ -148,6 +165,11 @@ class VendorTransactionController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
         ]);
+
+        $targetVendor = Vendor::findOrFail($request->vendor_id);
+        if (!$targetVendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         DB::transaction(function () use ($request, $transaction, $companyId) {
             $oldVendorId = $transaction->vendor_id;
@@ -197,7 +219,12 @@ class VendorTransactionController extends Controller
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->findOrFail($id);
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
         $vendorId = $transaction->vendor_id;
 
         DB::transaction(function () use ($transaction, $vendorId) {
@@ -229,6 +256,10 @@ class VendorTransactionController extends Controller
         $transaction = VendorTransaction::where('company_id', $companyId)
             ->with(['vendor', 'tags'])
             ->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         return view('vendor_transactions.receipt', compact('transaction'));
     }

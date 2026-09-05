@@ -2492,24 +2492,28 @@ use Illuminate\Http\Request;
 
 class DebtStatementReportController extends Controller
 {
-    // private function resolveCompanyIds(Request $request)
-    // {
-    //     $companyFilter = $request->input('company_filter', 'current');
-
-    //     if ($companyFilter === 'all') {
-    //         return null; // no constraint
-    //     }
-    //     if ($companyFilter === 'current') {
-    //         return [session('company_id')];
-    //     }
-    //     return [(int) $companyFilter];
-    // }
-
     private function buildQuery(Request $request)
     {
         $companyIds = $this->resolveCompanyIds($request);
 
-        $query = Vendor::query()->with(['company', 'group']);
+        $fromDate = $request->input('fromdate');
+        $toDate   = $request->input('todate');
+
+        $query = Vendor::query()->with([
+            'company',
+            'group',
+            // Only pull the transactions inside the requested date range so we
+            // can compute a period balance without touching the stored
+            // "all-time" balance column.
+            'transactions' => function ($t) use ($fromDate, $toDate) {
+                if ($fromDate) {
+                    $t->whereDate('date', '>=', $fromDate);
+                }
+                if ($toDate) {
+                    $t->whereDate('date', '<=', $toDate);
+                }
+            },
+        ]);
 
         if ($companyIds !== null) {
             $query->visibleToAny($companyIds);
@@ -2524,39 +2528,64 @@ class DebtStatementReportController extends Controller
         return $query;
     }
 
+    /**
+     * Decorate each vendor with the balance that should be displayed:
+     * - if a from/to date was supplied, that's the net movement (debit - credit)
+     *   of the transactions inside that range;
+     * - otherwise it's simply the vendor's stored running balance (unchanged
+     *   behaviour, so existing links/behaviour aren't affected).
+     */
+    private function applyDisplayBalance($vendors, Request $request)
+    {
+        $hasDateFilter = $request->filled('fromdate') || $request->filled('todate');
+
+        return $vendors->map(function ($vendor) use ($hasDateFilter) {
+            if ($hasDateFilter) {
+                $vendor->display_balance = $vendor->transactions->sum('debit') - $vendor->transactions->sum('credit');
+            } else {
+                $vendor->display_balance = $vendor->balance;
+            }
+            return $vendor;
+        });
+    }
+
     public function index(Request $request)
     {
         $companyId = session('company_id');
 
         $vendors = $this->buildQuery($request)->orderBy('name')->get();
+        $vendors = $this->applyDisplayBalance($vendors, $request);
 
         $totalDebit = $vendors->sum(function ($v) {
-            return $v->balance > 0 ? $v->balance : 0; });
+            return $v->display_balance > 0 ? $v->display_balance : 0; });
         $totalCredit = $vendors->sum(function ($v) {
-            return $v->balance < 0 ? abs($v->balance) : 0; });
-        $netBalance = $vendors->sum('balance');
+            return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
+        $netBalance = $vendors->sum('display_balance');
 
         $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
         $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
         $companies = company::all();
 
-$isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+        // BUG FIX: id is an Eloquent attribute, not a method â€” calling it as
+        // ->id() throws "Call to undefined method App\User::id()".
+        $isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id, [1, 2]);
 
-    return view('rep.debt_statement', compact(
-        'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
-        'totalDebit', 'totalCredit', 'netBalance'
-    ));
+        return view('rep.debt_statement', compact(
+            'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
+            'totalDebit', 'totalCredit', 'netBalance'
+        ));
     }
 
     public function print(Request $request)
     {
         $vendors = $this->buildQuery($request)->orderBy('name')->get();
+        $vendors = $this->applyDisplayBalance($vendors, $request);
 
         $totalDebit = $vendors->sum(function ($v) {
-            return $v->balance > 0 ? $v->balance : 0; });
+            return $v->display_balance > 0 ? $v->display_balance : 0; });
         $totalCredit = $vendors->sum(function ($v) {
-            return $v->balance < 0 ? abs($v->balance) : 0; });
-        $netBalance = $vendors->sum('balance');
+            return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
+        $netBalance = $vendors->sum('display_balance');
 
         // Build the scope phrase shown on the printed report
         if ($request->filled('vendor_id')) {
@@ -2578,31 +2607,43 @@ $isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2])
             $companyLabel = optional(company::find($companyFilter))->name ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
         }
 
+        // Shown in the printed report's meta block when a date range is used.
+        $fromDate = $request->input('fromdate');
+        $toDate   = $request->input('todate');
+        if ($fromDate && $toDate) {
+            $periodLabel = 'Ø§Ù„ÙØªØ±Ø© Ù…Ù† ' . $fromDate . ' Ø¥Ù„Ù‰ ' . $toDate;
+        } elseif ($fromDate) {
+            $periodLabel = 'Ù…Ù† ØªØ§Ø±ÙŠØ® ' . $fromDate;
+        } elseif ($toDate) {
+            $periodLabel = 'Ø­ØªÙ‰ ØªØ§Ø±ÙŠØ® ' . $toDate;
+        } else {
+            $periodLabel = 'ÙƒÙ„ Ø§Ù„ÙØªØ±Ø§Øª';
+        }
+
         return view('rep.debt_statement_print', compact(
             'vendors',
             'totalDebit',
             'totalCredit',
             'netBalance',
             'scopeLabel',
-            'companyLabel'
+            'companyLabel',
+            'periodLabel'
         ));
     }
 
-
     private function resolveCompanyIds(Request $request)
-{
-    $isPrivileged = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
-    $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
+    {
+        $isPrivileged = auth()->check() && in_array(auth()->user()->id, [1, 2]);
+        $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
 
-    if ($companyFilter === 'all') {
-        return null;
+        if ($companyFilter === 'all') {
+            return null;
+        }
+        if ($companyFilter === 'current') {
+            return [session('company_id')];
+        }
+        return [(int) $companyFilter];
     }
-    if ($companyFilter === 'current') {
-        return [session('company_id')];
-    }
-    return [(int) $companyFilter];
-}
-
 }
 
 --- FILE: app\Http\Controllers\DepartmentController.php ---
@@ -13175,13 +13216,13 @@ return $app;
   ),
   'facade/ignition' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
-    ),
     'aliases' => 
     array (
       'Flare' => 'Facade\\Ignition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
     ),
   ),
   'fideloper/proxy' => 
@@ -28284,24 +28325,28 @@ use Illuminate\Http\Request;
 
 class DebtStatementReportController extends Controller
 {
-    // private function resolveCompanyIds(Request $request)
-    // {
-    //     $companyFilter = $request->input('company_filter', 'current');
-
-    //     if ($companyFilter === 'all') {
-    //         return null; // no constraint
-    //     }
-    //     if ($companyFilter === 'current') {
-    //         return [session('company_id')];
-    //     }
-    //     return [(int) $companyFilter];
-    // }
-
     private function buildQuery(Request $request)
     {
         $companyIds = $this->resolveCompanyIds($request);
 
-        $query = Vendor::query()->with(['company', 'group']);
+        $fromDate = $request->input('fromdate');
+        $toDate   = $request->input('todate');
+
+        $query = Vendor::query()->with([
+            'company',
+            'group',
+            // Only pull the transactions inside the requested date range so we
+            // can compute a period balance without touching the stored
+            // "all-time" balance column.
+            'transactions' => function ($t) use ($fromDate, $toDate) {
+                if ($fromDate) {
+                    $t->whereDate('date', '>=', $fromDate);
+                }
+                if ($toDate) {
+                    $t->whereDate('date', '<=', $toDate);
+                }
+            },
+        ]);
 
         if ($companyIds !== null) {
             $query->visibleToAny($companyIds);
@@ -28316,39 +28361,64 @@ class DebtStatementReportController extends Controller
         return $query;
     }
 
+    /**
+     * Decorate each vendor with the balance that should be displayed:
+     * - if a from/to date was supplied, that's the net movement (debit - credit)
+     *   of the transactions inside that range;
+     * - otherwise it's simply the vendor's stored running balance (unchanged
+     *   behaviour, so existing links/behaviour aren't affected).
+     */
+    private function applyDisplayBalance($vendors, Request $request)
+    {
+        $hasDateFilter = $request->filled('fromdate') || $request->filled('todate');
+
+        return $vendors->map(function ($vendor) use ($hasDateFilter) {
+            if ($hasDateFilter) {
+                $vendor->display_balance = $vendor->transactions->sum('debit') - $vendor->transactions->sum('credit');
+            } else {
+                $vendor->display_balance = $vendor->balance;
+            }
+            return $vendor;
+        });
+    }
+
     public function index(Request $request)
     {
         $companyId = session('company_id');
 
         $vendors = $this->buildQuery($request)->orderBy('name')->get();
+        $vendors = $this->applyDisplayBalance($vendors, $request);
 
         $totalDebit = $vendors->sum(function ($v) {
-            return $v->balance > 0 ? $v->balance : 0; });
+            return $v->display_balance > 0 ? $v->display_balance : 0; });
         $totalCredit = $vendors->sum(function ($v) {
-            return $v->balance < 0 ? abs($v->balance) : 0; });
-        $netBalance = $vendors->sum('balance');
+            return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
+        $netBalance = $vendors->sum('display_balance');
 
         $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
         $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
         $companies = company::all();
 
-$isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
+        // BUG FIX: id is an Eloquent attribute, not a method â€” calling it as
+        // ->id() throws "Call to undefined method App\User::id()".
+        $isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id, [1, 2]);
 
-    return view('rep.debt_statement', compact(
-        'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
-        'totalDebit', 'totalCredit', 'netBalance'
-    ));
+        return view('rep.debt_statement', compact(
+            'vendors', 'allVendors', 'groups', 'companies', 'isAdminOrSupervisor',
+            'totalDebit', 'totalCredit', 'netBalance'
+        ));
     }
 
     public function print(Request $request)
     {
         $vendors = $this->buildQuery($request)->orderBy('name')->get();
+        $vendors = $this->applyDisplayBalance($vendors, $request);
 
         $totalDebit = $vendors->sum(function ($v) {
-            return $v->balance > 0 ? $v->balance : 0; });
+            return $v->display_balance > 0 ? $v->display_balance : 0; });
         $totalCredit = $vendors->sum(function ($v) {
-            return $v->balance < 0 ? abs($v->balance) : 0; });
-        $netBalance = $vendors->sum('balance');
+            return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
+        $netBalance = $vendors->sum('display_balance');
 
         // Build the scope phrase shown on the printed report
         if ($request->filled('vendor_id')) {
@@ -28370,31 +28440,43 @@ $isAdminOrSupervisor = auth()->check() && in_array(auth()->user()->id(), [1, 2])
             $companyLabel = optional(company::find($companyFilter))->name ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
         }
 
+        // Shown in the printed report's meta block when a date range is used.
+        $fromDate = $request->input('fromdate');
+        $toDate   = $request->input('todate');
+        if ($fromDate && $toDate) {
+            $periodLabel = 'Ø§Ù„ÙØªØ±Ø© Ù…Ù† ' . $fromDate . ' Ø¥Ù„Ù‰ ' . $toDate;
+        } elseif ($fromDate) {
+            $periodLabel = 'Ù…Ù† ØªØ§Ø±ÙŠØ® ' . $fromDate;
+        } elseif ($toDate) {
+            $periodLabel = 'Ø­ØªÙ‰ ØªØ§Ø±ÙŠØ® ' . $toDate;
+        } else {
+            $periodLabel = 'ÙƒÙ„ Ø§Ù„ÙØªØ±Ø§Øª';
+        }
+
         return view('rep.debt_statement_print', compact(
             'vendors',
             'totalDebit',
             'totalCredit',
             'netBalance',
             'scopeLabel',
-            'companyLabel'
+            'companyLabel',
+            'periodLabel'
         ));
     }
 
-
     private function resolveCompanyIds(Request $request)
-{
-    $isPrivileged = auth()->check() && in_array(auth()->user()->id(), [1, 2]);
-    $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
+    {
+        $isPrivileged = auth()->check() && in_array(auth()->user()->id, [1, 2]);
+        $companyFilter = $isPrivileged ? $request->input('company_filter', 'current') : 'current';
 
-    if ($companyFilter === 'all') {
-        return null;
+        if ($companyFilter === 'all') {
+            return null;
+        }
+        if ($companyFilter === 'current') {
+            return [session('company_id')];
+        }
+        return [(int) $companyFilter];
     }
-    if ($companyFilter === 'current') {
-        return [session('company_id')];
-    }
-    return [(int) $companyFilter];
-}
-
 }
 
 --- FILE: app\Http\Controllers\DepartmentController.php ---
@@ -38967,13 +39049,13 @@ return $app;
   ),
   'facade/ignition' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
-    ),
     'aliases' => 
     array (
       'Flare' => 'Facade\\Ignition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
     ),
   ),
   'fideloper/proxy' => 
@@ -59020,6 +59102,24 @@ QõS†ö]ä½d,ÙteØ‚rIj¤!ÛÎ(4·¬4ñï’\[¼–’ÆıØF!iÏ¦¼g´gY˜å‡tK(!eñÌ_g¿Äoö›,…
                             </div>
 
                         </div>
+
+                        {{-- DATE RANGE --}}
+                        <div class="row align-items-end">
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">Ù…Ù† ØªØ§Ø±ÙŠØ®</label>
+                                <input type="date" class="form-control" name="fromdate" value="{{ request('fromdate') }}">
+                            </div>
+                            <div class="col-md-3 form-group mb-3">
+                                <label class="font-weight-bold text-secondary small mb-1">Ø¥Ù„Ù‰ ØªØ§Ø±ÙŠØ®</label>
+                                <input type="date" class="form-control" name="todate" value="{{ request('todate') }}">
+                            </div>
+                            <div class="col-md-6 form-group mb-3 d-flex align-items-end">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle ml-1"></i>
+                                    Ø¹Ù†Ø¯ ØªØ­Ø¯ÙŠØ¯ ÙØªØ±Ø©ØŒ ÙŠØªÙ… Ø¹Ø±Ø¶ ØµØ§ÙÙŠ Ø­Ø±ÙƒØ© ÙƒÙ„ Ù…ÙˆØ±Ø¯ Ø®Ù„Ø§Ù„ Ù‡Ø°Ù‡ Ø§Ù„ÙØªØ±Ø© Ø¨Ø¯Ù„ Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„ÙƒÙ„ÙŠ Ø§Ù„ØªØ±Ø§ÙƒÙ…ÙŠ.
+                                </small>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -59066,7 +59166,9 @@ QõS†ö]ä½d,ÙteØ‚rIj¤!ÛÎ(4·¬4ñï’\[¼–’ÆıØF!iÏ¦¼g´gY˜å‡tK(!eñÌ_g¿Äoö›,…
                                 <th>Ø§Ø³Ù… Ø§Ù„Ù…ÙˆØ±Ø¯</th>
                                 <th>Ø§Ù„Ø´Ø±ÙƒØ©</th>
                                 <th>Ø§Ù„ØªØµÙ†ÙŠÙ</th>
-                                <th style="width:150px;">Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ</th>
+                                <th style="width:150px;">
+                                    {{ request('fromdate') || request('todate') ? 'ØµØ§ÙÙŠ Ø­Ø±ÙƒØ© Ø§Ù„ÙØªØ±Ø©' : 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ' }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59076,9 +59178,9 @@ QõS†ö]ä½d,ÙteØ‚rIj¤!ÛÎ(4·¬4ñï’\[¼–’ÆıØF!iÏ¦¼g´gY˜å‡tK(!eñÌ_g¿Äoö›,…
                                     <td class="font-weight-bold text-primary">{{ $vendor->name }}</td>
                                     <td>{{ $vendor->company->name ?? 'â€”' }}</td>
                                     <td>{{ $vendor->group->name ?? 'â€”' }}</td>
-                                    <td class="font-weight-bold {{ $vendor->balance < 0 ? 'text-danger' : 'text-success' }}">
-                                        {{ number_format($vendor->balance, 2) }}
-                                        {{ $vendor->balance < 0 ? '(Ø¯Ø§Ø¦Ù†)' : ($vendor->balance > 0 ? '(Ù…Ø¯ÙŠÙ†)' : '') }}
+                                    <td class="font-weight-bold {{ $vendor->display_balance < 0 ? 'text-danger' : 'text-success' }}">
+                                        {{ number_format($vendor->display_balance, 2) }}
+                                        {{ $vendor->display_balance < 0 ? '(Ø¯Ø§Ø¦Ù†)' : ($vendor->display_balance > 0 ? '(Ù…Ø¯ÙŠÙ†)' : '') }}
                                     </td>
                                 </tr>
                             @empty
@@ -59159,7 +59261,7 @@ QõS†ö]ä½d,ÙteØ‚rIj¤!ÛÎ(4·¬4ñï’\[¼–’ÆıØF!iÏ¦¼g´gY˜å‡tK(!eñÌ_g¿Äoö›,…
 
     {{-- Scope phrase: comprehensive / specific company / specific classification / specific vendor --}}
     <div class="scope-bar">
-        Ø§Ù„Ù†Ø·Ø§Ù‚: {{ $scopeLabel }} &nbsp;|&nbsp; Ø§Ù„Ø´Ø±ÙƒØ©: {{ $companyLabel }}
+        Ø§Ù„Ù†Ø·Ø§Ù‚: {{ $scopeLabel }} &nbsp;|&nbsp; Ø§Ù„Ø´Ø±ÙƒØ©: {{ $companyLabel }} &nbsp;|&nbsp; {{ $periodLabel }}
     </div>
 
     <div class="summary-row">
@@ -59184,7 +59286,7 @@ QõS†ö]ä½d,ÙteØ‚rIj¤!ÛÎ(4·¬4ñï’\[¼–’ÆıØF!iÏ¦¼g´gY˜å‡tK(!eñÌ_g¿Äoö›,…
                 <th>Ø§Ø³Ù… Ø§Ù„Ù…ÙˆØ±Ø¯</th>
                 <th>Ø§Ù„Ø´Ø±ÙƒØ©</th>
                 <th>Ø§Ù„ØªØµÙ†ÙŠÙ</th>
-                <th style="width:130px;">Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ</th>
+                <th style="width:130px;">{{ $periodLabel === 'ÙƒÙ„ Ø§Ù„ÙØªØ±Ø§Øª' ? 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ø­Ø§Ù„ÙŠ' : 'ØµØ§ÙÙŠ Ø­Ø±ÙƒØ© Ø§Ù„ÙØªØ±Ø©' }}</th>
             </tr>
         </thead>
         <tbody>
@@ -59194,9 +59296,9 @@ QõS†ö]ä½d,ÙteØ‚rIj¤!ÛÎ(4·¬4ñï’\[¼–’ÆıØF!iÏ¦¼g´gY˜å‡tK(!eñÌ_g¿Äoö›,…
                     <td style="font-weight:700; color:#2980b9;">{{ $vendor->name }}</td>
                     <td>{{ $vendor->company->name ?? 'â€”' }}</td>
                     <td>{{ $vendor->group->name ?? 'â€”' }}</td>
-                    <td class="{{ $vendor->balance < 0 ? 'text-danger' : 'text-success' }}" style="font-weight:700;">
-                        {{ number_format($vendor->balance, 2) }}
-                        {{ $vendor->balance < 0 ? '(Ø¯Ø§Ø¦Ù†)' : ($vendor->balance > 0 ? '(Ù…Ø¯ÙŠÙ†)' : '') }}
+                    <td class="{{ $vendor->display_balance < 0 ? 'text-danger' : 'text-success' }}" style="font-weight:700;">
+                        {{ number_format($vendor->display_balance, 2) }}
+                        {{ $vendor->display_balance < 0 ? '(Ø¯Ø§Ø¦Ù†)' : ($vendor->display_balance > 0 ? '(Ù…Ø¯ÙŠÙ†)' : '') }}
                     </td>
                 </tr>
             @empty

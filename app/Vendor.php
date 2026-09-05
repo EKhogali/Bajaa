@@ -58,4 +58,37 @@ public function scopeVisibleToAny($query, array $companyIds)
           });
     });
 }
+
+// vendor_id => [allowed user ids], from config/vendor_restrictions.php.
+// A vendor absent from this map is visible to everyone.
+protected static function restrictionMap(): array
+{
+    return config('vendor_restrictions', []);
+}
+
+// Vendors visible to a given user: unrestricted vendors, plus restricted
+// vendors where this user is on the allow-list. Chain alongside
+// visibleTo()/visibleToAny() wherever vendors are listed or reported on.
+public function scopeVisibleToUser($query, $userId)
+{
+    $blockedIds = collect(static::restrictionMap())
+        ->filter(fn ($allowedUserIds) => !in_array($userId, $allowedUserIds, true))
+        ->keys();
+
+    if ($blockedIds->isNotEmpty()) {
+        $query->whereNotIn('id', $blockedIds);
+    }
+
+    return $query;
+}
+
+// Whether this specific vendor instance is visible to the given user.
+// Use this to guard direct access (edit/update/delete/receipt) by ID,
+// since a route-model lookup bypasses the visibleToUser() query scope.
+public function isVisibleToUser($userId): bool
+{
+    $allowed = static::restrictionMap()[$this->id] ?? null;
+
+    return $allowed === null || in_array($userId, $allowed, true);
+}
 }

@@ -36,6 +36,8 @@ class DebtStatementReportController extends Controller
             $query->visibleToAny($companyIds);
         }
 
+        $query->visibleToUser(auth()->id());
+
         if ($request->filled('vendor_id')) {
             $query->where('id', $request->vendor_id);
         } elseif ($request->filled('vendor_group_id')) {
@@ -79,7 +81,7 @@ class DebtStatementReportController extends Controller
             return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
         $netBalance = $vendors->sum('display_balance');
 
-        $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
+        $allVendors = Vendor::where('company_id', $companyId)->visibleToUser(auth()->id())->orderBy('name')->get();
         $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
         $companies = company::all();
 
@@ -107,7 +109,8 @@ class DebtStatementReportController extends Controller
         // Build the scope phrase shown on the printed report
         if ($request->filled('vendor_id')) {
             $vendor = Vendor::find($request->vendor_id);
-            $scopeLabel = 'مورد محدد: ' . ($vendor->name ?? 'غير معروف');
+            $vendorVisible = $vendor && $vendor->isVisibleToUser(auth()->id());
+            $scopeLabel = 'مورد محدد: ' . ($vendorVisible ? $vendor->name : 'غير معروف');
         } elseif ($request->filled('vendor_group_id')) {
             $group = VendorGroup::find($request->vendor_group_id);
             $scopeLabel = 'تصنيف محدد: ' . ($group->name ?? 'غير معروف');

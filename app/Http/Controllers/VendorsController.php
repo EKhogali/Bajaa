@@ -18,6 +18,7 @@ class VendorsController extends Controller
         $companyId = session('company_id');
 
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -35,7 +36,7 @@ class VendorsController extends Controller
     public function create()
     {
         $companyId = session('company_id');
-        $vendors = Vendor::visibleTo($companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)->visibleToUser(auth()->id())->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
         $groups = VendorGroup::orderBy('name')->get();
         $companies = \App\company::all();
@@ -81,6 +82,11 @@ class VendorsController extends Controller
         $companyId = session('company_id');
 
         $vendor = Vendor::with('tags', 'companies')->findOrFail($id);
+
+        if (!$vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
         $existingTags = VendorTag::where('company_id', $companyId)->get();
         $groups = VendorGroup::orderBy('name')->get();
         $companies = \App\company::all();
@@ -91,6 +97,10 @@ class VendorsController extends Controller
     public function update(Request $request, $id)
     {
         $vendor = Vendor::findOrFail($id);
+
+        if (!$vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -121,6 +131,10 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
         $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
+
+        if (!$vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         $vendor->delete();
 

@@ -15,7 +15,15 @@ class VendorReportController extends Controller
     {
         $companyId = session('company_id');
 
+        if ($request->filled('vendor_id')) {
+            $requestedVendor = Vendor::findOrFail($request->vendor_id);
+            if (!$requestedVendor->isVisibleToUser(auth()->id())) {
+                abort(404);
+            }
+        }
+
         $query = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->with(['vendor.tags', 'tags']);
 
         if ($request->filled('vendor_id')) {
@@ -54,7 +62,7 @@ class VendorReportController extends Controller
         $totalCredit = $transactions->sum('credit');
         $finalBalance = $previousBalance + $totalDebit - $totalCredit;
 
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::where('company_id', $companyId)->visibleToUser(auth()->id())->get();
         $vendorTags = VendorTag::where('company_id', $companyId)->get();
         $transactionTags = TransactionTag::where('company_id', $companyId)->get();
 
@@ -74,7 +82,15 @@ class VendorReportController extends Controller
     {
         $companyId = session('company_id');
 
+        if ($request->filled('vendor_id')) {
+            $requestedVendor = Vendor::findOrFail($request->vendor_id);
+            if (!$requestedVendor->isVisibleToUser(auth()->id())) {
+                abort(404);
+            }
+        }
+
         $query = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->with(['vendor.tags', 'tags']);
 
         if ($request->filled('vendor_id')) {
