@@ -32,7 +32,7 @@ class HomeController extends Controller
     public function index()
     {
 
-        if(auth()->user()->type == 1 || auth()->user()->type == 4git ){ //admin
+        if(auth()->user()->type == 1 || auth()->user()->type == 4){ //admin
             $companies = company::where('archived',0)->get();
             $financial_years = financial_year::where('archived',0)
                 ->get();
