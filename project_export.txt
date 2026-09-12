@@ -2519,6 +2519,8 @@ class DebtStatementReportController extends Controller
             $query->visibleToAny($companyIds);
         }
 
+        $query->visibleToUser(auth()->id());
+
         if ($request->filled('vendor_id')) {
             $query->where('id', $request->vendor_id);
         } elseif ($request->filled('vendor_group_id')) {
@@ -2562,7 +2564,7 @@ class DebtStatementReportController extends Controller
             return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
         $netBalance = $vendors->sum('display_balance');
 
-        $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
+        $allVendors = Vendor::where('company_id', $companyId)->visibleToUser(auth()->id())->orderBy('name')->get();
         $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
         $companies = company::all();
 
@@ -2590,7 +2592,8 @@ class DebtStatementReportController extends Controller
         // Build the scope phrase shown on the printed report
         if ($request->filled('vendor_id')) {
             $vendor = Vendor::find($request->vendor_id);
-            $scopeLabel = 'مورد محدد: ' . ($vendor->name ?? 'غير معروف');
+            $vendorVisible = $vendor && $vendor->isVisibleToUser(auth()->id());
+            $scopeLabel = 'مورد محدد: ' . ($vendorVisible ? $vendor->name : 'غير معروف');
         } elseif ($request->filled('vendor_group_id')) {
             $group = VendorGroup::find($request->vendor_group_id);
             $scopeLabel = 'تصنيف محدد: ' . ($group->name ?? 'غير معروف');
@@ -10856,6 +10859,18 @@ use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
+    // This user's own record is hidden from the users list, and unreachable
+    // by ID (show/edit/update/delete), for everyone except this ID itself.
+    private const HIDDEN_FROM_OTHERS_ID = 2;
+
+    // Block direct access to the protected record by anyone but its owner.
+    private function guardHiddenUser($id): void
+    {
+        if ((int) $id === self::HIDDEN_FROM_OTHERS_ID && auth()->id() !== self::HIDDEN_FROM_OTHERS_ID) {
+            abort(404);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -10863,7 +10878,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $query = User::query();
+
+        if (auth()->id() !== self::HIDDEN_FROM_OTHERS_ID) {
+            $query->where('id', '!=', self::HIDDEN_FROM_OTHERS_ID);
+        }
+
+        $users = $query->get();
         return view('/sys.users.index')->with('users', $users);
     }
 
@@ -10950,6 +10971,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::find($id);
         $user_permissions = user_permission::where('user_id', $user->id)->get();
 
@@ -10967,6 +10990,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::findorfail($id);
         $companies = company::all();
         return view('/sys.users.edit')
@@ -10983,6 +11008,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->guardHiddenUser($id);
 
         if (!Request()->has('name') || is_null(Request('name'))) {
             $msg = 'عفواً، يجب تحديد اسم المستخدم قبل المتابعة في العملية';
@@ -11029,6 +11055,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::find($id);
 
         $existsInOtherTable = company::where('user_id', $id)->exists();
@@ -11043,7 +11071,6 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }
-
 
 --- FILE: app\Http\Controllers\UserPermissionController.php ---
 
@@ -11307,7 +11334,15 @@ class VendorReportController extends Controller
     {
         $companyId = session('company_id');
 
+        if ($request->filled('vendor_id')) {
+            $requestedVendor = Vendor::findOrFail($request->vendor_id);
+            if (!$requestedVendor->isVisibleToUser(auth()->id())) {
+                abort(404);
+            }
+        }
+
         $query = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->with(['vendor.tags', 'tags']);
 
         if ($request->filled('vendor_id')) {
@@ -11346,7 +11381,7 @@ class VendorReportController extends Controller
         $totalCredit = $transactions->sum('credit');
         $finalBalance = $previousBalance + $totalDebit - $totalCredit;
 
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::where('company_id', $companyId)->visibleToUser(auth()->id())->get();
         $vendorTags = VendorTag::where('company_id', $companyId)->get();
         $transactionTags = TransactionTag::where('company_id', $companyId)->get();
 
@@ -11366,7 +11401,15 @@ class VendorReportController extends Controller
     {
         $companyId = session('company_id');
 
+        if ($request->filled('vendor_id')) {
+            $requestedVendor = Vendor::findOrFail($request->vendor_id);
+            if (!$requestedVendor->isVisibleToUser(auth()->id())) {
+                abort(404);
+            }
+        }
+
         $query = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->with(['vendor.tags', 'tags']);
 
         if ($request->filled('vendor_id')) {
@@ -11550,6 +11593,7 @@ class VendorTransactionController extends Controller
         $companyId = session('company_id');
 
         $transactions = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->whereHas('vendor', function ($v) use ($request) {
                     $v->where('vendor_group_id', $request->vendor_group_id);
@@ -11565,6 +11609,7 @@ class VendorTransactionController extends Controller
         $groups = \App\VendorGroup::orderBy('name')->get();
 
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -11583,6 +11628,7 @@ class VendorTransactionController extends Controller
     {
         $companyId = session('company_id');
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -11608,6 +11654,11 @@ class VendorTransactionController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
         ]);
+
+        $targetVendor = Vendor::findOrFail($request->vendor_id);
+        if (!$targetVendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         DB::transaction(function () use ($request, $companyId) {
             // تحديد القيمة بناءً على نوع الحركة
@@ -11653,8 +11704,13 @@ class VendorTransactionController extends Controller
     public function edit($id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::visibleTo($companyId)->get();
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags', 'vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
+        $vendors = Vendor::visibleTo($companyId)->visibleToUser(auth()->id())->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
@@ -11673,7 +11729,11 @@ class VendorTransactionController extends Controller
     public function update(Request $request, $id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->findOrFail($id);
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         $request->validate([
             'vendor_id' => 'required|exists:vendors,id',
@@ -11682,6 +11742,11 @@ class VendorTransactionController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
         ]);
+
+        $targetVendor = Vendor::findOrFail($request->vendor_id);
+        if (!$targetVendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         DB::transaction(function () use ($request, $transaction, $companyId) {
             $oldVendorId = $transaction->vendor_id;
@@ -11731,7 +11796,12 @@ class VendorTransactionController extends Controller
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->findOrFail($id);
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
         $vendorId = $transaction->vendor_id;
 
         DB::transaction(function () use ($transaction, $vendorId) {
@@ -11764,6 +11834,10 @@ class VendorTransactionController extends Controller
             ->with(['vendor', 'tags'])
             ->findOrFail($id);
 
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
         return view('vendor_transactions.receipt', compact('transaction'));
     }
 
@@ -11780,6 +11854,7 @@ namespace App\Http\Controllers;
 use App\Vendor;
 use App\VendorTag;
 use App\VendorGroup;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\TransactionTag;
@@ -11793,6 +11868,7 @@ class VendorsController extends Controller
         $companyId = session('company_id');
 
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -11810,12 +11886,24 @@ class VendorsController extends Controller
     public function create()
     {
         $companyId = session('company_id');
-        $vendors = Vendor::visibleTo($companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)->visibleToUser(auth()->id())->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
         $groups = VendorGroup::orderBy('name')->get();
         $companies = \App\company::all();
 
-        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups', 'companies'));
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+        $allUsers = $canManageVendorAccess
+    ? User::when(
+        auth()->id() !== User::HIDDEN_FROM_OTHERS_ID,
+        fn ($q) => $q->where('id', '!=', User::HIDDEN_FROM_OTHERS_ID)
+      )->orderBy('name')->get()
+    : collect();
+        $restrictedUserIds = [];
+
+        return view('bsc.vendors.create', compact(
+            'vendors', 'existingTags', 'groups', 'companies',
+            'canManageVendorAccess', 'allUsers', 'restrictedUserIds'
+        ));
     }
 
     public function store(Request $request)
@@ -11848,6 +11936,8 @@ class VendorsController extends Controller
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
+        $this->syncVendorRestriction($request, $vendor);
+
         return redirect()->route('vendors.index')->with('success', 'تم إضافة المورد بنجاح.');
     }
 
@@ -11855,17 +11945,44 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
 
-        $vendor = Vendor::with('tags', 'companies')->findOrFail($id);
+        $vendor = Vendor::with('tags', 'companies', 'restrictedUsers')->findOrFail($id);
+
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+
+        // Managers can always reach the edit screen — even for a vendor
+        // they've restricted themselves out of — so a restriction mistake
+        // can never lock them out of fixing it. Everyone else still 404s.
+        if (!$vendor->isVisibleToUser(auth()->id()) && !$canManageVendorAccess) {
+            abort(404);
+        }
+
         $existingTags = VendorTag::where('company_id', $companyId)->get();
         $groups = VendorGroup::orderBy('name')->get();
         $companies = \App\company::all();
 
-        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups', 'companies'));
+        $allUsers = $canManageVendorAccess
+    ? User::when(
+        auth()->id() !== User::HIDDEN_FROM_OTHERS_ID,
+        fn ($q) => $q->where('id', '!=', User::HIDDEN_FROM_OTHERS_ID)
+      )->orderBy('name')->get()
+    : collect();
+        $restrictedUserIds = $vendor->restrictedUsers->pluck('id')->toArray();
+
+        return view('bsc.vendors.edit', compact(
+            'vendor', 'existingTags', 'groups', 'companies',
+            'canManageVendorAccess', 'allUsers', 'restrictedUserIds'
+        ));
     }
 
     public function update(Request $request, $id)
     {
         $vendor = Vendor::findOrFail($id);
+
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+
+        if (!$vendor->isVisibleToUser(auth()->id()) && !$canManageVendorAccess) {
+            abort(404);
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -11889,6 +12006,8 @@ class VendorsController extends Controller
 
         $vendor->tags()->sync($this->resolveTagIds($request, session('company_id')));
 
+        $this->syncVendorRestriction($request, $vendor);
+
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
 
@@ -11896,6 +12015,12 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
         $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
+
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+
+        if (!$vendor->isVisibleToUser(auth()->id()) && !$canManageVendorAccess) {
+            abort(404);
+        }
 
         $vendor->delete();
 
@@ -11919,6 +12044,48 @@ class VendorsController extends Controller
 
         return redirect()->route('vendors.index')->with('success', 'تم إعادة احتساب الأرصدة بنجاح.');
     }
+
+    /**
+     * Apply the "restrict this vendor to specific users" setting from the
+     * vendor form — only when submitted by one of Vendor::RESTRICTION_MANAGERS.
+     * A non-manager's request never includes these fields (the form doesn't
+     * render them), so this silently does nothing for anyone else, leaving
+     * any existing restriction untouched.
+     */
+    private function syncVendorRestriction(Request $request, Vendor $vendor): void
+{
+    if (!in_array(auth()->id(), Vendor::RESTRICTION_MANAGERS, true)) {
+        return;
+    }
+
+    if (!$request->filled('restrict_visibility')) {
+        return;
+    }
+
+    $request->validate([
+        'restrict_visibility' => 'in:all,specific',
+        'restricted_user_ids' => 'nullable|array',
+        'restricted_user_ids.*' => 'exists:users,id',
+    ]);
+
+    $isRestricted = $request->restrict_visibility === 'specific';
+    $submittedIds = $isRestricted ? ($request->restricted_user_ids ?? []) : [];
+
+    // The hidden user's checkbox is never shown to another manager, so
+    // never let saving this form from someone else silently drop them
+    // from a restriction they were already part of.
+    if ($isRestricted && auth()->id() !== User::HIDDEN_FROM_OTHERS_ID) {
+        $alreadyIncluded = $vendor->restrictedUsers()
+            ->where('user_id', User::HIDDEN_FROM_OTHERS_ID)
+            ->exists();
+
+        if ($alreadyIncluded) {
+            $submittedIds[] = User::HIDDEN_FROM_OTHERS_ID;
+        }
+    }
+
+    $vendor->restrictedUsers()->sync($submittedIds);
+}
 
     /**
      * Resolve tag IDs from the multi-select array input.
@@ -12014,6 +12181,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    \App\Http\Middleware\RestrictReporterAccess::class,
         ],
 
         'api' => [
@@ -12141,6 +12309,82 @@ class RedirectIfAuthenticated
     }
 }
 
+
+--- FILE: app\Http\Middleware\RestrictReporterAccess.php ---
+
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+
+class RestrictReporterAccess
+{
+    private const REPORTER_TYPE = 4;
+
+    private const AUTH_ROUTE_NAMES = [
+        'login', 'logout', 'register',
+        'password.request', 'password.email', 'password.reset', 'password.update',
+        'verification.notice', 'verification.verify', 'verification.resend',
+    ];
+
+    private const ALLOWED_ROUTE_NAMES = [
+        'reports.vendor_report',
+        'reports.vendor_report_print',
+        'reports.debt_statement',
+        'reports.debt_statement_print',
+    ];
+
+    private const ALLOWED_PATHS = [
+        'gl_index', 'l_index', 'gl_exec', 'l_exec', 'tr_index', 'tr_exec',
+        'income_report', 'income_report2', 'estimated_expense_report',
+        'pulled_from_net_income_report', 'category_percentage_report',
+        'treasury_report', 'ledger2', 'partners_accounts_report',
+        'partners_accounts_with_income_report', 'account_details_report',
+        'daily_report', 'daily_report002',
+    ];
+
+    // Needed so a reporter can go through the same company/financial-year
+    // picker every other role uses — without it, session('company_id')
+    // never gets set, and every report query (which all filter by
+    // company_id) comes back empty.
+    private const SETUP_PATHS = ['', 'home', 'company_and_financial_year'];
+
+    public function handle($request, Closure $next)
+    {
+        $user = auth()->user();
+
+        if (!$user || (int) $user->type !== self::REPORTER_TYPE) {
+            return $next($request);
+        }
+
+        $routeName = optional($request->route())->getName();
+
+        if ($routeName && in_array($routeName, self::AUTH_ROUTE_NAMES, true)) {
+            return $next($request);
+        }
+
+        $path = trim($request->path(), '/');
+
+        if (in_array($path, self::SETUP_PATHS, true)) {
+            return $next($request);
+        }
+
+        // A reporter can never add, edit, or delete anything, anywhere.
+        if (!$request->isMethod('GET') && !$request->isMethod('HEAD')) {
+            abort(403, 'حسابك للاطلاع على التقارير فقط، ولا يمكن إضافة أو تعديل أي بيانات.');
+        }
+
+        $isAllowedPage = ($routeName && in_array($routeName, self::ALLOWED_ROUTE_NAMES, true))
+            || in_array($path, self::ALLOWED_PATHS, true);
+
+        if (!$isAllowedPage) {
+            abort(403, 'حسابك مخصص للاطلاع على التقارير فقط.');
+        }
+
+        return $next($request);
+    }
+}
 
 --- FILE: app\Http\Middleware\TrimStrings.php ---
 
@@ -12589,6 +12833,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use Notifiable;
+    const HIDDEN_FROM_OTHERS_ID = 2;
 
     /**
      * The attributes that are mass assignable.
@@ -12638,6 +12883,10 @@ class Vendor extends Model
 
     protected $fillable = ['company_id', 'name', 'tel', 'balance', 'vendor_group_id', 'is_global'];
 
+    // Only these user IDs can restrict/unrestrict a vendor's visibility from
+    // the vendor form. Hardcoded on purpose — this list itself isn't meant to
+    // be editable through the UI.
+    public const RESTRICTION_MANAGERS = [1, 2];
 
     public function transactions()
     {
@@ -12660,31 +12909,64 @@ class Vendor extends Model
     }
 
     public function companies()
-{
-    return $this->belongsToMany(\App\company::class, 'company_vendor', 'vendor_id', 'company_id');
-}
+    {
+        return $this->belongsToMany(\App\company::class, 'company_vendor', 'vendor_id', 'company_id');
+    }
 
-// Vendors visible to a single company: global vendors + vendors explicitly linked to it
-public function scopeVisibleTo($query, $companyId)
-{
-    return $query->where(function ($q) use ($companyId) {
-        $q->where('is_global', true)
-          ->orWhereHas('companies', function ($q2) use ($companyId) {
-              $q2->where('companies.id', $companyId);
-          });
-    });
-}
+    // Vendors visible to a single company: global vendors + vendors explicitly linked to it
+    public function scopeVisibleTo($query, $companyId)
+    {
+        return $query->where(function ($q) use ($companyId) {
+            $q->where('is_global', true)
+              ->orWhereHas('companies', function ($q2) use ($companyId) {
+                  $q2->where('companies.id', $companyId);
+              });
+        });
+    }
 
-// Same, but for a set of companies (used by the "specific company" report filter)
-public function scopeVisibleToAny($query, array $companyIds)
-{
-    return $query->where(function ($q) use ($companyIds) {
-        $q->where('is_global', true)
-          ->orWhereHas('companies', function ($q2) use ($companyIds) {
-              $q2->whereIn('companies.id', $companyIds);
-          });
-    });
-}
+    // Same, but for a set of companies (used by the "specific company" report filter)
+    public function scopeVisibleToAny($query, array $companyIds)
+    {
+        return $query->where(function ($q) use ($companyIds) {
+            $q->where('is_global', true)
+              ->orWhereHas('companies', function ($q2) use ($companyIds) {
+                  $q2->whereIn('companies.id', $companyIds);
+              });
+        });
+    }
+
+    // The users a restricted vendor is allowed to be seen by. A vendor with
+    // no rows here is unrestricted (visible to everyone). Managed from the
+    // vendor create/edit form by users in RESTRICTION_MANAGERS.
+    public function restrictedUsers()
+    {
+        return $this->belongsToMany(\App\User::class, 'vendor_restricted_users', 'vendor_id', 'user_id');
+    }
+
+    // Vendors visible to a given user: unrestricted vendors, plus restricted
+    // vendors where this user is on the allow-list. Chain alongside
+    // visibleTo()/visibleToAny() wherever vendors are listed or reported on.
+    public function scopeVisibleToUser($query, $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->whereDoesntHave('restrictedUsers')
+              ->orWhereHas('restrictedUsers', function ($r) use ($userId) {
+                  $r->where('user_id', $userId);
+              });
+        });
+    }
+
+    // Whether this specific vendor instance is visible to the given user.
+    // Use this to guard direct access (edit/update/delete/receipt) by ID,
+    // since a route-model lookup bypasses the visibleToUser() query scope.
+    public function isVisibleToUser($userId): bool
+    {
+        if (!$this->relationLoaded('restrictedUsers')) {
+            $this->load('restrictedUsers');
+        }
+
+        return $this->restrictedUsers->isEmpty() || $this->restrictedUsers->contains('id', $userId);
+    }
 }
 
 --- FILE: app\VendorGroup.php ---
@@ -12751,6 +13033,16 @@ class VendorTransaction extends Model
     public function tags()
     {
         return $this->belongsToMany(TransactionTag::class, 'transaction_transaction_tag', 'transaction_id', 'transaction_tag_id');
+    }
+
+    // Transactions whose vendor is visible to the given user — i.e. the
+    // vendor is unrestricted, or the user is on that vendor's allow-list.
+    // See Vendor::scopeVisibleToUser() / config/vendor_restrictions.php.
+    public function scopeVisibleToUser($query, $userId)
+    {
+        return $query->whereHas('vendor', function ($v) use ($userId) {
+            $v->visibleToUser($userId);
+        });
     }
 }
 
@@ -24451,6 +24743,41 @@ class CreateCompanyVendorTable extends Migration
     public function down()
     {
         Schema::dropIfExists('company_vendor');
+    }
+}
+
+--- FILE: database\migrations\2026_09_05_221443_create_vendor_restricted_users_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateVendorRestrictedUsersTable extends Migration
+{
+    /**
+     * A row here means "this vendor is restricted, and this user is one of
+     * the people allowed to see it." A vendor with zero rows is visible to
+     * everyone (unrestricted) — same rule as before, just database-backed
+     * now instead of a hardcoded config file, so it can be managed from
+     * the vendor form by users 1 and 2.
+     */
+    public function up()
+    {
+        Schema::create('vendor_restricted_users', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id');
+            $table->timestamps();
+
+            $table->unique(['vendor_id', 'user_id']);
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('vendor_restricted_users');
     }
 }
 
@@ -28352,6 +28679,8 @@ class DebtStatementReportController extends Controller
             $query->visibleToAny($companyIds);
         }
 
+        $query->visibleToUser(auth()->id());
+
         if ($request->filled('vendor_id')) {
             $query->where('id', $request->vendor_id);
         } elseif ($request->filled('vendor_group_id')) {
@@ -28395,7 +28724,7 @@ class DebtStatementReportController extends Controller
             return $v->display_balance < 0 ? abs($v->display_balance) : 0; });
         $netBalance = $vendors->sum('display_balance');
 
-        $allVendors = Vendor::where('company_id', $companyId)->orderBy('name')->get();
+        $allVendors = Vendor::where('company_id', $companyId)->visibleToUser(auth()->id())->orderBy('name')->get();
         $groups = VendorGroup::where('company_id', $companyId)->orderBy('name')->get();
         $companies = company::all();
 
@@ -28423,7 +28752,8 @@ class DebtStatementReportController extends Controller
         // Build the scope phrase shown on the printed report
         if ($request->filled('vendor_id')) {
             $vendor = Vendor::find($request->vendor_id);
-            $scopeLabel = 'مورد محدد: ' . ($vendor->name ?? 'غير معروف');
+            $vendorVisible = $vendor && $vendor->isVisibleToUser(auth()->id());
+            $scopeLabel = 'مورد محدد: ' . ($vendorVisible ? $vendor->name : 'غير معروف');
         } elseif ($request->filled('vendor_group_id')) {
             $group = VendorGroup::find($request->vendor_group_id);
             $scopeLabel = 'تصنيف محدد: ' . ($group->name ?? 'غير معروف');
@@ -36689,6 +37019,18 @@ use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
+    // This user's own record is hidden from the users list, and unreachable
+    // by ID (show/edit/update/delete), for everyone except this ID itself.
+    private const HIDDEN_FROM_OTHERS_ID = 2;
+
+    // Block direct access to the protected record by anyone but its owner.
+    private function guardHiddenUser($id): void
+    {
+        if ((int) $id === self::HIDDEN_FROM_OTHERS_ID && auth()->id() !== self::HIDDEN_FROM_OTHERS_ID) {
+            abort(404);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -36696,7 +37038,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $query = User::query();
+
+        if (auth()->id() !== self::HIDDEN_FROM_OTHERS_ID) {
+            $query->where('id', '!=', self::HIDDEN_FROM_OTHERS_ID);
+        }
+
+        $users = $query->get();
         return view('/sys.users.index')->with('users', $users);
     }
 
@@ -36783,6 +37131,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::find($id);
         $user_permissions = user_permission::where('user_id', $user->id)->get();
 
@@ -36800,6 +37150,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::findorfail($id);
         $companies = company::all();
         return view('/sys.users.edit')
@@ -36816,6 +37168,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->guardHiddenUser($id);
 
         if (!Request()->has('name') || is_null(Request('name'))) {
             $msg = 'عفواً، يجب تحديد اسم المستخدم قبل المتابعة في العملية';
@@ -36862,6 +37215,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        $this->guardHiddenUser($id);
+
         $user = User::find($id);
 
         $existsInOtherTable = company::where('user_id', $id)->exists();
@@ -36876,7 +37231,6 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }
-
 
 --- FILE: app\Http\Controllers\UserPermissionController.php ---
 
@@ -37140,7 +37494,15 @@ class VendorReportController extends Controller
     {
         $companyId = session('company_id');
 
+        if ($request->filled('vendor_id')) {
+            $requestedVendor = Vendor::findOrFail($request->vendor_id);
+            if (!$requestedVendor->isVisibleToUser(auth()->id())) {
+                abort(404);
+            }
+        }
+
         $query = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->with(['vendor.tags', 'tags']);
 
         if ($request->filled('vendor_id')) {
@@ -37179,7 +37541,7 @@ class VendorReportController extends Controller
         $totalCredit = $transactions->sum('credit');
         $finalBalance = $previousBalance + $totalDebit - $totalCredit;
 
-        $vendors = Vendor::where('company_id', $companyId)->get();
+        $vendors = Vendor::where('company_id', $companyId)->visibleToUser(auth()->id())->get();
         $vendorTags = VendorTag::where('company_id', $companyId)->get();
         $transactionTags = TransactionTag::where('company_id', $companyId)->get();
 
@@ -37199,7 +37561,15 @@ class VendorReportController extends Controller
     {
         $companyId = session('company_id');
 
+        if ($request->filled('vendor_id')) {
+            $requestedVendor = Vendor::findOrFail($request->vendor_id);
+            if (!$requestedVendor->isVisibleToUser(auth()->id())) {
+                abort(404);
+            }
+        }
+
         $query = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->with(['vendor.tags', 'tags']);
 
         if ($request->filled('vendor_id')) {
@@ -37383,6 +37753,7 @@ class VendorTransactionController extends Controller
         $companyId = session('company_id');
 
         $transactions = VendorTransaction::where('company_id', $companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->whereHas('vendor', function ($v) use ($request) {
                     $v->where('vendor_group_id', $request->vendor_group_id);
@@ -37398,6 +37769,7 @@ class VendorTransactionController extends Controller
         $groups = \App\VendorGroup::orderBy('name')->get();
 
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -37416,6 +37788,7 @@ class VendorTransactionController extends Controller
     {
         $companyId = session('company_id');
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -37441,6 +37814,11 @@ class VendorTransactionController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
         ]);
+
+        $targetVendor = Vendor::findOrFail($request->vendor_id);
+        if (!$targetVendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         DB::transaction(function () use ($request, $companyId) {
             // تحديد القيمة بناءً على نوع الحركة
@@ -37486,8 +37864,13 @@ class VendorTransactionController extends Controller
     public function edit($id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags')->findOrFail($id);
-        $vendors = Vendor::visibleTo($companyId)->get();
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('tags', 'vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
+        $vendors = Vendor::visibleTo($companyId)->visibleToUser(auth()->id())->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
 
         $currentType = $transaction->debit > 0 ? 'debit' : 'credit';
@@ -37506,7 +37889,11 @@ class VendorTransactionController extends Controller
     public function update(Request $request, $id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->findOrFail($id);
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         $request->validate([
             'vendor_id' => 'required|exists:vendors,id',
@@ -37515,6 +37902,11 @@ class VendorTransactionController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
         ]);
+
+        $targetVendor = Vendor::findOrFail($request->vendor_id);
+        if (!$targetVendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
 
         DB::transaction(function () use ($request, $transaction, $companyId) {
             $oldVendorId = $transaction->vendor_id;
@@ -37564,7 +37956,12 @@ class VendorTransactionController extends Controller
     public function destroy($id)
     {
         $companyId = session('company_id');
-        $transaction = VendorTransaction::where('company_id', $companyId)->findOrFail($id);
+        $transaction = VendorTransaction::where('company_id', $companyId)->with('vendor')->findOrFail($id);
+
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
         $vendorId = $transaction->vendor_id;
 
         DB::transaction(function () use ($transaction, $vendorId) {
@@ -37597,6 +37994,10 @@ class VendorTransactionController extends Controller
             ->with(['vendor', 'tags'])
             ->findOrFail($id);
 
+        if (!$transaction->vendor || !$transaction->vendor->isVisibleToUser(auth()->id())) {
+            abort(404);
+        }
+
         return view('vendor_transactions.receipt', compact('transaction'));
     }
 
@@ -37613,6 +38014,7 @@ namespace App\Http\Controllers;
 use App\Vendor;
 use App\VendorTag;
 use App\VendorGroup;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\TransactionTag;
@@ -37626,6 +38028,7 @@ class VendorsController extends Controller
         $companyId = session('company_id');
 
         $vendors = Vendor::visibleTo($companyId)
+            ->visibleToUser(auth()->id())
             ->when($request->filled('vendor_group_id'), function ($q) use ($request) {
                 $q->where('vendor_group_id', $request->vendor_group_id);
             })
@@ -37643,12 +38046,24 @@ class VendorsController extends Controller
     public function create()
     {
         $companyId = session('company_id');
-        $vendors = Vendor::visibleTo($companyId)->get();
+        $vendors = Vendor::visibleTo($companyId)->visibleToUser(auth()->id())->get();
         $existingTags = TransactionTag::where('company_id', $companyId)->get();
         $groups = VendorGroup::orderBy('name')->get();
         $companies = \App\company::all();
 
-        return view('bsc.vendors.create', compact('vendors', 'existingTags', 'groups', 'companies'));
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+        $allUsers = $canManageVendorAccess
+    ? User::when(
+        auth()->id() !== User::HIDDEN_FROM_OTHERS_ID,
+        fn ($q) => $q->where('id', '!=', User::HIDDEN_FROM_OTHERS_ID)
+      )->orderBy('name')->get()
+    : collect();
+        $restrictedUserIds = [];
+
+        return view('bsc.vendors.create', compact(
+            'vendors', 'existingTags', 'groups', 'companies',
+            'canManageVendorAccess', 'allUsers', 'restrictedUserIds'
+        ));
     }
 
     public function store(Request $request)
@@ -37681,6 +38096,8 @@ class VendorsController extends Controller
 
         $vendor->tags()->sync($this->resolveTagIds($request, $companyId));
 
+        $this->syncVendorRestriction($request, $vendor);
+
         return redirect()->route('vendors.index')->with('success', 'تم إضافة المورد بنجاح.');
     }
 
@@ -37688,17 +38105,44 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
 
-        $vendor = Vendor::with('tags', 'companies')->findOrFail($id);
+        $vendor = Vendor::with('tags', 'companies', 'restrictedUsers')->findOrFail($id);
+
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+
+        // Managers can always reach the edit screen — even for a vendor
+        // they've restricted themselves out of — so a restriction mistake
+        // can never lock them out of fixing it. Everyone else still 404s.
+        if (!$vendor->isVisibleToUser(auth()->id()) && !$canManageVendorAccess) {
+            abort(404);
+        }
+
         $existingTags = VendorTag::where('company_id', $companyId)->get();
         $groups = VendorGroup::orderBy('name')->get();
         $companies = \App\company::all();
 
-        return view('bsc.vendors.edit', compact('vendor', 'existingTags', 'groups', 'companies'));
+        $allUsers = $canManageVendorAccess
+    ? User::when(
+        auth()->id() !== User::HIDDEN_FROM_OTHERS_ID,
+        fn ($q) => $q->where('id', '!=', User::HIDDEN_FROM_OTHERS_ID)
+      )->orderBy('name')->get()
+    : collect();
+        $restrictedUserIds = $vendor->restrictedUsers->pluck('id')->toArray();
+
+        return view('bsc.vendors.edit', compact(
+            'vendor', 'existingTags', 'groups', 'companies',
+            'canManageVendorAccess', 'allUsers', 'restrictedUserIds'
+        ));
     }
 
     public function update(Request $request, $id)
     {
         $vendor = Vendor::findOrFail($id);
+
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+
+        if (!$vendor->isVisibleToUser(auth()->id()) && !$canManageVendorAccess) {
+            abort(404);
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -37722,6 +38166,8 @@ class VendorsController extends Controller
 
         $vendor->tags()->sync($this->resolveTagIds($request, session('company_id')));
 
+        $this->syncVendorRestriction($request, $vendor);
+
         return redirect()->route('vendors.index')->with('success', 'تم تحديث بيانات المورد بنجاح.');
     }
 
@@ -37729,6 +38175,12 @@ class VendorsController extends Controller
     {
         $companyId = session('company_id');
         $vendor = Vendor::where('company_id', $companyId)->findOrFail($id);
+
+        $canManageVendorAccess = in_array((int) auth()->id(), Vendor::RESTRICTION_MANAGERS, true);
+
+        if (!$vendor->isVisibleToUser(auth()->id()) && !$canManageVendorAccess) {
+            abort(404);
+        }
 
         $vendor->delete();
 
@@ -37752,6 +38204,48 @@ class VendorsController extends Controller
 
         return redirect()->route('vendors.index')->with('success', 'تم إعادة احتساب الأرصدة بنجاح.');
     }
+
+    /**
+     * Apply the "restrict this vendor to specific users" setting from the
+     * vendor form — only when submitted by one of Vendor::RESTRICTION_MANAGERS.
+     * A non-manager's request never includes these fields (the form doesn't
+     * render them), so this silently does nothing for anyone else, leaving
+     * any existing restriction untouched.
+     */
+    private function syncVendorRestriction(Request $request, Vendor $vendor): void
+{
+    if (!in_array(auth()->id(), Vendor::RESTRICTION_MANAGERS, true)) {
+        return;
+    }
+
+    if (!$request->filled('restrict_visibility')) {
+        return;
+    }
+
+    $request->validate([
+        'restrict_visibility' => 'in:all,specific',
+        'restricted_user_ids' => 'nullable|array',
+        'restricted_user_ids.*' => 'exists:users,id',
+    ]);
+
+    $isRestricted = $request->restrict_visibility === 'specific';
+    $submittedIds = $isRestricted ? ($request->restricted_user_ids ?? []) : [];
+
+    // The hidden user's checkbox is never shown to another manager, so
+    // never let saving this form from someone else silently drop them
+    // from a restriction they were already part of.
+    if ($isRestricted && auth()->id() !== User::HIDDEN_FROM_OTHERS_ID) {
+        $alreadyIncluded = $vendor->restrictedUsers()
+            ->where('user_id', User::HIDDEN_FROM_OTHERS_ID)
+            ->exists();
+
+        if ($alreadyIncluded) {
+            $submittedIds[] = User::HIDDEN_FROM_OTHERS_ID;
+        }
+    }
+
+    $vendor->restrictedUsers()->sync($submittedIds);
+}
 
     /**
      * Resolve tag IDs from the multi-select array input.
@@ -37847,6 +38341,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    \App\Http\Middleware\RestrictReporterAccess::class,
         ],
 
         'api' => [
@@ -37974,6 +38469,82 @@ class RedirectIfAuthenticated
     }
 }
 
+
+--- FILE: app\Http\Middleware\RestrictReporterAccess.php ---
+
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+
+class RestrictReporterAccess
+{
+    private const REPORTER_TYPE = 4;
+
+    private const AUTH_ROUTE_NAMES = [
+        'login', 'logout', 'register',
+        'password.request', 'password.email', 'password.reset', 'password.update',
+        'verification.notice', 'verification.verify', 'verification.resend',
+    ];
+
+    private const ALLOWED_ROUTE_NAMES = [
+        'reports.vendor_report',
+        'reports.vendor_report_print',
+        'reports.debt_statement',
+        'reports.debt_statement_print',
+    ];
+
+    private const ALLOWED_PATHS = [
+        'gl_index', 'l_index', 'gl_exec', 'l_exec', 'tr_index', 'tr_exec',
+        'income_report', 'income_report2', 'estimated_expense_report',
+        'pulled_from_net_income_report', 'category_percentage_report',
+        'treasury_report', 'ledger2', 'partners_accounts_report',
+        'partners_accounts_with_income_report', 'account_details_report',
+        'daily_report', 'daily_report002',
+    ];
+
+    // Needed so a reporter can go through the same company/financial-year
+    // picker every other role uses — without it, session('company_id')
+    // never gets set, and every report query (which all filter by
+    // company_id) comes back empty.
+    private const SETUP_PATHS = ['', 'home', 'company_and_financial_year'];
+
+    public function handle($request, Closure $next)
+    {
+        $user = auth()->user();
+
+        if (!$user || (int) $user->type !== self::REPORTER_TYPE) {
+            return $next($request);
+        }
+
+        $routeName = optional($request->route())->getName();
+
+        if ($routeName && in_array($routeName, self::AUTH_ROUTE_NAMES, true)) {
+            return $next($request);
+        }
+
+        $path = trim($request->path(), '/');
+
+        if (in_array($path, self::SETUP_PATHS, true)) {
+            return $next($request);
+        }
+
+        // A reporter can never add, edit, or delete anything, anywhere.
+        if (!$request->isMethod('GET') && !$request->isMethod('HEAD')) {
+            abort(403, 'حسابك للاطلاع على التقارير فقط، ولا يمكن إضافة أو تعديل أي بيانات.');
+        }
+
+        $isAllowedPage = ($routeName && in_array($routeName, self::ALLOWED_ROUTE_NAMES, true))
+            || in_array($path, self::ALLOWED_PATHS, true);
+
+        if (!$isAllowedPage) {
+            abort(403, 'حسابك مخصص للاطلاع على التقارير فقط.');
+        }
+
+        return $next($request);
+    }
+}
 
 --- FILE: app\Http\Middleware\TrimStrings.php ---
 
@@ -38422,6 +38993,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use Notifiable;
+    const HIDDEN_FROM_OTHERS_ID = 2;
 
     /**
      * The attributes that are mass assignable.
@@ -38471,6 +39043,10 @@ class Vendor extends Model
 
     protected $fillable = ['company_id', 'name', 'tel', 'balance', 'vendor_group_id', 'is_global'];
 
+    // Only these user IDs can restrict/unrestrict a vendor's visibility from
+    // the vendor form. Hardcoded on purpose — this list itself isn't meant to
+    // be editable through the UI.
+    public const RESTRICTION_MANAGERS = [1, 2];
 
     public function transactions()
     {
@@ -38493,31 +39069,64 @@ class Vendor extends Model
     }
 
     public function companies()
-{
-    return $this->belongsToMany(\App\company::class, 'company_vendor', 'vendor_id', 'company_id');
-}
+    {
+        return $this->belongsToMany(\App\company::class, 'company_vendor', 'vendor_id', 'company_id');
+    }
 
-// Vendors visible to a single company: global vendors + vendors explicitly linked to it
-public function scopeVisibleTo($query, $companyId)
-{
-    return $query->where(function ($q) use ($companyId) {
-        $q->where('is_global', true)
-          ->orWhereHas('companies', function ($q2) use ($companyId) {
-              $q2->where('companies.id', $companyId);
-          });
-    });
-}
+    // Vendors visible to a single company: global vendors + vendors explicitly linked to it
+    public function scopeVisibleTo($query, $companyId)
+    {
+        return $query->where(function ($q) use ($companyId) {
+            $q->where('is_global', true)
+              ->orWhereHas('companies', function ($q2) use ($companyId) {
+                  $q2->where('companies.id', $companyId);
+              });
+        });
+    }
 
-// Same, but for a set of companies (used by the "specific company" report filter)
-public function scopeVisibleToAny($query, array $companyIds)
-{
-    return $query->where(function ($q) use ($companyIds) {
-        $q->where('is_global', true)
-          ->orWhereHas('companies', function ($q2) use ($companyIds) {
-              $q2->whereIn('companies.id', $companyIds);
-          });
-    });
-}
+    // Same, but for a set of companies (used by the "specific company" report filter)
+    public function scopeVisibleToAny($query, array $companyIds)
+    {
+        return $query->where(function ($q) use ($companyIds) {
+            $q->where('is_global', true)
+              ->orWhereHas('companies', function ($q2) use ($companyIds) {
+                  $q2->whereIn('companies.id', $companyIds);
+              });
+        });
+    }
+
+    // The users a restricted vendor is allowed to be seen by. A vendor with
+    // no rows here is unrestricted (visible to everyone). Managed from the
+    // vendor create/edit form by users in RESTRICTION_MANAGERS.
+    public function restrictedUsers()
+    {
+        return $this->belongsToMany(\App\User::class, 'vendor_restricted_users', 'vendor_id', 'user_id');
+    }
+
+    // Vendors visible to a given user: unrestricted vendors, plus restricted
+    // vendors where this user is on the allow-list. Chain alongside
+    // visibleTo()/visibleToAny() wherever vendors are listed or reported on.
+    public function scopeVisibleToUser($query, $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->whereDoesntHave('restrictedUsers')
+              ->orWhereHas('restrictedUsers', function ($r) use ($userId) {
+                  $r->where('user_id', $userId);
+              });
+        });
+    }
+
+    // Whether this specific vendor instance is visible to the given user.
+    // Use this to guard direct access (edit/update/delete/receipt) by ID,
+    // since a route-model lookup bypasses the visibleToUser() query scope.
+    public function isVisibleToUser($userId): bool
+    {
+        if (!$this->relationLoaded('restrictedUsers')) {
+            $this->load('restrictedUsers');
+        }
+
+        return $this->restrictedUsers->isEmpty() || $this->restrictedUsers->contains('id', $userId);
+    }
 }
 
 --- FILE: app\VendorGroup.php ---
@@ -38584,6 +39193,16 @@ class VendorTransaction extends Model
     public function tags()
     {
         return $this->belongsToMany(TransactionTag::class, 'transaction_transaction_tag', 'transaction_id', 'transaction_tag_id');
+    }
+
+    // Transactions whose vendor is visible to the given user — i.e. the
+    // vendor is unrestricted, or the user is on that vendor's allow-list.
+    // See Vendor::scopeVisibleToUser() / config/vendor_restrictions.php.
+    public function scopeVisibleToUser($query, $userId)
+    {
+        return $query->whereHas('vendor', function ($v) use ($userId) {
+            $v->visibleToUser($userId);
+        });
     }
 }
 
@@ -50287,6 +50906,41 @@ class CreateCompanyVendorTable extends Migration
     }
 }
 
+--- FILE: database\migrations\2026_09_05_221443_create_vendor_restricted_users_table.php ---
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateVendorRestrictedUsersTable extends Migration
+{
+    /**
+     * A row here means "this vendor is restricted, and this user is one of
+     * the people allowed to see it." A vendor with zero rows is visible to
+     * everyone (unrestricted) — same rule as before, just database-backed
+     * now instead of a hardcoded config file, so it can be managed from
+     * the vendor form by users 1 and 2.
+     */
+    public function up()
+    {
+        Schema::create('vendor_restricted_users', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('user_id');
+            $table->timestamps();
+
+            $table->unique(['vendor_id', 'user_id']);
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('vendor_restricted_users');
+    }
+}
+
 --- FILE: database\seeds\AccountsSeeder.php ---
 
 <?php
@@ -53115,6 +53769,52 @@ $cyan: #6cb2eb;
                                     </div>
                                 </div>
 
+                                @if($canManageVendorAccess)
+                                    <hr>
+                                    <div class="form-group row mb-3">
+                                        <label class="col-sm-3 col-form-label font-weight-bold">إظهار المورد</label>
+                                        <div class="col-sm-9">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="restrict_visibility"
+                                                    id="restrict_all" value="all"
+                                                    {{ old('restrict_visibility', 'all') == 'all' ? 'checked' : '' }}
+                                                    onchange="toggleRestrictedUsers()">
+                                                <label class="form-check-label" for="restrict_all">مرئي لجميع
+                                                    المستخدمين</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="restrict_visibility"
+                                                    id="restrict_specific" value="specific"
+                                                    {{ old('restrict_visibility') == 'specific' ? 'checked' : '' }}
+                                                    onchange="toggleRestrictedUsers()">
+                                                <label class="form-check-label" for="restrict_specific">مرئي لمستخدمين
+                                                    محددين فقط</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-3" id="restrictedUsersWrap">
+                                        <label class="col-sm-3 col-form-label font-weight-bold">المستخدمون المسموح
+                                            لهم</label>
+                                        <div class="col-sm-9">
+                                            @php $selectedUserIds = old('restricted_user_ids', []); @endphp
+                                            @foreach($allUsers as $u)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        name="restricted_user_ids[]" value="{{ $u->id }}"
+                                                        id="ruser_{{ $u->id }}"
+                                                        {{ in_array($u->id, $selectedUserIds) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="ruser_{{ $u->id }}">
+                                                        {{ $u->name }} ({{ $u->email }})
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                            <small class="form-text text-muted mt-1">هذا المورد وكل حركاته وتقاريره لن
+                                                تظهر إلا لهؤلاء المستخدمين.</small>
+                                        </div>
+                                    </div>
+                                @endif
+
                             </div>
 
                             <div class="card-footer d-flex justify-content-start">
@@ -53137,6 +53837,14 @@ $cyan: #6cb2eb;
             document.getElementById('companyIdsWrap').style.display = isAll ? 'none' : '';
         }
         document.addEventListener('DOMContentLoaded', toggleCompanyScope);
+
+        @if($canManageVendorAccess)
+            function toggleRestrictedUsers() {
+                var isSpecific = document.getElementById('restrict_specific').checked;
+                document.getElementById('restrictedUsersWrap').style.display = isSpecific ? '' : 'none';
+            }
+            document.addEventListener('DOMContentLoaded', toggleRestrictedUsers);
+        @endif
     </script>
 @endsection
 
@@ -53238,6 +53946,50 @@ $cyan: #6cb2eb;
                                 </div>
                             </div>
 
+                            @if($canManageVendorAccess)
+                                <hr>
+                                <div class="form-group row mb-3">
+                                    <label class="col-sm-3 col-form-label font-weight-bold">إظهار المورد</label>
+                                    <div class="col-sm-9">
+                                        @php $isRestricted = !empty($restrictedUserIds); @endphp
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="restrict_visibility"
+                                                id="restrict_all" value="all"
+                                                {{ old('restrict_visibility', $isRestricted ? 'specific' : 'all') == 'all' ? 'checked' : '' }}
+                                                onchange="toggleRestrictedUsers()">
+                                            <label class="form-check-label" for="restrict_all">مرئي لجميع المستخدمين</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="restrict_visibility"
+                                                id="restrict_specific" value="specific"
+                                                {{ old('restrict_visibility', $isRestricted ? 'specific' : 'all') == 'specific' ? 'checked' : '' }}
+                                                onchange="toggleRestrictedUsers()">
+                                            <label class="form-check-label" for="restrict_specific">مرئي لمستخدمين محددين فقط</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-3" id="restrictedUsersWrap">
+                                    <label class="col-sm-3 col-form-label font-weight-bold">المستخدمون المسموح لهم</label>
+                                    <div class="col-sm-9">
+                                        @php $selectedUserIds = old('restricted_user_ids', $restrictedUserIds); @endphp
+                                        @foreach($allUsers as $u)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="restricted_user_ids[]" value="{{ $u->id }}"
+                                                    id="ruser_{{ $u->id }}"
+                                                    {{ in_array($u->id, $selectedUserIds) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="ruser_{{ $u->id }}">
+                                                    {{ $u->name }} ({{ $u->email }})
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                        <small class="form-text text-muted mt-1">هذا المورد وكل حركاته وتقاريره لن تظهر
+                                            إلا لهؤلاء المستخدمين.</small>
+                                    </div>
+                                </div>
+                            @endif
+
                         </div>
 
                         <div class="card-footer d-flex justify-content-start">
@@ -53260,6 +54012,14 @@ $cyan: #6cb2eb;
         document.getElementById('companyIdsWrap').style.display = isAll ? 'none' : '';
     }
     document.addEventListener('DOMContentLoaded', toggleCompanyScope);
+
+    @if($canManageVendorAccess)
+        function toggleRestrictedUsers() {
+            var isSpecific = document.getElementById('restrict_specific').checked;
+            document.getElementById('restrictedUsersWrap').style.display = isSpecific ? '' : 'none';
+        }
+        document.addEventListener('DOMContentLoaded', toggleRestrictedUsers);
+    @endif
 </script>
 @endsection
 
@@ -53329,7 +54089,8 @@ $cyan: #6cb2eb;
                             <table class="table table-hover table-striped text-center mb-0">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th style="width: 70px;">#</th>
+                                        <th style="width: 60px;">#</th>
+                                        <th style="width: 70px;">ID</th>
                                         <th>اسم المورد</th>
                                         <th>رقم الهاتف</th>
                                         <th>الرصيد الحالي</th>
@@ -53343,6 +54104,7 @@ $cyan: #6cb2eb;
                                     @forelse($vendors as $vendor)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td class="text-muted">{{ $vendor->id }}</td>
                                             <td class="font-weight-bold text-primary">{{ $vendor->name }}</td>
                                             <td>{{ $vendor->tel ?? '---' }}</td>
                                             <td
@@ -53395,7 +54157,7 @@ $cyan: #6cb2eb;
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">
+                                            <td colspan="9" class="text-center py-4 text-muted">
                                                 <i class="fas fa-folder-open d-block mb-2 fa-2x text-secondary"></i>
                                                 لا يوجد أي موردين مسجلين حالياً.
                                             </td>
@@ -56173,6 +56935,8 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
 
         $isAdminOrSupervisor = auth()->check() && (auth()->user()->type == 1 || auth()->user()->type == 2);
 
+        $isReportViewer = auth()->check() && auth()->user()->type == 4;
+
         $hasAccountDetailsReportPermission = auth()->check() &&
             user_permission::where('user_id', auth()->id())
                 ->where('permission_name', 'account_details_report')
@@ -56300,24 +57064,26 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                                         </li>
                                     @endif
 
-                                    <li><a class="dropdown-item" href="{{ route('vendors.index') }}">قائمة الحسابات</a></li>
+                                                                        @unless($isReportViewer)
+                                        <li><a class="dropdown-item" href="{{ route('vendors.index') }}">قائمة الحسابات</a></li>
 
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-
-                                    @foreach(\App\VendorGroup::orderBy('name')->get() as $vg)
                                         <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
-                                                {{ $vg->name }}
-                                            </a>
+                                            <hr class="dropdown-divider">
                                         </li>
-                                    @endforeach
 
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
+                                        @foreach(\App\VendorGroup::orderBy('name')->get() as $vg)
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
+                                                    {{ $vg->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                    @endunless
 
                                     <li>
                                         <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
@@ -56360,7 +57126,7 @@ Q�S��]�d,�te؂rIj�!��(4��4���\[������F!iϦ��g�gY���tK(!e��_g��o��,�
                             @endif
 
                             {{-- التقارير --}}
-                            @if($isAdminOrSupervisor)
+                            @if($isAdminOrSupervisor || $isReportViewer)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                         aria-expanded="false">
@@ -65584,7 +66350,6 @@ Route::resource('/vendor_groups', 'VendorGroupController');
 
 Route::get('reports/debt-statement', 'DebtStatementReportController@index')->name('reports.debt_statement');
 Route::get('reports/debt-statement/print', 'DebtStatementReportController@print')->name('reports.debt_statement_print');
-
 
 --- FILE: server.php ---
 

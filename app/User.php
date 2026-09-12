@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use Notifiable;
+    const HIDDEN_FROM_OTHERS_ID = 2;
 
     /**
      * The attributes that are mass assignable.

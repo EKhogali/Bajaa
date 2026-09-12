@@ -47,6 +47,8 @@
 
         $isAdminOrSupervisor = auth()->check() && (auth()->user()->type == 1 || auth()->user()->type == 2);
 
+        $isReportViewer = auth()->check() && auth()->user()->type == 4;
+
         $hasAccountDetailsReportPermission = auth()->check() &&
             user_permission::where('user_id', auth()->id())
                 ->where('permission_name', 'account_details_report')
@@ -174,24 +176,26 @@
                                         </li>
                                     @endif
 
-                                    <li><a class="dropdown-item" href="{{ route('vendors.index') }}">قائمة الحسابات</a></li>
+                                                                        @unless($isReportViewer)
+                                        <li><a class="dropdown-item" href="{{ route('vendors.index') }}">قائمة الحسابات</a></li>
 
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-
-                                    @foreach(\App\VendorGroup::orderBy('name')->get() as $vg)
                                         <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
-                                                {{ $vg->name }}
-                                            </a>
+                                            <hr class="dropdown-divider">
                                         </li>
-                                    @endforeach
 
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
+                                        @foreach(\App\VendorGroup::orderBy('name')->get() as $vg)
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('transactions.index', ['vendor_group_id' => $vg->id]) }}">
+                                                    {{ $vg->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                    @endunless
 
                                     <li>
                                         <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
@@ -234,7 +238,7 @@
                             @endif
 
                             {{-- التقارير --}}
-                            @if($isAdminOrSupervisor)
+                            @if($isAdminOrSupervisor || $isReportViewer)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                         aria-expanded="false">

@@ -95,6 +95,52 @@
                                     </div>
                                 </div>
 
+                                @if($canManageVendorAccess)
+                                    <hr>
+                                    <div class="form-group row mb-3">
+                                        <label class="col-sm-3 col-form-label font-weight-bold">إظهار المورد</label>
+                                        <div class="col-sm-9">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="restrict_visibility"
+                                                    id="restrict_all" value="all"
+                                                    {{ old('restrict_visibility', 'all') == 'all' ? 'checked' : '' }}
+                                                    onchange="toggleRestrictedUsers()">
+                                                <label class="form-check-label" for="restrict_all">مرئي لجميع
+                                                    المستخدمين</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="restrict_visibility"
+                                                    id="restrict_specific" value="specific"
+                                                    {{ old('restrict_visibility') == 'specific' ? 'checked' : '' }}
+                                                    onchange="toggleRestrictedUsers()">
+                                                <label class="form-check-label" for="restrict_specific">مرئي لمستخدمين
+                                                    محددين فقط</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row mb-3" id="restrictedUsersWrap">
+                                        <label class="col-sm-3 col-form-label font-weight-bold">المستخدمون المسموح
+                                            لهم</label>
+                                        <div class="col-sm-9">
+                                            @php $selectedUserIds = old('restricted_user_ids', []); @endphp
+                                            @foreach($allUsers as $u)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        name="restricted_user_ids[]" value="{{ $u->id }}"
+                                                        id="ruser_{{ $u->id }}"
+                                                        {{ in_array($u->id, $selectedUserIds) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="ruser_{{ $u->id }}">
+                                                        {{ $u->name }} ({{ $u->email }})
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                            <small class="form-text text-muted mt-1">هذا المورد وكل حركاته وتقاريره لن
+                                                تظهر إلا لهؤلاء المستخدمين.</small>
+                                        </div>
+                                    </div>
+                                @endif
+
                             </div>
 
                             <div class="card-footer d-flex justify-content-start">
@@ -117,5 +163,13 @@
             document.getElementById('companyIdsWrap').style.display = isAll ? 'none' : '';
         }
         document.addEventListener('DOMContentLoaded', toggleCompanyScope);
+
+        @if($canManageVendorAccess)
+            function toggleRestrictedUsers() {
+                var isSpecific = document.getElementById('restrict_specific').checked;
+                document.getElementById('restrictedUsersWrap').style.display = isSpecific ? '' : 'none';
+            }
+            document.addEventListener('DOMContentLoaded', toggleRestrictedUsers);
+        @endif
     </script>
 @endsection
