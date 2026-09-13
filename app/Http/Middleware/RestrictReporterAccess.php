@@ -14,27 +14,35 @@ class RestrictReporterAccess
         'verification.notice', 'verification.verify', 'verification.resend',
     ];
 
-    private const ALLOWED_ROUTE_NAMES = [
-        'reports.vendor_report',
-        'reports.vendor_report_print',
-        'reports.debt_statement',
-        'reports.debt_statement_print',
-    ];
-
-    private const ALLOWED_PATHS = [
-        'gl_index', 'l_index', 'gl_exec', 'l_exec', 'tr_index', 'tr_exec',
-        'income_report', 'income_report2', 'estimated_expense_report',
-        'pulled_from_net_income_report', 'category_percentage_report',
-        'treasury_report', 'ledger2', 'partners_accounts_report',
-        'partners_accounts_with_income_report', 'account_details_report',
-        'daily_report', 'daily_report002',
-    ];
-
-    // Needed so a reporter can go through the same company/financial-year
-    // picker every other role uses — without it, session('company_id')
-    // never gets set, and every report query (which all filter by
-    // company_id) comes back empty.
     private const SETUP_PATHS = ['', 'home', 'company_and_financial_year'];
+
+    // Internal helper endpoints behind some reports (print/execute actions).
+    // Always allowed for a reporter, not individually permission-gated.
+    private const SUPPORT_PATHS = ['gl_index', 'l_index', 'gl_exec', 'l_exec', 'tr_index', 'tr_exec'];
+
+    // route name => module key (must match config/access_modules.php)
+    private const ROUTE_NAME_MODULES = [
+        'reports.vendor_report'        => 'vendor_report',
+        'reports.vendor_report_print'  => 'vendor_report',
+        'reports.debt_statement'       => 'debt_statement_report',
+        'reports.debt_statement_print' => 'debt_statement_report',
+    ];
+
+    // url path => module key
+    private const PATH_MODULES = [
+        'income_report'                        => 'income_report',
+        'income_report2'                       => 'income_report2',
+        'estimated_expense_report'             => 'estimated_expense_report',
+        'treasury_report'                      => 'treasury_report',
+        'ledger2'                               => 'ledger_report',
+        'account_details_report'               => 'account_details_report',
+        'category_percentage_report'           => 'category_percentage_report',
+        'pulled_from_net_income_report'        => 'pulled_from_net_income_report',
+        'partners_accounts_report'             => 'partners_accounts_report',
+        'partners_accounts_with_income_report' => 'partners_accounts_with_income_report',
+        'daily_report'                         => 'daily_report',
+        'daily_report002'                      => 'daily_report002',
+    ];
 
     public function handle($request, Closure $next)
     {
@@ -52,20 +60,20 @@ class RestrictReporterAccess
 
         $path = trim($request->path(), '/');
 
-        if (in_array($path, self::SETUP_PATHS, true)) {
+        if (in_array($path, self::SETUP_PATHS, true) || in_array($path, self::SUPPORT_PATHS, true)) {
             return $next($request);
         }
 
-        // A reporter can never add, edit, or delete anything, anywhere.
         if (!$request->isMethod('GET') && !$request->isMethod('HEAD')) {
             abort(403, 'حسابك للاطلاع على التقارير فقط، ولا يمكن إضافة أو تعديل أي بيانات.');
         }
 
-        $isAllowedPage = ($routeName && in_array($routeName, self::ALLOWED_ROUTE_NAMES, true))
-            || in_array($path, self::ALLOWED_PATHS, true);
+        $moduleKey = ($routeName && isset(self::ROUTE_NAME_MODULES[$routeName]))
+            ? self::ROUTE_NAME_MODULES[$routeName]
+            : (self::PATH_MODULES[$path] ?? null);
 
-        if (!$isAllowedPage) {
-            abort(403, 'حسابك مخصص للاطلاع على التقارير فقط.');
+        if (!$moduleKey || !$user->hasModuleAccess($moduleKey)) {
+            abort(403, 'لا تملك صلاحية الاطلاع على هذا التقرير.');
         }
 
         return $next($request);

@@ -142,3 +142,7 @@ Route::resource('/vendor_groups', 'VendorGroupController');
 
 Route::get('reports/debt-statement', 'DebtStatementReportController@index')->name('reports.debt_statement');
 Route::get('reports/debt-statement/print', 'DebtStatementReportController@print')->name('reports.debt_statement_print');
+
+Route::get('/access-permissions', 'AccessPermissionController@index')->name('access_permissions.index');
+Route::post('/access-permissions/{id}', 'AccessPermissionController@update')->name('access_permissions.update');
+

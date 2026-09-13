@@ -41,4 +41,22 @@ class User extends Authenticatable
     public function company(){
         return $this->belongsTo(company::class,'company_id','id');
     }
+
+    public function permissions()
+{
+    return $this->hasMany(\App\user_permission::class, 'user_id');
+}
+
+// Whether this user can access a given module/page. Admins and supervisors
+// always can; everyone else needs an explicit grant in user_permissions.
+// See config/access_modules.php for the list of keys, and the
+// /access-permissions screen that grants/revokes them.
+public function hasModuleAccess(string $key): bool
+{
+    if (in_array($this->type, [1, 2], true)) {
+        return true;
+    }
+
+    return $this->permissions()->where('permission_name', $key)->exists();
+}
 }

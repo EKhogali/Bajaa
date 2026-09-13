@@ -197,12 +197,16 @@
                                         </li>
                                     @endunless
 
-                                    <li>
-                                        <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('reports.debt_statement') }}">كشف المديونية</a>
-                                    </li>
+                                                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('vendor_report'))
+                                        <li>
+                                            <a class="dropdown-item" href="/reports/vendor-report">تقرير الموردين</a>
+                                        </li>
+                                    @endif
+                                    @if(!$isReportViewer || auth()->user()->hasModuleAccess('debt_statement_report'))
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('reports.debt_statement') }}">كشف المديونية</a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </li>
 
@@ -224,7 +228,7 @@
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                                        <li><a class="dropdown-item" href="/loan_headers">السُّلــــــف</a></li>
+                                        <li><a class="dropdown-item" href="/loan_headers">السُّلــــــف</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
@@ -237,7 +241,7 @@
                                 </li>
                             @endif
 
-                            {{-- التقارير --}}
+                                                        {{-- التقارير --}}
                             @if($isAdminOrSupervisor || $isReportViewer)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -245,36 +249,47 @@
                                         التقاريــر
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="/income_report">تقرير الدخل</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="/income_report2">تقرير الدخل2</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="/estimated_expense_report">تقرير الدخل التقديري</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="/treasury_report">تقرير الخزينة</a></li>
-                                        <li><a class="dropdown-item" href="/ledger2">تقرير حركة حساب</a></li>
-
-                                        <li>
-                                            <a class="dropdown-item" href="/account_details_report">
-                                                تقرير الحركة التفصيلية لحساب
-                                            </a>
-                                        </li>
-
-                                        <li><a class="dropdown-item" href="/category_percentage_report">تقرير نسبة المصروفات من
-                                                اجمالي المبيعات</a></li>
-                                        <li><a class="dropdown-item" href="/pulled_from_net_income_report">تقرير مسحوبات من صافي
-                                                الربح</a></li>
-                                        <li><a class="dropdown-item" href="/partners_accounts_report">تقرير حساب المستثمر
-                                                والشريك</a></li>
-                                        <li><a class="dropdown-item" href="/partners_accounts_with_income_report">تقرير مسحوبات من
-                                                صافي الربح وحصص المستثمر والشريك</a></li>
-                                        <li><a class="dropdown-item" href="/daily_report">التقرير اليومي</a></li>
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('income_report'))
+                                            <li><a class="dropdown-item" href="/income_report">تقرير الدخل</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('income_report2'))
+                                            <li><a class="dropdown-item" href="/income_report2">تقرير الدخل2</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('estimated_expense_report'))
+                                            <li><a class="dropdown-item" href="/estimated_expense_report">تقرير الدخل التقديري</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('treasury_report'))
+                                            <li><a class="dropdown-item" href="/treasury_report">تقرير الخزينة</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('ledger_report'))
+                                            <li><a class="dropdown-item" href="/ledger2">تقرير حركة حساب</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('account_details_report'))
+                                            <li>
+                                                <a class="dropdown-item" href="/account_details_report">
+                                                    تقرير الحركة التفصيلية لحساب
+                                                </a>
+                                            </li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('category_percentage_report'))
+                                            <li><a class="dropdown-item" href="/category_percentage_report">تقرير نسبة المصروفات من
+                                                    اجمالي المبيعات</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('pulled_from_net_income_report'))
+                                            <li><a class="dropdown-item" href="/pulled_from_net_income_report">تقرير مسحوبات من صافي
+                                                    الربح</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('partners_accounts_report'))
+                                            <li><a class="dropdown-item" href="/partners_accounts_report">تقرير حساب المستثمر
+                                                    والشريك</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('partners_accounts_with_income_report'))
+                                            <li><a class="dropdown-item" href="/partners_accounts_with_income_report">تقرير مسحوبات من
+                                                    صافي الربح وحصص المستثمر والشريك</a></li>
+                                        @endif
+                                        @if(!$isReportViewer || auth()->user()->hasModuleAccess('daily_report'))
+                                            <li><a class="dropdown-item" href="/daily_report">التقرير اليومي</a></li>
+                                        @endif
                                     </ul>
                                 </li>
                             @endif
@@ -315,6 +330,7 @@
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="/sitting">إعدادات النظام</a></li>
                                     <li><a class="dropdown-item" href="/users">المستخدمين والصلاحيات</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('access_permissions.index') }}">صلاحيات الوصول</a></li>
                                 </ul>
                             </li>
                         @endif
