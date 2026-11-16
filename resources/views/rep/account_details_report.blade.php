@@ -80,10 +80,11 @@
             <thead>
             <tr style="background-color: lightgray;">
                 <th scope="col" width="4%">م.</th>
+                <th scope="col" width="4%">الرقم اليدوي</th>
                 <th scope="col" width="4%">التاريخ</th>
+                <th scope="col" width="4%">الوحدة</th>
                 <th scope="col" width="4%">الكمية</th>
                 <th scope="col" width="4%">القيمة</th>
-                <th scope="col" width="4%">الوحدة</th>
             </tr>
             </thead>
             <tbody>
@@ -92,10 +93,11 @@
                 @php $rec++; $qty_total += $report->qty; @endphp
                 <tr>
                     <th scope="row" width="4%">{{$rec}}</th>
+                    <th scope="row" width="4%">{{$report->manual_no}}</th>
                     <th scope="row" width="4%">{{ \Carbon\Carbon::parse($report->date)->format('Y-m-d') ?? '' }}</th>
+                    <th scope="row" width="4%">{{ $report->Unit_description ?? '' }}</th>
                     <th scope="row" width="4%">{{ $report->qty ?? '' }}</th>
                     <th scope="row" width="4%">{{ number_format($report->d_amount,2) ?? '' }}</th>
-                    <th scope="row" width="4%">{{ $report->Unit_description ?? '' }}</th>
                 </tr>
             @endforeach
             <!-- Totals Row -->
